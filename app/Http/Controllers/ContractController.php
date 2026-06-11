@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contract;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContractController extends Controller
 {
@@ -17,8 +18,9 @@ class ContractController extends Controller
             'owner',
             'creator'
         ]);
-
-        $user = auth()->user();
+        
+    /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         if ($user->isAccountManager()) {
             $query->where(
@@ -82,7 +84,7 @@ class ContractController extends Controller
         ]);
 
         $validated['created_by']
-            = auth()->id();
+            = Auth::id();
 
         $validated['status']
             = 'active';
