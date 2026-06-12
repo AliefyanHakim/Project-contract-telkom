@@ -12,4 +12,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('contracts', ContractController::class);
 
+    Route::get('/dashboard', function () {
+
+        return 'Dashboard';
+    });
 });
