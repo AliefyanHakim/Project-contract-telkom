@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 11, 2026 at 03:47 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: Jun 15, 2026 at 09:40 AM
+-- Server version: 8.4.3
+-- PHP Version: 8.3.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `activity_logs` (
-  `id` bigint(20) NOT NULL,
-  `user_id` bigint(20) NOT NULL,
-  `module` varchar(100) DEFAULT NULL,
-  `activity` text DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `module` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `activity` text COLLATE utf8mb4_general_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -43,14 +43,14 @@ CREATE TABLE `activity_logs` (
 --
 
 CREATE TABLE `billings` (
-  `id` bigint(20) NOT NULL,
-  `contract_id` bigint(20) NOT NULL,
-  `billing_period` varchar(50) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `contract_id` bigint NOT NULL,
+  `billing_period` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `amount` decimal(15,2) NOT NULL,
-  `payment_status` enum('pending','paid','overdue') DEFAULT 'pending',
+  `payment_status` enum('pending','paid','overdue') COLLATE utf8mb4_general_ci DEFAULT 'pending',
   `payment_date` date DEFAULT NULL,
-  `proof_file` text DEFAULT NULL,
-  `updated_by` bigint(20) DEFAULT NULL,
+  `proof_file` text COLLATE utf8mb4_general_ci,
+  `updated_by` bigint DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -62,14 +62,14 @@ CREATE TABLE `billings` (
 --
 
 CREATE TABLE `contracts` (
-  `id` bigint(20) NOT NULL,
-  `contract_number` varchar(100) NOT NULL,
-  `contract_name` varchar(255) NOT NULL,
-  `owner_am_id` bigint(20) NOT NULL,
+  `id` bigint NOT NULL,
+  `contract_number` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `contract_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `owner_am_id` bigint NOT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
-  `status` enum('active','expired','terminated') DEFAULT 'active',
-  `created_by` bigint(20) DEFAULT NULL,
+  `status` enum('active','expired','terminated') COLLATE utf8mb4_general_ci DEFAULT 'active',
+  `created_by` bigint DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -81,12 +81,12 @@ CREATE TABLE `contracts` (
 --
 
 CREATE TABLE `contract_extensions` (
-  `id` bigint(20) NOT NULL,
-  `contract_id` bigint(20) NOT NULL,
+  `id` bigint NOT NULL,
+  `contract_id` bigint NOT NULL,
   `old_end_date` date NOT NULL,
   `new_end_date` date NOT NULL,
-  `reason` text DEFAULT NULL,
-  `updated_by` bigint(20) NOT NULL,
+  `reason` text COLLATE utf8mb4_general_ci,
+  `updated_by` bigint NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -98,11 +98,11 @@ CREATE TABLE `contract_extensions` (
 --
 
 CREATE TABLE `contract_files` (
-  `id` bigint(20) NOT NULL,
-  `contract_id` bigint(20) NOT NULL,
-  `file_name` varchar(255) NOT NULL,
-  `file_path` text NOT NULL,
-  `uploaded_by` bigint(20) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `contract_id` bigint NOT NULL,
+  `file_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `file_path` text COLLATE utf8mb4_general_ci NOT NULL,
+  `uploaded_by` bigint DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -114,12 +114,12 @@ CREATE TABLE `contract_files` (
 --
 
 CREATE TABLE `contract_transfer_history` (
-  `id` bigint(20) NOT NULL,
-  `contract_id` bigint(20) NOT NULL,
-  `from_am_id` bigint(20) DEFAULT NULL,
-  `to_am_id` bigint(20) DEFAULT NULL,
-  `transferred_by` bigint(20) NOT NULL,
-  `notes` text DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `contract_id` bigint NOT NULL,
+  `from_am_id` bigint DEFAULT NULL,
+  `to_am_id` bigint DEFAULT NULL,
+  `transferred_by` bigint NOT NULL,
+  `notes` text COLLATE utf8mb4_general_ci,
   `transfer_date` datetime NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -132,14 +132,14 @@ CREATE TABLE `contract_transfer_history` (
 --
 
 CREATE TABLE `contract_transfer_requests` (
-  `id` bigint(20) NOT NULL,
-  `contract_id` bigint(20) NOT NULL,
-  `requested_by` bigint(20) NOT NULL,
-  `current_am_id` bigint(20) NOT NULL,
-  `target_am_id` bigint(20) NOT NULL,
-  `reason` text DEFAULT NULL,
-  `status` enum('pending','approved','rejected') DEFAULT 'pending',
-  `approved_by` bigint(20) DEFAULT NULL,
+  `id` bigint NOT NULL,
+  `contract_id` bigint NOT NULL,
+  `requested_by` bigint NOT NULL,
+  `current_am_id` bigint NOT NULL,
+  `target_am_id` bigint NOT NULL,
+  `reason` text COLLATE utf8mb4_general_ci,
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `approved_by` bigint DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -152,10 +152,10 @@ CREATE TABLE `contract_transfer_requests` (
 --
 
 CREATE TABLE `notes` (
-  `id` bigint(20) NOT NULL,
-  `contract_id` bigint(20) NOT NULL,
-  `user_id` bigint(20) NOT NULL,
-  `note` text NOT NULL,
+  `id` bigint NOT NULL,
+  `contract_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `note` text COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -167,11 +167,11 @@ CREATE TABLE `notes` (
 --
 
 CREATE TABLE `notifications` (
-  `id` bigint(20) NOT NULL,
-  `user_id` bigint(20) NOT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `message` text DEFAULT NULL,
-  `is_read` tinyint(1) DEFAULT 0,
+  `id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `message` text COLLATE utf8mb4_general_ci,
+  `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -183,8 +183,8 @@ CREATE TABLE `notifications` (
 --
 
 CREATE TABLE `roles` (
-  `id` bigint(20) NOT NULL,
-  `name` varchar(50) NOT NULL,
+  `id` bigint NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -202,16 +202,31 @@ INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sessions`
+--
+
+CREATE TABLE `sessions` (
+  `id` varchar(255) NOT NULL,
+  `user_id` bigint UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text,
+  `payload` longtext NOT NULL,
+  `last_activity` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
-  `id` bigint(20) NOT NULL,
-  `role_id` bigint(20) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `status` enum('active','inactive') DEFAULT 'active',
+  `id` bigint NOT NULL,
+  `role_id` bigint NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -304,6 +319,12 @@ ALTER TABLE `roles`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indexes for table `sessions`
+--
+ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -319,67 +340,67 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `billings`
 --
 ALTER TABLE `billings`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contract_extensions`
 --
 ALTER TABLE `contract_extensions`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contract_files`
 --
 ALTER TABLE `contract_files`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contract_transfer_history`
 --
 ALTER TABLE `contract_transfer_history`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contract_transfer_requests`
 --
 ALTER TABLE `contract_transfer_requests`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
