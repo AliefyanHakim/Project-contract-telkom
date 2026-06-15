@@ -47,7 +47,10 @@ class ContractController extends Controller
         $accountManagers = User::where(
             'role_id',
             User::ROLE_ACCOUNT_MANAGER
-        )->get();
+        )
+        ->where('status', 'active')
+        ->orderBy('name')
+        ->get();
 
         return view(
             'contracts.create',
@@ -62,7 +65,7 @@ class ContractController extends Controller
     {
         $validated = $request->validate([
             'contract_number' => [
-                'required',
+                'nullable',
                 'unique:contracts,contract_number'
             ],
             'contract_name' => [
@@ -74,12 +77,14 @@ class ContractController extends Controller
                 'exists:users,id'
             ],
             'start_date' => [
-                'nullable',
+                'required',
                 'date'
             ],
+
             'end_date' => [
-                'nullable',
-                'date'
+                'required',
+                'date',
+                'after:start_date'
             ],
         ]);
 
