@@ -8,12 +8,8 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::resource('contracts', ContractController::class);
 
-    Route::resource('contracts', ContractController::class);
-
-    Route::get('/dashboard', function () {
-
-        return 'Dashboard';
-    });
+Route::get('/dashboard', function () {
+    return view('dashboard');
 });
