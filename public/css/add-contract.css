@@ -1,0 +1,34 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:white;
+}
+
+.contract-page{
+    padding:30px;
+}
+
+.contract-page{
+    padding:15px 30px;
+}
+
+
+.contract-container{
+    background:#ececec;
+    border:3px solid #cfcfcf;
+    border-radius:18px;
+    padding:25px;
+    min-height:620px;
+}
+
+
+.contract-title{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:15px;
+}
