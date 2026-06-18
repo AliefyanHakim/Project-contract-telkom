@@ -89,6 +89,10 @@
                 145.000.000
             </div>
 
+            <div class="title">
+                Rupiah
+            </div>
+
             <p>
                 6 pending invoices
             </p>
