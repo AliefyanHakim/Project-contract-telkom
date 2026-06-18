@@ -17,16 +17,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-<<<<<<< Updated upstream
-Route::resource('contracts', ContractController::class);
-
-Route::get('/dashboard', function () {
-    return view('dashboard.index');
-=======
 Route::middleware('auth')->group(function () {
     
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return view('dashboard.index');
     })->name('dashboard');
 
     Route::get(
@@ -38,5 +32,4 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
->>>>>>> Stashed changes
 });
