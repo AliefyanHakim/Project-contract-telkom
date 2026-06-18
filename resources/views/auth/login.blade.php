@@ -17,19 +17,41 @@
 
     <div class="login-card">
 
-        <input
+        <form
+            action="{{ route('login.post') }}"
+            method="POST"
+            class="login-form">
+
+            @csrf
+
+            @if ($errors->any())
+                <div class="login-error">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            <input
                 type="text"
+                name="login"
                 class="input-box"
-                placeholder="Manager">
+                placeholder="Username / Email"
+                value="{{ old('login') }}"
+                required>
 
-        <input
+            <input
                 type="password"
+                name="password"
                 class="input-box"
-                placeholder="Password">
+                placeholder="Password"
+                required>
 
-        <button class="login-btn">
-            LOGIN
-        </button>
+            <button
+                type="submit"
+                class="login-btn">
+                LOGIN
+            </button>
+
+        </form>
 
     </div>
 

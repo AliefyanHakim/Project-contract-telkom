@@ -103,3 +103,16 @@ body{
 
     line-height:20px;
 }
+
+.login-form{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.login-error{
+    color:#E31E24;
+    text-align:center;
+    font-size:13px;
+    margin-bottom:5px;
+}
