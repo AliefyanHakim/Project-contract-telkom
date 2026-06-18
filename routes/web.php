@@ -17,8 +17,26 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+<<<<<<< Updated upstream
 Route::resource('contracts', ContractController::class);
 
 Route::get('/dashboard', function () {
     return view('dashboard.index');
+=======
+Route::middleware('auth')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    Route::get(
+        '/contracts-list',
+        [ContractController::class, 'index']
+    )->name('contracts.list');
+
+    Route::resource('contracts', ContractController::class);
+
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+>>>>>>> Stashed changes
 });
