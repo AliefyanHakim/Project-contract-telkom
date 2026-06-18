@@ -30,6 +30,10 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contracts', ContractController::class);
 
+    Route::get('/email-notifications', function () {
+    return view('settings.email-notifications');
+});
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
