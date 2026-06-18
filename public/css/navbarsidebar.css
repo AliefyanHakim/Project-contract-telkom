@@ -9,27 +9,33 @@ body{
     background:#ececec;
 }
 
+/* =========================
+   SIDEBAR
+========================= */
+
 .sidebar{
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 180px;
-    height: 100vh;
-    background: #001e62;
-    color: white;
-    z-index: 2;
+    position:fixed;
+    left:0;
+    top:0;
+    width:180px;
+    height:100vh;
+    background:#001e62;
+    color:white;
+    z-index:2;
 }
 
 .menu-btn{
     width:180px;
     height:60px;
     background:#c01c1c;
+
     display:flex;
     justify-content:left;
-    padding-left: 20px;
     align-items:center;
+
+    padding-left:20px;
+
     font-size:30px;
-    border-radius:0 0 0 0;
 }
 
 .menu-title{
@@ -38,51 +44,87 @@ body{
     font-size:14px;
 }
 
+.setting-title{
+    margin-top:25px;
+    margin-left:15px;
+    color:#bdbdbd;
+    font-size:14px;
+}
+
 .sidebar ul{
     list-style:none;
 }
 
 .sidebar li{
-    padding:18px 15px;
-    display:flex;
-    justify-content:space-between;
-    cursor:pointer;
     font-size:15px;
 }
 
-.active{
+.sidebar li a{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    width:100%;
+
+    padding:18px 15px;
+
+    color:white;
+    text-decoration:none;
+
+    transition:.2s;
+}
+
+.sidebar li a:hover{
+    background:rgba(255,255,255,.08);
+}
+
+.sidebar li.active{
+    border-left:4px solid #ff2d2d;
+    background:rgba(255,255,255,.08);
+}
+
+.sidebar li.active a{
     color:#ff2d2d;
     font-weight:600;
 }
 
-.setting-title{
-    margin-top:25px;
-    margin-left:15px;
-    color:#bdbdbd;
-}
+/* =========================
+   MAIN CONTENT
+========================= */
 
 .main{
-    margin-left: 180px;
-    padding-top: 60px;
+    margin-left:180px;
+    padding-top:60px;
 }
 
+/* =========================
+   NAVBAR
+========================= */
+
 .navbar{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background: #c01c1c;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding-right: 20px;
-    z-index: 1;
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:60px;
+
+    background:#c01c1c;
+
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+
+    padding-right:20px;
+
+    z-index:1;
 }
 
 .nav-right{
     display:flex;
     gap:25px;
+
     color:white;
     font-size:28px;
 }

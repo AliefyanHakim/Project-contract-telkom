@@ -105,4 +105,11 @@ class User extends Authenticatable
     {
         return $this->role_id === self::ROLE_SUPPORT_PAYCALL;
     }
+
+    public function notificationSetting()
+    {
+    return $this->hasOne(
+        NotificationSetting::class
+    );
+    }
 }

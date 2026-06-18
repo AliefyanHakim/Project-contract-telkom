@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\NotificationSettingController;
 
 Route::middleware('guest')->group(function () {
 
@@ -30,9 +31,15 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contracts', ContractController::class);
 
-    Route::get('/email-notifications', function () {
-    return view('settings.email-notifications');
-});
+    Route::get(
+        '/email-notifications',
+        [NotificationSettingController::class, 'index']
+    )->name('settings.email-notifications');
+
+    Route::post(
+        '/email-notifications',
+        [NotificationSettingController::class, 'update']
+    )->name('settings.email-notifications.update');
 
     Route::get('/contract-list', function () {
     return view('contracts.contract-list');

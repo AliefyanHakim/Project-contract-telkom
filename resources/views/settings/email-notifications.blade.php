@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css\email-notifications.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/email-notifications.css') }}">
 @endsection
 
 @section('content')
@@ -10,83 +10,104 @@
 
     <div class="email-container">
 
+        @if(session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert-error">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="email-title">
             ✉ Automatic Email Alert Settings
         </div>
 
         <hr>
 
-        <!-- Manager Email -->
-        <div class="form-group">
+        <form
+            method="POST"
+            action="{{ route('settings.email-notifications.update') }}"
+        >
+            @csrf
 
-            <label>
-                Manager Email (recipient of all critical alerts)
-            </label>
+            <!-- Email -->
 
-            <input
-                type="text"
-                value="manager@perusahaan.com">
+            <div class="form-group">
 
-        </div>
+                <label>
+                    Email (notifications will be sent to this email address)
+                </label>
 
+                <input
+                    type="email"
+                    name="notification_email"
+                    value="{{ old(
+                        'notification_email',
+                        $setting?->notification_email
+                    ) }}"
+                    placeholder="manager@perusahaan.com"
+                    required
+                >
 
-        <!-- Admin Email -->
-        <div class="form-group">
+            </div>
 
-            <label>
-                Admin / Support Email (recipient of overdue billing alerts)
-            </label>
+            <!-- Schedule Box -->
 
-            <input
-                type="text"
-                value="admin@perusahaan.com">
+            <div class="schedule-box">
 
-        </div>
+                <h3>
+                    Alert Email Delivery Schedule
+                </h3>
 
+                <div class="schedule-row">
 
-        <!-- Schedule Box -->
+                    <div>
+                        Contracts expiring in &lt; 7 days
+                    </div>
 
-        <div class="schedule-box">
+                    <div class="daily">
+                        Daily email (08:00 WIB)
+                    </div>
 
-            <h3>
-                Alert Email Delivery Schedule
-            </h3>
-
-
-            <div class="schedule-row">
-
-                <div>
-                    Contracts expiring in &lt; 7 days
                 </div>
 
-                <div class="daily">
-                    Daily email (08:00 WIB)
+                <div class="schedule-row">
+
+                    <div>
+                        Contracts expiring in 8–30 days
+                    </div>
+
+                    <div class="weekly">
+                        Weekly email (Monday morning)
+                    </div>
+
                 </div>
 
             </div>
 
+            <div class="button-wrapper">
 
-            <div class="schedule-row">
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Save Settings
+                </button>
 
-                <div>
-                    Contracts expiring in 8–30 days
-                </div>
-
-                <div class="weekly">
-                    Weekly email (Monday morning)
-                </div>
             </div>
-        </div>
 
+        </form>
 
-        <div class="button-wrapper">
-            <button class="save-btn">
-                Save settings
-
-            </button>
-        </div>
     </div>
-</div>
 
+</div>
 
 @endsection

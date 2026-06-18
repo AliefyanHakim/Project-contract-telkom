@@ -10,33 +10,45 @@
 
     <ul>
 
-        <li class="active">
-            Dashboard
-            <span>›</span>
+        <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('dashboard') }}">
+                <span>Dashboard</span>
+                <span>›</span>
+            </a>
+        </li>
+
+        <li class="{{ request()->routeIs('contracts.list') ? 'active' : '' }}">
+            <a href="{{ route('contracts.list') }}">
+                <span>Contract List</span>
+                <span>›</span>
+            </a>
         </li>
 
         <li>
-            Contract List
-            <span>›</span>
+            <a href="#">
+                <span>Billing & Invoices</span>
+                <span>›</span>
+            </a>
         </li>
 
         <li>
-            Billing & Invoices
-            <span>›</span>
+            <a href="#">
+                <span>By Account Manager</span>
+                <span>›</span>
+            </a>
         </li>
 
         <li>
-            By Account Manager
-            <span>›</span>
+            <a href="#">
+                <span>Contract Alerts</span>
+            </a>
         </li>
 
         <li>
-            Contract Alerts
-        </li>
-
-        <li>
-            Transfer Request
-            <span>›</span>
+            <a href="#">
+                <span>Transfer Request</span>
+                <span>›</span>
+            </a>
         </li>
 
     </ul>
@@ -47,9 +59,11 @@
 
     <ul>
 
-        <li>
-            Email Notifications
-            <span>›</span>
+        <li class="{{ request()->routeIs('settings.email-notifications') ? 'active' : '' }}">
+            <a href="{{ route('settings.email-notifications') }}">
+                <span>Email Notifications</span>
+                <span>›</span>
+            </a>
         </li>
 
     </ul>

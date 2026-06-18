@@ -116,3 +116,24 @@ body{
 .save-btn:hover{
     background:#1eaa33;
 }
+
+.alert-success{
+    background:#d1fae5;
+    color:#065f46;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+}
+
+.alert-error{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:15px;
+}
+
+.alert-error ul{
+    margin:0;
+    padding-left:20px;
+}

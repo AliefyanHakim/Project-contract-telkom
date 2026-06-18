@@ -12,32 +12,103 @@ class ContractController extends Controller
     /**
      * Display a listing of contracts.
      */
-    public function index()
-    {
-        $query = Contract::with([
-            'owner',
-            'creator'
-        ]);
-        
+public function index(Request $request)
+{
+    $query = Contract::with([
+        'owner',
+        'creator'
+    ]);
+
     /** @var \App\Models\User $user */
-        $user = Auth::user();
+    $user = Auth::user();
 
-        if ($user->isAccountManager()) {
-            $query->where(
-                'owner_am_id',
-                $user->id
-            );
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | Account Manager hanya melihat kontraknya sendiri
+    |--------------------------------------------------------------------------
+    */
+    if ($user->isAccountManager()) {
 
-        $contracts = $query
-            ->latest()
-            ->paginate(20);
-
-        return view(
-            'contracts.index',
-            compact('contracts')
+        $query->where(
+            'owner_am_id',
+            $user->id
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('search')) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search    ) {
+
+            $q->where(
+                'contract_name',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
+                'contract_number',
+                'like',
+                "%{$search}%"
+            );
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Account Manager
+    |--------------------------------------------------------------------------
+    */
+    if (
+        $request->filled('account_manager')
+        && !$user->isAccountManager()
+    ) {
+
+        $query->where(
+            'owner_am_id',
+            $request->account_manager
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Status
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('status')) {
+
+        $query->where(
+            'status',
+            $request->status
+        );
+    }
+
+    $contracts = $query
+        ->orderBy('end_date')
+        ->paginate(15)
+        ->withQueryString();
+
+    $accountManagers = User::where(
+        'role_id',
+        User::ROLE_ACCOUNT_MANAGER
+    )
+    ->where('status', 'active')
+    ->orderBy('name')
+    ->get();
+
+    return view(
+        'contracts-list',
+        compact(
+            'contracts',
+            'accountManagers'
+        )
+    );
+}
 
     /**
      * Show form create contract.
