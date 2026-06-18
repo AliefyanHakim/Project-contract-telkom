@@ -34,6 +34,14 @@ Route::middleware('auth')->group(function () {
     return view('settings.email-notifications');
 });
 
+    Route::get('/contract-list', function () {
+    return view('contracts.contract-list');
+});
+
+    Route::get('/closed-contract', function () {
+    return view('contracts.closed-contract');
+});
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
