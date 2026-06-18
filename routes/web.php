@@ -17,14 +17,8 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::middleware('auth')->group(function () {
+Route::resource('contracts', ContractController::class);
 
-    Route::resource('contracts', ContractController::class);
-
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
+Route::get('/dashboard', function () {
+    return view('dashboard.index');
 });
