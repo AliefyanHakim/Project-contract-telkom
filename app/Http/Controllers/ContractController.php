@@ -24,7 +24,7 @@ public function index(Request $request)
 
     /*
     |--------------------------------------------------------------------------
-    | Account Manager hanya melihat kontraknya sendiri
+    | Account Manager hanya melihat kontrak miliknya
     |--------------------------------------------------------------------------
     */
     if ($user->isAccountManager()) {
@@ -37,14 +37,21 @@ public function index(Request $request)
 
     /*
     |--------------------------------------------------------------------------
+    | Current Contract Only
+    |--------------------------------------------------------------------------
+    */
+    $query->where('status', 'active');
+
+    /*
+    |--------------------------------------------------------------------------
     | Search
     |--------------------------------------------------------------------------
     */
     if ($request->filled('search')) {
 
-        $search = $request->search;
+        $search = trim($request->search);
 
-        $query->where(function ($q) use ($search    ) {
+        $query->where(function ($q) use ($search) {
 
             $q->where(
                 'contract_name',
@@ -102,7 +109,7 @@ public function index(Request $request)
     ->get();
 
     return view(
-        'contracts-list',
+        'contracts.contract-list',
         compact(
             'contracts',
             'accountManagers'

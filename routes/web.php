@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\NotificationSettingController;
 
 Route::middleware('guest')->group(function () {
 
@@ -23,32 +24,34 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.index');
     })->name('dashboard');
 
-    Route::get(
-        '/contracts-list',
-        [ContractController::class, 'index']
-    )->name('contracts.list');
-
     Route::resource('contracts', ContractController::class);
 
-    Route::get('/email-notifications', function () {
-    return view('settings.email-notifications');
-});
+    Route::get(
+            '/email-notifications',
+            [NotificationSettingController::class, 'index']
+        )->name('settings.email-notifications');
 
-    Route::get('/contract-list', function () {
-    return view('contracts.contract-list');
-});
+    Route::post(
+            '/email-notifications',
+            [NotificationSettingController::class, 'update']
+        )->name('settings.email-notifications.update');
+
+    Route::get(
+        '/contract-list',
+        [ContractController::class, 'index']
+    )->name('contract.list');
 
     Route::get('/closed-contract', function () {
     return view('contracts.closed-contract');
-});
+    });
 
     Route::get('/add-contract', function () {
     return view('contracts.add-contract');
-});
+    });
 
     Route::get('/detail-contract', function () {
     return view('contracts.add-contract');
-});
+    });
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
