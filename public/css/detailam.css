@@ -1,0 +1,252 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:white;
+}
+
+.am-page{
+    padding:30px;
+}
+
+.am-page{
+    padding:5px 30px;
+}
+
+.page-title{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:15px;
+}
+
+
+.back-arrow{
+    font-size:25px;
+}
+
+
+.page-title h1{
+    font-size:25px;
+}
+
+.am-card{
+    background:white;
+    border:2px solid #d5d5d5;
+    border-radius:20px;
+    padding:15px;
+}
+
+.profile-section{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+.profile-left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+
+.profile-icon{
+    width:70px;
+    height:70px;
+    border:4px solid #002060;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:40px;
+    color:#002060;
+}
+
+
+.profile-left h2{
+    color:#002060;
+    font-size:20px;
+}
+
+
+.profile-left p{
+    color:#002060;
+    font-size:16px;
+}
+
+
+.dropdown-btn{
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:10px;
+    background:#e6e6e6;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.summary-cards{
+    display:flex;
+    gap:35px;
+    margin-top:25px;
+}
+
+.summary-card{
+    flex:1;
+    border-radius:18px;
+    padding:18px 22px;
+}
+
+.summary-card h3{
+    font-size:15px;
+    color:#002060;
+    margin-bottom:0px;
+}
+
+.summary-card span{
+    font-size:40px;
+    font-weight:700;
+    color:#002060;
+}
+
+.active-card{
+    background:#95dc82;
+}
+
+.critical-card{
+    background:#e58b8b;
+}
+
+.expiring-card{
+    background:#dfe589;
+}
+
+.summary-card{
+    height:100px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.filter-bar{
+    display:flex;
+    gap:20px;
+    align-items:center;
+    margin-top:25px;
+    margin-bottom:20px;
+}
+
+.filter-bar select{
+    width:150px;
+    height:40px;
+    border:none;
+    background:#d9d9d9;
+    padding:0 15px;
+    font-size:15px;
+}
+
+.filter-bar input{
+    width:200px;
+    height:40px;
+    border:none;
+    background:#d9d9d9;
+    padding:0 15px;
+    font-size:15px;
+}
+
+.download-btn{
+    width:150px;
+    height:40px;
+    border:none;
+    background:#4d78d8;
+    color:white;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.contract-table{
+    margin-top:25px;
+    background:white;
+    border:3px solid #d5d5d5;
+    border-radius:18px;
+    overflow:hidden;
+}
+
+.contract-table table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.contract-table thead{
+    border-bottom:3px solid #d8d8d8;
+}
+
+.contract-table th{
+    padding:16px;
+    text-align:left;
+    font-size:15px;
+}
+
+.contract-table td{
+    padding:18px;
+    font-size:15px;
+}
+
+.critical-row{
+    background:#f7e4e4;
+}
+
+.expiring-row{
+    background:#f1f0dd;
+}
+
+.active-row{
+    background:#dff1df;
+}
+
+.red-text{
+    color:#ff2c1b;
+    font-weight:700;
+}
+
+.yellow-text{
+    color:#d5c400;
+    font-weight:700;
+}
+
+.green-text{
+    color:#32d132;
+    font-weight:700;
+}
+
+.contract-table tbody tr{
+    transition:.3s;
+}
+
+.contract-table tbody tr:hover{
+    transform:scale(1.005);
+    cursor:pointer;
+}
+
+.contract-table{
+    margin-top:20px;
+    background:white;
+    border:3px solid #d5d5d5;
+    border-radius:18px;
+    overflow:hidden;
+    max-height:500px;
+    overflow-y:auto;
+}
+
+.contract-table thead{
+    position:sticky;
+    top:0;
+    background:white;
+    z-index:1;
+}

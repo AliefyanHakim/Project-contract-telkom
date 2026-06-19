@@ -53,6 +53,10 @@ Route::middleware('auth')->group(function () {
     return view('contracts.add-contract');
     });
 
+    Route::get('/account-manager-detail', function () {
+    return view('am.detail-am');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
