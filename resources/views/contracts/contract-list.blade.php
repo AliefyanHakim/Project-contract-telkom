@@ -124,7 +124,7 @@ href="{{ asset('css/contract-list.css') }}">
                 Search
             </button>
 
-            <a href="{{ route('contracts.create') }}">
+            <a href="{{ route('contract.create') }}">
             <button type="button">
                 + Add Contract
             </button>

@@ -36,9 +36,9 @@
             </a>
         </li>
 
-        <li>
-            <a href="#">
-                <span>By Account Manager</span>
+                <li class="{{ request()->routeIs('am.detail-am') ? 'active' : '' }}">
+            <a href="{{ route('am.detail-am') }}">
+                <span>Detail Account Manager</span>
                 <span>›</span>
             </a>
         </li>
