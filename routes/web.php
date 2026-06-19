@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/detail-contract', function () {
     return view('contracts.detail-contract');
-    });->name('contract.detail');
+    })->name('contract.detail');
 
     Route::get(
         '/account-manager-detail',function () {
