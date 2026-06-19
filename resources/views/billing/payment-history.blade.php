@@ -31,11 +31,12 @@ href="{{ asset('css/billing.css') }}">
 
 <div class="billing-tabs">
 
-    <a href="/billing/payment-history">
+    <a href="outstanding">
         Outstanding
     </a>
 
-    <a href="#" class="active-tab">
+    <a href="#"
+    class="active-tab">
         Payment History
     </a>
 

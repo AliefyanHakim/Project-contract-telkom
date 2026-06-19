@@ -92,7 +92,9 @@ href="{{ asset('css/billing.css') }}">
 
             <tbody>
 
-                <tr class="paid-row">
+                <!-- MERAH -->
+
+                <tr class="critical">
 
                     <td>PT Maju Bersama</td>
                     <td>1234567890</td>
@@ -101,16 +103,16 @@ href="{{ asset('css/billing.css') }}">
                     <td>Rp 15.000.000</td>
                     <td>29/05/2026</td>
 
-                    <td class="paid-status">
+                    <td class="red-status">
 
-                        Paid
+                        Follow-up pending
 
                     </td>
 
                 </tr>
 
 
-                <tr class="paid-row">
+                <tr class="critical">
 
                     <td>PT Maju Bersama</td>
                     <td>1234567890</td>
@@ -119,15 +121,18 @@ href="{{ asset('css/billing.css') }}">
                     <td>Rp 4.000.000</td>
                     <td>29/05/2026</td>
 
-                    <td class="paid-status">
+                    <td class="red-status">
 
-                        Paid
+                        Follow-up pending
 
                     </td>
 
                 </tr>
 
-                <tr class="paid-row">
+
+                <!-- KUNING -->
+
+                <tr class="warning">
 
                     <td>PT Maju Bersama</td>
                     <td>1234567890</td>
@@ -136,16 +141,16 @@ href="{{ asset('css/billing.css') }}">
                     <td>Rp 15.000.000</td>
                     <td>30/05/2026</td>
 
-                    <td class="paid-status">
+                    <td class="yellow-status">
 
-                        Paid
+                        Expiring soon
 
                     </td>
 
                 </tr>
 
 
-                <tr class="paid-row">
+                <tr class="warning">
 
                     <td>PT Maju Bersama</td>
                     <td>1234567890</td>
@@ -154,9 +159,9 @@ href="{{ asset('css/billing.css') }}">
                     <td>Rp 2.000.000</td>
                     <td>30/05/2026</td>
 
-                    <td class="paid-status">
+                    <td class="yellow-status">
 
-                        Paid
+                        Expiring soon
 
                     </td>
 
