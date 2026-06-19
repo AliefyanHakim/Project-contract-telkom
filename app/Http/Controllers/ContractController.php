@@ -199,7 +199,7 @@ public function closedContracts(Request $request)
         ->get();
 
         return view(
-            'contracts.create',
+            'contracts.add-contract',
             compact('accountManagers')
         );
     }

@@ -47,16 +47,17 @@ Route::middleware('auth')->group(function () {
     )->name('contract.closed');
 
     Route::get('/add-contract', function () {
-    return view('contracts.add-contract');
-    });
+        return view('contracts.add-contract');
+    })->name('contract.create');
 
     Route::get('/detail-contract', function () {
-        return view('contracts.add-contract');
-    });
+    return view('contracts.detail-contract');
+    });->name('contract.detail');
 
-    Route::get('/account-manager-detail', function () {
-        return view('am.detail-am');
-    });
+    Route::get(
+        '/account-manager-detail',function () {
+    return view('am.detail-am');
+    })->name('am.detail-am');
 
     Route::get('/billing', function () {
         return view('billing.outstanding');
