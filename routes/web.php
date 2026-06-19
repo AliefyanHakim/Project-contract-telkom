@@ -70,6 +70,14 @@ Route::middleware('auth')->group(function () {
         return view('alerts.contract-alerts');
     });
 
+    Route::get('/transfer-request', function () {
+        return view('transfer.transfer-request');
+    });
+
+    Route::get('/direct-transfer', function () {
+        return view('transfer.direct-transfer');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
