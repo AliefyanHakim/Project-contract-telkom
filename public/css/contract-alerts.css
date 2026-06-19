@@ -1,0 +1,134 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:white;
+}
+
+.alerts-page{
+    padding:30px;
+}
+
+.alerts-page{
+    padding:15px 30px;
+}
+
+
+.alerts-container{
+    background:#ffffff;
+    border:2px solid #cfcfcf;
+    border-radius:18px;
+    padding:25px;
+    min-height:620px;
+}
+
+
+.alert-title{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.alert-summary{
+    display:flex;
+    gap:15px;
+    margin-top:20px;
+}
+
+.summary-card{
+    flex:1;
+    background:#f8f5f5;
+    border-radius:15px;
+    padding:15px 35px;
+}
+
+.red{
+    border-left:5px solid red;
+    border-bottom:5px solid red;
+}
+
+.yellow{
+    border-left:5px solid #d6d600;
+    border-bottom:5px solid #d6d600;
+}
+
+.red h1{
+    color:#ff1d1d;
+    font-size:35px;
+    margin-bottom:5px;
+}
+
+.yellow h1{
+    color:#d1d100;
+    font-size:35px;
+    margin-bottom:5px;
+}
+
+.contract-section{
+    margin-top:25px;
+    background:white;
+    border:2px solid #d4d4d4;
+    border-radius:15px;
+    padding:20px;
+}
+
+.contract-section h2{
+    margin-bottom:10px;
+    font-size:20px;
+}
+
+.contract-section h3{
+    font-size:17px;
+}
+
+.contract-box{
+    border:2px solid #d4d4d4;
+    border-radius:15px;
+    overflow:hidden;
+}
+
+.contract-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 25px;
+    border-bottom:2px solid #d4d4d4;
+}
+
+.contract-left{
+    display:flex;
+    gap:20px;
+    align-items:center;
+}
+
+.dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+}
+
+.red-dot{
+    background:red;
+}
+
+.yellow-dot{
+    background:#d6d600;
+}
+
+.email-red{
+    color:red;
+}
+
+.days-red{
+    color:red;
+    font-weight:700;
+}
+
+.days-yellow{
+    color:#d1d100;
+    font-weight:700;
+}

@@ -51,19 +51,23 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/detail-contract', function () {
-    return view('contracts.add-contract');
+        return view('contracts.add-contract');
     });
 
     Route::get('/account-manager-detail', function () {
-    return view('am.detail-am');
+        return view('am.detail-am');
     });
 
     Route::get('/billing', function () {
-    return view('billing.outstanding');
+        return view('billing.outstanding');
     });
 
     Route::get('/billing/payment-history', function () {
-    return view('billing.payment-history');
+        return view('billing.payment-history');
+    });
+
+    Route::get('/contract-alerts', function () {
+        return view('alerts.contract-alerts');
     });
 
     Route::post('/logout', [AuthController::class, 'logout'])
