@@ -41,9 +41,10 @@ Route::middleware('auth')->group(function () {
         [ContractController::class, 'index']
     )->name('contract.list');
 
-    Route::get('/closed-contract', function () {
-    return view('contracts.closed-contract');
-    });
+    Route::get(
+        '/closed-contract',
+        [ContractController::class, 'closedContracts']
+    )->name('contract.closed');
 
     Route::get('/add-contract', function () {
     return view('contracts.add-contract');

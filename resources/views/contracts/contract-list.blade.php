@@ -25,13 +25,17 @@ href="{{ asset('css/contract-list.css') }}">
 
     <div class="tabs">
 
-        <a href="{{ route('contract.list') }}"
-           class="tab active">
+        <a
+            href="{{ route('contract.list') }}"
+            class="tab {{ request()->routeIs('contract.list') ? 'active' : '' }}"
+        >
             Current Contracts
         </a>
 
-        <a href="/closed-contract"
-           class="tab">
+        <a
+            href="{{ route('contract.closed') }}"
+            class="tab {{ request()->routeIs('contract.closed') ? 'active' : '' }}"
+        >
             Closed Contracts
         </a>
 
@@ -120,6 +124,11 @@ href="{{ asset('css/contract-list.css') }}">
                 Search
             </button>
 
+            <a href="{{ route('contracts.create') }}">
+            <button type="button">
+                + Add Contract
+            </button>
+            </a>
         </div>
 
     </form>

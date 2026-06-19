@@ -117,6 +117,74 @@ public function index(Request $request)
     );
 }
 
+public function closedContracts(Request $request)
+{
+    $query = Contract::with([
+        'owner',
+        'creator'
+    ])->where('status', 'closed');
+
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+
+    if ($user->isAccountManager()) {
+        $query->where(
+            'owner_am_id',
+            $user->id
+        );
+    }
+
+    if ($request->filled('search')) {
+
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+
+            $q->where(
+                'contract_name',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
+                'contract_number',
+                'like',
+                "%{$search}%"
+            );
+        });
+    }
+
+    if (
+        $request->filled('account_manager')
+        && !$user->isAccountManager()
+    ) {
+        $query->where(
+            'owner_am_id',
+            $request->account_manager
+        );
+    }
+
+    $contracts = $query
+        ->orderByDesc('end_date')
+        ->paginate(15)
+        ->withQueryString();
+
+    $accountManagers = User::where(
+        'role_id',
+        User::ROLE_ACCOUNT_MANAGER
+    )
+    ->where('status', 'active')
+    ->orderBy('name')
+    ->get();
+
+    return view(
+        'contracts.closed-contract',
+        compact(
+            'contracts',
+            'accountManagers'
+        )
+    );
+}
+
     /**
      * Show form create contract.
      */

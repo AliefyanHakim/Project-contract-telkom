@@ -17,7 +17,12 @@
             </a>
         </li>
 
-        <li class="{{ request()->routeIs('contract.list') ? 'active' : '' }}">
+        <li class="{{
+            request()->routeIs('contract.list')
+            || request()->routeIs('contract.closed')
+                ? 'active'
+                : ''
+        }}">
             <a href="{{ route('contract.list') }}">
                 <span>Contract List</span>
                 <span>›</span>
