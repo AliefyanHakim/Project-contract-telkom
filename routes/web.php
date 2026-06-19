@@ -58,6 +58,14 @@ Route::middleware('auth')->group(function () {
     return view('am.detail-am');
     });
 
+    Route::get('/billing', function () {
+    return view('billing.outstanding');
+    });
+
+    Route::get('/billing/payment-history', function () {
+    return view('billing.payment-history');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
