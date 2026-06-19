@@ -20,12 +20,11 @@ body{
 
 .contract-container{
     background:#ececec;
-    border:3px solid #cfcfcf;
-    border-radius:18px;
-    padding:25px;
+    border:2px solid #cfcfcf;
+    border-radius:10px;
+    padding:15px 25px;
     min-height:620px;
 }
-
 
 .contract-title{
     font-size:20px;

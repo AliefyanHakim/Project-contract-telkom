@@ -3,7 +3,7 @@
 @section('styles')
 
 <link rel="stylesheet"
-href="{{ asset('css/add-contract.css') }}">
+href="{{ asset('css/create.css') }}">
 
 @endsection
 
