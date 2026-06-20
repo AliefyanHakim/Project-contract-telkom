@@ -155,14 +155,13 @@ td{
 }
 
 .transfer-btn{
-    margin-top:15px;
-    width:150px;
-    height:30px;
-    background:#29c93d;
-    border:none;
-    color:white;
-    font-size:15px;
-    font-weight:700;
-    border-radius:10px;
-    cursor:pointer;
+    background: #25c83f;
+    color: white;
+    border: none;
+    padding: 7px 40px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
 }

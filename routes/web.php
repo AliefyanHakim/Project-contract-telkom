@@ -87,6 +87,10 @@ Route::middleware('auth')->group(function () {
         return view('contracts.edit-contract');
     });
 
+    Route::get('acceptreject-transfer', function () {
+        return view('transfer.acceptreject-transfer');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });

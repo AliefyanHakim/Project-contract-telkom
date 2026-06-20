@@ -3,7 +3,7 @@
 @section('styles')
 
 <link rel="stylesheet"
-href="{{ asset('css/create.css') }}">
+href="{{ asset('css/transfer2.css') }}">
 
 @endsection
 
@@ -12,14 +12,15 @@ href="{{ asset('css/create.css') }}">
 <div class="contract-page">
 
     <div class="contract-container">
+        <div class="table-wrapper">
 
-        <div class="contract-title">
+            <div class="contract-title">
             ✉ Detail Contract
-        </div>
+            </div>
 
-        <hr>
+            <hr>
 
-        <form>
+            <form>
             <!-- baris 1 -->
             <div class="form-row">
 
@@ -152,29 +153,55 @@ href="{{ asset('css/create.css') }}">
 
             <!-- Upload -->
             <div class="form-group">
-                <label>Upload Contract File</label>
 
-                <div class="upload-box">
+                <label>Contract File</label>
 
-                    <input type="file">
+                <div class="file-row">
 
-                    <button type="button" class="upload-btn">
-                        Upload
+                    <div class="file-name">
+                        document123.pdf
+                    </div>
+
+                    <button class="view-btn">
+                        View Document
+                    </button>
+
+                    <button class="download-btn">
+                        Download
                     </button>
 
                 </div>
+
             </div>
 
+            </form>
 
-            <!-- Save button -->
-            <div class="save-area">
-                <button class="save-btn">
-                    Save
-                </button>
-            </div>
+        </div>
 
-        </form>
+    </div>
 
+    <div class="recipient-card">
+        <label>Account Manager</label>
+
+        <div class="fixed-box small-box">
+            Account manager 3
+        </div>
+
+        <label>Reason</label>
+
+        <div class="fixed-box reason-box">
+            Alasan blablabla
+        </div>
+
+        <div class="save-area">
+            <button class="reject-btn">
+                Reject
+            </button>
+
+            <button class="accept-btn">
+                Accept
+            </button>
+        </div>
     </div>
 
 </div>
