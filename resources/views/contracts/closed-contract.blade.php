@@ -70,11 +70,22 @@ href="{{ asset('css/contract-list.css') }}">
 
             @endif
 
-            <select>
+            <select name="service">
 
-                <option>
+                <option value="">
                     All Packages
                 </option>
+
+                @foreach($services as $service)
+
+                    <option
+                        value="{{ $service->id }}"
+                        @selected(request('service') == $service->id)
+                    >
+                        {{ $service->service_name }}
+                    </option>
+
+                @endforeach
 
             </select>
 

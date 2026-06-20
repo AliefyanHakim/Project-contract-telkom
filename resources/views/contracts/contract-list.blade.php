@@ -187,7 +187,12 @@ href="{{ asset('css/contract-list.css') }}">
                         </td>
 
                         <td>
-                            -
+
+                        {{ $contract->services
+                            ->pluck('service.service_name')
+                            ->filter()
+                            ->implode(', ') }}
+
                         </td>
 
                         <td>

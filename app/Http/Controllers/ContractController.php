@@ -99,6 +99,11 @@ public function index(Request $request)
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Service
+    |--------------------------------------------------------------------------
+    */
     if ($request->filled('service')) {
 
         $query->whereHas(
@@ -157,26 +162,43 @@ public function index(Request $request)
     );
 }
 
-public function closedContracts(Request $request)
-{
-    $query = Contract::with([
-        'owner',
-        'creator'
-    ])->where('status', 'closed');
+    public function closedContracts(Request $request)
+    {
+        $query = Contract::with([
+            'owner',
+            'creator',
+            'services.service'
+        ])
+        ->whereIn('status', [
+            'expired',
+            'terminated'
+        ]);
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
+    $services = Service::orderBy('service_name')->get();
 
+    /*
+    |--------------------------------------------------------------------------
+    | Account Manager hanya melihat kontrak miliknya
+    |--------------------------------------------------------------------------
+    */
     if ($user->isAccountManager()) {
+
         $query->where(
             'owner_am_id',
             $user->id
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
     if ($request->filled('search')) {
 
-        $search = $request->search;
+        $search = trim($request->search);
 
         $query->where(function ($q) use ($search) {
 
@@ -193,37 +215,64 @@ public function closedContracts(Request $request)
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Account Manager
+    |--------------------------------------------------------------------------
+    */
     if (
         $request->filled('account_manager')
         && !$user->isAccountManager()
     ) {
+
         $query->where(
             'owner_am_id',
             $request->account_manager
         );
     }
 
-    $contracts = $query
-        ->orderByDesc('end_date')
-        ->paginate(15)
-        ->withQueryString();
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Service
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('service')) {
 
-    $accountManagers = User::where(
-        'role_id',
-        User::ROLE_ACCOUNT_MANAGER
-    )
-    ->where('status', 'active')
-    ->orderBy('name')
-    ->get();
+        $query->whereHas(
+            'services',
+            function ($q) use ($request) {
 
-    return view(
-        'contracts.closed-contract',
-        compact(
-            'contracts',
-            'accountManagers'
+                $q->where(
+                    'service_id',
+                    $request->service
+                );
+
+            }
+        );
+    }
+
+        $contracts = $query
+            ->orderByDesc('end_date')
+            ->paginate(15)
+            ->withQueryString();
+
+        $accountManagers = User::where(
+            'role_id',
+            User::ROLE_ACCOUNT_MANAGER
         )
-    );
-}
+        ->where('status', 'active')
+        ->orderBy('name')
+        ->get();
+
+        return view(
+            'contracts.closed-contract',
+            compact(
+                'contracts',
+                'accountManagers',
+                'services'
+            )
+        );
+    }
 
     /**
      * Show form create contract.
@@ -466,7 +515,7 @@ public function closedContracts(Request $request)
     }
 
     public function destroy(Contract $contract)
-{
+    {
     $contract->delete();
 
     return redirect()
@@ -475,5 +524,199 @@ public function closedContracts(Request $request)
             'success',
             'Contract deleted successfully.'
         );
-}
+    }
+
+    public function edit(Contract $contract)
+    {
+    $contract->load([
+        'services'
+    ]);
+
+    $accountManagers = User::where(
+        'role_id',
+        User::ROLE_ACCOUNT_MANAGER
+    )
+    ->where('status', 'active')
+    ->orderBy('name')
+    ->get();
+
+    $services = Service::orderBy(
+        'service_name'
+    )->get();
+
+    return view(
+        'contracts.edit-contract',
+        compact(
+            'contract',
+            'accountManagers',
+            'services'
+        )
+    );
+    }
+
+    public function update(
+        Request $request,
+        Contract $contract
+    )
+    
+    {
+        $validated = $request->validate([
+
+            'contract_name' => [
+                'required',
+                'max:255'
+            ],
+
+            'customer_id_number' => [
+                'nullable'
+            ],
+
+            'customer_address' => [
+                'nullable'
+            ],
+
+            'customer_npwp' => [
+                'nullable'
+            ],
+
+            'customer_pic_name' => [
+                'nullable'
+            ],
+
+            'customer_pic_position' => [
+                'nullable'
+            ],
+
+            'customer_phone' => [
+                'nullable'
+            ],
+
+            'customer_email' => [
+                'nullable',
+                'email'
+            ],
+
+            'owner_am_id' => [
+                'required',
+                'exists:users,id'
+            ],
+
+            'start_date' => [
+                'required',
+                'date'
+            ],
+
+            'end_date' => [
+                'required',
+                'date'
+            ],
+
+            'services' => [
+                'required',
+                'array',
+                'min:1'
+            ],
+        ]);
+
+        DB::transaction(function () use (
+            $validated,
+            $request,
+            $contract
+        ) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Data contract
+            |--------------------------------------------------------------------------
+            */
+
+            $data = [
+
+                'contract_name'
+                    => $validated['contract_name'],
+
+                'customer_id_number'
+                    => $validated['customer_id_number'] ?? null,
+
+                'customer_address'
+                    => $validated['customer_address'] ?? null,
+
+                'customer_npwp'
+                    => $validated['customer_npwp'] ?? null,
+
+                'customer_pic_name'
+                    => $validated['customer_pic_name'] ?? null,
+
+                'customer_pic_position'
+                    => $validated['customer_pic_position'] ?? null,
+
+                'customer_phone'
+                    => $validated['customer_phone'] ?? null,
+
+                'customer_email'
+                    => $validated['customer_email'] ?? null,
+
+                'owner_am_id'
+                    => $validated['owner_am_id'],
+
+                'start_date'
+                    => $validated['start_date'],
+
+                'end_date'
+                    => $validated['end_date'],
+            ];
+
+            /*
+            |--------------------------------------------------------------------------
+            | Support Paycall boleh ubah status
+            |--------------------------------------------------------------------------
+            */
+
+            if (Auth::user()->isSupportPaycall()) {
+
+                $data['status'] = $request->status;
+            }
+
+            $contract->update($data);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Hapus service lama
+            |--------------------------------------------------------------------------
+            */
+
+            ContractService::where(
+                'contract_id',
+                $contract->id
+            )->delete();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Simpan service baru
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($validated['services'] as $serviceId) {
+
+                ContractService::create([
+
+                    'contract_id'
+                        => $contract->id,
+
+                    'service_id'
+                        => $serviceId,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route(
+                'contracts.show',
+                $contract->id
+            )
+            ->with(
+                'success',
+                'Contract updated successfully.'
+            );
+    }
 }

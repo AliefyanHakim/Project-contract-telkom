@@ -66,6 +66,16 @@ Route::middleware('auth')->group(function () {
     return view('am.detail-am');
     })->name('am.detail-am');
 
+    Route::get(
+    '/contracts/{contract}/edit',
+    [ContractController::class, 'edit']
+    )->name('contracts.edit');
+
+    Route::put(
+        '/contracts/{contract}',
+        [ContractController::class, 'update']
+    )->name('contracts.update');
+
     Route::get('/billing/outstanding', function () {
         return view('billing.outstanding');
     });
@@ -88,10 +98,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/transfer-contract', function () {
         return view('transfer.transfer-contract');
-    });
-
-    Route::get('/edit-contract', function () {
-        return view('contracts.edit-contract');
     });
 
     Route::get('acceptreject-transfer', function () {

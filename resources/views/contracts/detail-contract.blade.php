@@ -365,44 +365,16 @@ href="{{ asset('css/create.css') }}">
 
             <div class="save-area">
 
-                @if(Auth::user()->isManager())
-
-                    <form
-                        action="{{ route('contracts.destroy', $contract->id) }}"
-                        method="POST"
-                        onsubmit="return confirm('Delete this contract?');"
-                        style="display:inline;">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            type="submit"
-                            class="delete-btn">
-
-                            Delete
-
-                        </button>
-
-                    </form>
-
-                @else
-
                     <a href="{{ route('contracts.index') }}"
                     class="save-btn">
-
                         Back
-
                     </a>
 
-                @endif
-
-                <a href="{{ route('contracts.edit', $contract->id) }}"
-                class="edit-btn">
-
-                    Edit
-
-                </a>
+                    <a href="{{ route('contracts.edit', $contract->id) }}">
+                        <button type="button" class="edit-btn">
+                            Edit
+                        </button>
+                    </a>
 
             </div>
 
