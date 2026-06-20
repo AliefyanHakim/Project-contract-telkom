@@ -229,3 +229,53 @@ body{
     font-weight: 600;
     cursor: pointer;
 }
+
+.accepted-card{
+    margin-top:18px;
+    background:#42e21a88;
+    border:2px solid #c8c8c8;
+    border-radius:10px;
+    padding:20px;
+}
+
+.accepted-card label{
+    display:block;
+    font-weight:700;
+    margin-bottom:0px;
+    font-size: 15px;
+}
+
+
+.accepted{
+    display:block;
+    font-weight:700;
+    margin-bottom:10px;
+    margin-top: 10px;
+    margin-left: 30px;
+    font-size: 17px;
+}
+
+.rejected-card{
+    margin-top:18px;
+    background:#E2231A88;
+    border:2px solid #c8c8c8;
+    border-radius:10px;
+    padding:20px;
+}
+
+.rejected-card label{
+    display:block;
+    font-weight:700;
+    margin-bottom:0px;
+    font-size: 15px;
+}
+
+
+.rejected{
+    display:block;
+    font-weight:700;
+    margin-bottom:10px;
+    margin-top: 10px;
+    margin-left: 30px;
+    font-size: 17px;
+}

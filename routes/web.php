@@ -91,6 +91,14 @@ Route::middleware('auth')->group(function () {
         return view('transfer.acceptreject-transfer');
     });
 
+    Route::get('accepted-transfer', function () {
+        return view('transfer.accepted-transfer');
+    });
+
+    Route::get('rejected-transfer', function () {
+        return view('transfer.rejected-transfer');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
