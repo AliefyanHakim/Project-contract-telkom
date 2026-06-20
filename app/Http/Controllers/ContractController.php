@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\User;
+use App\Models\Service;
+use App\Models\ContractService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ContractController extends Controller
@@ -21,6 +24,7 @@ public function index(Request $request)
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
+    $services = Service::orderBy('service_name')->get();
 
     /*
     |--------------------------------------------------------------------------
@@ -40,7 +44,20 @@ public function index(Request $request)
     | Current Contract Only
     |--------------------------------------------------------------------------
     */
-    $query->where('status', 'active');
+    if ($request->filled('status')) {
+
+        $query->where(
+            'status',
+            $request->status
+        );
+
+    } else {
+
+        $query->where(
+            'status',
+            'active'
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -82,6 +99,21 @@ public function index(Request $request)
         );
     }
 
+    if ($request->filled('service')) {
+
+        $query->whereHas(
+            'services',
+            function ($q) use ($request) {
+
+                $q->where(
+                    'contract_services.service_id',
+                    $request->service
+                );
+
+            }
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Filter Status
@@ -92,6 +124,13 @@ public function index(Request $request)
         $query->where(
             'status',
             $request->status
+        );
+
+    } else {
+
+        $query->where(
+            'status',
+            'active'
         );
     }
 
@@ -112,7 +151,8 @@ public function index(Request $request)
         'contracts.contract-list',
         compact(
             'contracts',
-            'accountManagers'
+            'accountManagers',
+            'services'
         )
     );
 }
@@ -198,30 +238,94 @@ public function closedContracts(Request $request)
         ->orderBy('name')
         ->get();
 
+        $services = Service::where(
+            'status',
+            'active'
+        )
+        ->orderBy('service_name')
+        ->get();
+
         return view(
             'contracts.add-contract',
-            compact('accountManagers')
+            compact(
+                'accountManagers',
+                'services'
+            )
         );
     }
-
     /**
      * Store contract.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
+
             'contract_number' => [
-                'nullable',
+                'required',
+                'max:100',
                 'unique:contracts,contract_number'
             ],
+
             'contract_name' => [
                 'required',
                 'max:255'
             ],
+
+            'customer_id_number' => [
+                'nullable',
+                'max:100'
+            ],
+
+            'telkom_name' => [
+                'nullable',
+                'max:255'
+            ],
+
+            'telkom_position' => [
+                'nullable',
+                'max:255'
+            ],
+
+            'telkom_unit' => [
+                'nullable',
+                'max:255'
+            ],
+
+            'customer_address' => [
+                'nullable'
+            ],
+
+            'customer_npwp' => [
+                'nullable',
+                'max:100'
+            ],
+
+            'customer_pic_name' => [
+                'nullable',
+                'max:255'
+            ],
+
+            'customer_pic_position' => [
+                'nullable',
+                'max:255'
+            ],
+
+            'customer_phone' => [
+                'nullable',
+                'max:50'
+            ],
+
+            'customer_email' => [
+                'nullable',
+                'email',
+                'max:255'
+            ],
+
             'owner_am_id' => [
                 'required',
                 'exists:users,id'
             ],
+
             'start_date' => [
                 'required',
                 'date'
@@ -232,22 +336,117 @@ public function closedContracts(Request $request)
                 'date',
                 'after:start_date'
             ],
+
+            'signing_date' => [
+                'nullable',
+                'date'
+            ],
+
+            'signing_location' => [
+                'nullable',
+                'max:255'
+            ],
+
+            'services' => [
+                'required',
+                'array',
+                'min:1'
+            ],
+
+            'services.*' => [
+                'required',
+                'exists:services,id'
+            ],
         ]);
 
-        $validated['created_by']
-            = Auth::id();
+        $contract = null;
 
-        $validated['status']
-            = 'active';
+        DB::transaction(function () use (
+            $validated,
+            &$contract) {
 
-        Contract::create($validated);
+            $contract = Contract::create([
 
-        return redirect()
-            ->route('contracts.index')
-            ->with(
-                'success',
-                'Contract created successfully.'
-            );
+                'contract_number'
+                    => $validated['contract_number'],
+
+                'contract_name'
+                    => $validated['contract_name'],
+
+                'customer_id_number'
+                    => $validated['customer_id_number'] ?? null,
+
+                'telkom_name'
+                    => $validated['telkom_name'] ?? null,
+
+                'telkom_position'
+                    => $validated['telkom_position'] ?? null,
+
+                'telkom_unit'
+                    => $validated['telkom_unit'] ?? null,
+
+                'customer_address'
+                    => $validated['customer_address'] ?? null,
+
+                'customer_npwp'
+                    => $validated['customer_npwp'] ?? null,
+
+                'customer_pic_name'
+                    => $validated['customer_pic_name'] ?? null,
+
+                'customer_pic_position'
+                    => $validated['customer_pic_position'] ?? null,
+
+                'customer_phone'
+                    => $validated['customer_phone'] ?? null,
+
+                'customer_email'
+                    => $validated['customer_email'] ?? null,
+
+                'signing_date'
+                    => $validated['signing_date'] ?? null,
+
+                'signing_location'
+                    => $validated['signing_location'] ?? null,
+
+                'owner_am_id'
+                    => $validated['owner_am_id'],
+
+                'start_date'
+                    => $validated['start_date'],
+
+                'end_date'
+                    => $validated['end_date'],
+
+                'status'
+                    => 'active',
+
+                'created_by'
+                    => Auth::id(),
+            ]);
+
+            foreach ($validated['services'] as $serviceId) {
+
+                ContractService::create([
+
+                    'contract_id'
+                        => $contract->id,
+
+                    'service_id'
+                        => $serviceId,
+                ]);
+            }
+        });
+
+    return redirect()
+        ->route(
+            'contracts.show',
+            $contract->id
+        )
+        ->with(
+            'success',
+            'Contract created successfully.'
+        );
     }
 
     /**
@@ -257,18 +456,24 @@ public function closedContracts(Request $request)
     {
         $contract->load([
             'owner',
-            'creator',
-            'files',
-            'notes',
-            'billings',
-            'extensions',
-            'transferRequests',
-            'transferHistory'
+            'services.service'
         ]);
 
         return view(
-            'contracts.show',
+            'contracts.detail-contract',
             compact('contract')
         );
     }
+
+    public function destroy(Contract $contract)
+{
+    $contract->delete();
+
+    return redirect()
+        ->route('contracts.index')
+        ->with(
+            'success',
+            'Contract deleted successfully.'
+        );
+}
 }

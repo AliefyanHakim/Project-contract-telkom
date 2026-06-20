@@ -105,11 +105,22 @@ href="{{ asset('css/contract-list.css') }}">
 
             </select>
 
-            <select>
+            <select name="service">
 
-                <option>
+                <option value="">
                     All Packages
                 </option>
+
+                @foreach($services as $service)
+
+                    <option
+                        value="{{ $service->id }}"
+                        @selected(request('service') == $service->id)
+                    >
+                        {{ $service->service_name }}
+                    </option>
+
+                @endforeach
 
             </select>
 
@@ -124,7 +135,7 @@ href="{{ asset('css/contract-list.css') }}">
                 Search
             </button>
 
-            <a href="{{ route('contract.create') }}">
+            <a href="{{ route('contracts.create') }}">
             <button type="button">
                 + Add Contract
             </button>
@@ -159,7 +170,9 @@ href="{{ asset('css/contract-list.css') }}">
 
                 @forelse($contracts as $contract)
 
-                    <tr>
+                    <tr                     
+                    onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
+                    style="cursor:pointer;">
 
                         <td>
                             {{ $contract->contract_name }}

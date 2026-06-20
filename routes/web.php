@@ -46,20 +46,27 @@ Route::middleware('auth')->group(function () {
         [ContractController::class, 'closedContracts']
     )->name('contract.closed');
 
-    Route::get('/add-contract', function () {
-        return view('contracts.add-contract');
-    })->name('contract.create');
+    Route::get(
+        '/add-contract',
+        [ContractController::class, 'create']
+    )->name('contracts.create');
 
-    Route::get('/detail-contract', function () {
-    return view('contracts.detail-contract');
-    })->name('contract.detail');
+    Route::get(
+        '/contracts/{contract}',
+        [ContractController::class, 'show']
+    )->name('contracts.show');
+
+    Route::delete(
+    '/contracts/{contract}',
+    [ContractController::class, 'destroy']
+    )->name('contracts.destroy');
 
     Route::get(
         '/account-manager-detail',function () {
     return view('am.detail-am');
     })->name('am.detail-am');
 
-    Route::get('/billing', function () {
+    Route::get('/billing/outstanding', function () {
         return view('billing.outstanding');
     });
 

@@ -14,178 +14,399 @@ href="{{ asset('css/create.css') }}">
     <div class="contract-container">
 
         <div class="contract-title">
-            ✉ Add Contract
+            📄 Contract Detail
         </div>
 
         <hr>
 
-        <form>
-            <!-- baris 1 -->
-            <div class="form-row">
+        @if(session('success'))
 
-                <div class="form-group half">
-                    <label>Customer ID Number</label>
-                    <input type="text">
-                </div>
+            <div class="alert alert-success">
 
-                <div class="form-group half">
-                    <label>ID Contract</label>
-                    <input type="text">
-                </div>
+                {{ session('success') }}
 
-            </div>
-
-            <br><hr><br>
-
-            <a> 1. PERUSAHAAN PERSEROAN (PERSERO) PT TELEKOMUNIKASI INDONESIA Tbk (TELKOM)<br>
-            DIwakili secara sah oleh:<a>
-
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text">
-            </div>
-
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Position</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group half">
-                    <label>Unit</label>
-                    <input type="text">
-                </div>
-
-            </div>
-
-            <br><hr><br>
-
-            <a>2. PELANGGAN<br>
-                Identitas Perusahaan/Institusi</a>
-
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text">
-            </div>
-
-            <div class="form-group">
-                <label>Address</label>
-                <input type="text">
-            </div>
-
-            <div class="form-group">
-                <label>NPWP</label>
-                <input type="text">
             </div>
 
             <br>
-            <a>Diwakili secara sah oleh:</a>
-            <div class="form-row">
 
-                <div class="form-group half">
-                    <label>Name</label>
-                    <input type="text">
-                </div>
+        @endif
 
-                <div class="form-group half">
-                    <label>Position</label>
-                    <input type="text">
-                </div>
+        {{-- CONTRACT INFORMATION --}}
 
-            </div>
+        <div class="form-row">
 
-            <div class="form-row">
+            <div class="form-group half">
 
-                <div class="form-group half">
-                    <label>Phone Number</label>
-                    <input type="text">
-                </div>
+                <label>Customer ID Number</label>
 
-                <div class="form-group half">
-                    <label>Email Address</label>
-                    <input type="text">
-                </div>
+                <input
+                    type="text"
+                    value="{{ $contract->customer_id_number }}"
+                    readonly>
 
             </div>
 
-            <br><hr>
+            <div class="form-group half">
 
-            <div class="form-group">
-                <label>Service Type</label>
-                <input type="text">
-            </div>
+                <label>Contract Number</label>
 
-            <br><hr>
-            <!-- Contract Value -->
-            <div class="form-group">
-                <label>Contract Value</label>
-                <input type="text">
-            </div>
-
-            <br><hr>
-
-            <!-- tanggal -->
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Start Date</label>
-                    <input type="date">
-                </div>
-
-                <div class="form-group half">
-                    <label>End Date</label>
-                    <input type="date">
-                </div>
+                <input
+                    type="text"
+                    value="{{ $contract->contract_number }}"
+                    readonly>
 
             </div>
 
-            <br><hr>
+        </div>
 
+        <br><hr><br>
 
-            <!-- Assigned AM -->
-            <div class="form-group">
-                <label>Assigned AM</label>
-                <input type="text">
+        <strong>
+            1. PERUSAHAAN PERSEROAN (PERSERO)
+            PT TELEKOMUNIKASI INDONESIA Tbk
+        </strong>
+
+        <br>
+        Diwakili secara sah oleh:
+
+        <br><br>
+
+        <div class="form-group">
+
+            <label>Name</label>
+
+            <input
+                type="text"
+                value="{{ $contract->telkom_name }}"
+                readonly>
+
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group half">
+
+                <label>Position</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->telkom_position }}"
+                    readonly>
+
             </div>
 
+            <div class="form-group half">
 
-            <!-- Upload -->
-            <div class="form-group">
+                <label>Unit</label>
 
-                <label>Contract File</label>
+                <input
+                    type="text"
+                    value="{{ $contract->telkom_unit }}"
+                    readonly>
+
+            </div>
+
+        </div>
+
+        <br><hr><br>
+
+        <strong>
+            2. CUSTOMER
+        </strong>
+
+        <br>
+        Company Information
+
+        <br><br>
+
+        <div class="form-group">
+
+            <label>Company Name</label>
+
+            <input
+                type="text"
+                value="{{ $contract->contract_name }}"
+                readonly>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Address</label>
+
+            <textarea
+                rows="4"
+                readonly>{{ $contract->customer_address }}</textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>NPWP</label>
+
+            <input
+                type="text"
+                value="{{ $contract->customer_npwp }}"
+                readonly>
+
+        </div>
+
+        <br>
+
+        <strong>
+            Customer Representative
+        </strong>
+
+        <br><br>
+
+        <div class="form-row">
+
+            <div class="form-group half">
+
+                <label>Name</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->customer_pic_name }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group half">
+
+                <label>Position</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->customer_pic_position }}"
+                    readonly>
+
+            </div>
+
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group half">
+
+                <label>Phone Number</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->customer_phone }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group half">
+
+                <label>Email Address</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->customer_email }}"
+                    readonly>
+
+            </div>
+
+        </div>
+
+        <br><hr><br>
+
+        {{-- SERVICES --}}
+
+        <h4>
+            Services
+        </h4>
+
+        @forelse($contract->services as $contractService)
+
+            <div
+                style="
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                    padding:12px;
+                    margin-bottom:10px;
+                    background:#fafafa;
+                ">
+
+                <strong>
+
+                    {{ $contractService->service->service_name }}
+
+                </strong>
+
+            </div>
+
+        @empty
+
+            <p>
+                No service selected.
+            </p>
+
+        @endforelse
+
+        <br><hr><br>
+
+        {{-- CONTRACT DATE --}}
+
+        <div class="form-row">
+
+            <div class="form-group half">
+
+                <label>Start Date</label>
+
+                <input
+                    type="text"
+                    value="{{ optional($contract->start_date)->format('d M Y') }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group half">
+
+                <label>End Date</label>
+
+                <input
+                    type="text"
+                    value="{{ optional($contract->end_date)->format('d M Y') }}"
+                    readonly>
+
+            </div>
+
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group half">
+
+                <label>Signing Date</label>
+
+                <input
+                    type="text"
+                    value="{{ optional($contract->signing_date)->format('d M Y') }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group half">
+
+                <label>Signing Location</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->signing_location }}"
+                    readonly>
+
+            </div>
+
+        </div>
+
+        <br><hr><br>
+
+        {{-- ACCOUNT MANAGER --}}
+
+        <div class="form-group">
+
+            <label>Assigned Account Manager</label>
+
+            <input
+                type="text"
+                value="{{ $contract->owner?->name }}"
+                readonly>
+
+        </div>
+
+        <br><hr><br>
+
+        {{-- FILE SECTION --}}
+
+        <div class="form-group">
+
+            <label>Contract File</label>
+
+            @if($contract->generated_file)
 
                 <div class="file-row">
 
                     <div class="file-name">
-                        document123.pdf
+
+                        {{ $contract->generated_file }}
+
                     </div>
 
-                    <button class="view-btn">
-                        View Document
-                    </button>
+                    <a
+                        href="{{ route('contracts.download', $contract) }}"
+                        class="download-btn">
 
-                    <button class="download-btn">
                         Download
-                    </button>
+
+                    </a>
 
                 </div>
 
-            </div>
+            @else
 
+                <div class="file-row">
 
-            <!-- Save button -->
+                    <div class="file-name">
+
+                        Contract file has not been generated yet.
+
+                    </div>
+
+                </div>
+
+            @endif
+
+        </div>
+
+        <div class="save-area">
+
             <div class="save-area">
-                <button class="delete-btn">
-                    Delete
-                </button>
 
-                <button class="edit-btn">
+                @if(Auth::user()->isManager())
+
+                    <form
+                        action="{{ route('contracts.destroy', $contract->id) }}"
+                        method="POST"
+                        onsubmit="return confirm('Delete this contract?');"
+                        style="display:inline;">
+
+                        @csrf
+                        @method('DELETE')
+
+                        <button
+                            type="submit"
+                            class="delete-btn">
+
+                            Delete
+
+                        </button>
+
+                    </form>
+
+                @else
+
+                    <a href="{{ route('contracts.index') }}"
+                    class="save-btn">
+
+                        Back
+
+                    </a>
+
+                @endif
+
+                <a href="{{ route('contracts.edit', $contract->id) }}"
+                class="edit-btn">
+
                     Edit
-                </button>
+
+                </a>
+
             </div>
 
-        </form>
+        </div>
 
     </div>
 

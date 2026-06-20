@@ -9,9 +9,31 @@ class Contract extends Model
     protected $fillable = [
         'contract_number',
         'contract_name',
+
+        'customer_id_number',
+
+        'telkom_name',
+        'telkom_position',
+        'telkom_unit',
+
+        'customer_address',
+        'customer_npwp',
+
+        'customer_pic_name',
+        'customer_pic_position',
+        'customer_phone',
+        'customer_email',
+
+        'signing_date',
+        'signing_location',
+
         'owner_am_id',
+
         'start_date',
         'end_date',
+
+        'generated_file',
+
         'status',
         'created_by',
     ];
@@ -32,6 +54,11 @@ class Contract extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function services()
+    {
+    return $this->hasMany(ContractService::class);
     }
 
     public function files()
