@@ -152,36 +152,24 @@ href="{{ asset('css/create.css') }}">
 
             <!-- Upload -->
             <div class="form-group">
+                <label>Upload Contract File</label>
 
-                <label>Contract File</label>
+                <div class="upload-box">
 
-                <div class="file-row">
+                    <input type="file">
 
-                    <div class="file-name">
-                        document123.pdf
-                    </div>
-
-                    <button class="view-btn">
-                        View Document
-                    </button>
-
-                    <button class="download-btn">
-                        Download
+                    <button type="button" class="upload-btn">
+                        Upload
                     </button>
 
                 </div>
-
             </div>
 
 
             <!-- Save button -->
             <div class="save-area">
-                <button class="delete-btn">
-                    Delete
-                </button>
-
-                <button class="edit-btn">
-                    Edit
+                <button class="save-btn">
+                    Save
                 </button>
             </div>
 

@@ -95,6 +95,20 @@ href="{{ asset('css/create.css') }}">
 
             </div>
 
+            <div class="form-row">
+
+                <div class="form-group half">
+                    <label>Phone Number</label>
+                    <input type="text">
+                </div>
+
+                <div class="form-group half">
+                    <label>Email Address</label>
+                    <input type="text">
+                </div>
+
+            </div>
+
             <br><hr>
 
             <div class="form-group">

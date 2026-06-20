@@ -83,6 +83,10 @@ Route::middleware('auth')->group(function () {
         return view('transfer.transfer-contract');
     });
 
+    Route::get('/edit-contract', function () {
+        return view('contracts.edit-contract');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });

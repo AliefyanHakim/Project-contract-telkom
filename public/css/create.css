@@ -74,9 +74,9 @@ body{
     background: #6f8fd8;
     color: white;
     border: none;
-    padding: 7px 25px;
-    border-radius: 10px;
-    font-size: 15px;
+    padding: 8px 15px;
+    border-radius: 7px;
+    font-size: 13px;
     cursor: pointer;
 }
 
@@ -84,15 +84,88 @@ body{
     display: flex;
     justify-content: flex-end;
     margin-top: 40px;
+    gap: 10px;
 }
 
 .save-btn{
     background: #25c83f;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 40px;
     border-radius: 10px;
     font-size: 15px;
     font-weight: 600;
+    cursor: pointer;
+}
+
+.edit-btn{
+    background: #153469;
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.delete-btn{
+    background: #E2231A;
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.file-box{
+    margin-top: 20px;
+}
+
+.file-box label{
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+}
+
+.file-row{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    background:white;
+    border:2px solid #cfcfcf;
+    border-radius:10px;
+    padding:0px;
+}
+
+
+.file-name{
+    width:250px;
+    background:white;
+    padding:6px 10px;
+    border-radius:3px;
+    font-size:13px;
+    color:#777;
+}
+
+.view-btn{
+    background:#5d84d8;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 3px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.download-btn{
+    background:#49df2d;
+    color: white;
+    border: none;
+    padding: 6px 15px;
+    border-radius: 3px;
+    font-size: 13px;
     cursor: pointer;
 }
