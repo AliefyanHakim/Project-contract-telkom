@@ -46,6 +46,7 @@
         <li>
             <a href="#">
                 <span>Contract Alerts</span>
+                <span>›</span>
             </a>
         </li>
 
@@ -67,6 +68,13 @@
         <li class="{{ request()->routeIs('settings.email-notifications') ? 'active' : '' }}">
             <a href="{{ route('settings.email-notifications') }}">
                 <span>Email Notifications</span>
+                <span>›</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="#">
+                <span>Profile</span>
                 <span>›</span>
             </a>
         </li>
