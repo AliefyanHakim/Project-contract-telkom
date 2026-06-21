@@ -1,96 +1,82 @@
-<div class="sidebar">
+<aside class="vt-sidebar">
+    <div class="vt-brand">
+        <div class="vt-logo-image">
+            <img src="{{ asset('images/logo-vastrack.png') }}" alt="Logo VasTrack">
+        </div>
 
-    <div class="menu-btn">
-        ☰
+        <div>
+            <h1>Vas<span>Track</span></h1>
+            <p>Track • Manage • Secure</p>
+        </div>
     </div>
 
-    <div class="menu-title">
-        Menu
+    <nav class="vt-menu">
+        <p class="vt-menu-title">Menu</p>
+
+        <a href="{{ url('/dashboard') }}"
+           class="vt-menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
+            <span class="vt-menu-icon">⌂</span>
+            <span>Dashboard</span>
+            <b>›</b>
+        </a>
+
+       <a href="{{ url('/contract-list') }}"
+   class="vt-menu-item {{ request()->is('contract-list') || request()->is('closed-contract') ? 'active' : '' }}">
+    <span class="vt-menu-icon">▤</span>
+    <span>Contract List</span>
+    <b>›</b>
+</a>
+
+                <a href="{{ url('/billing') }}"
+   class="vt-menu-item {{ request()->is('billing*') ? 'active' : '' }}">
+    <span class="vt-menu-icon">▥</span>
+    <span>Billing & Invoices</span>
+    <b>›</b>
+</a>
+
+<a href="{{ url('/detailam') }}"
+   class="vt-menu-item {{ request()->is('detailam') ? 'active' : '' }}">
+    <span class="vt-menu-icon">AM</span>
+    <span>By Account Manager</span>
+    <b>›</b>
+</a>
+
+        <a href="{{ url('/contract-alerts') }}"
+           class="vt-menu-item {{ request()->is('contract-alerts*') ? 'active' : '' }}">
+            <span class="vt-menu-icon">!</span>
+            <span>Contract Alerts</span>
+            <b>›</b>
+        </a>
+
+        <a href="{{ url('/transfer-request') }}"
+   class="vt-menu-item {{ request()->is('transfer-request') || request()->is('direct-transfer') ? 'active' : '' }}">
+    <span class="vt-menu-icon">⇄</span>
+    <span>Transfer Request</span>
+    <b>›</b>
+</a>
+
+        <p class="vt-menu-title">Settings</p>
+
+        <a href="{{ url('/email-notifications') }}"
+           class="vt-menu-item {{ request()->is('email-notifications') ? 'active' : '' }}">
+            <span class="vt-menu-icon">✉</span>
+            <span>Email Notifications</span>
+            <b>›</b>
+        </a>
+
+        <a href="{{ url('/profile') }}"
+           class="vt-menu-item {{ request()->is('profile') || request()->is('settings/profile') ? 'active' : '' }}">
+            <span class="vt-menu-icon">⚙</span>
+            <span>Profile</span>
+            <b>›</b>
+        </a>
+    </nav>
+
+    <div class="vt-user-card">
+        <div class="vt-avatar">B</div>
+        <div>
+            <h4>Budi Santoso</h4>
+            <p>Account Manager</p>
+        </div>
     </div>
-
-    <ul>
-
-        <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <a href="{{ route('dashboard') }}">
-                <span>Dashboard</span>
-                <span>›</span>
-            </a>
-        </li>
-
-        <li class="{{
-            request()->routeIs('contract.list')
-            || request()->routeIs('contract.closed')
-                ? 'active'
-                : ''
-        }}">
-            <a href="{{ route('contract.list') }}">
-                <span>Contract List</span>
-                <span>›</span>
-            </a>
-        </li>
-
-        <li>
-            <a href="#">
-                <span>Billing & Invoices</span>
-                <span>›</span>
-            </a>
-        </li>
-        
-        @php
-        $defaultAm = \App\Models\User::where(
-            'role_id',
-            \App\Models\User::ROLE_ACCOUNT_MANAGER
-        )->first();
-        @endphp
-
-        <li class="{{ request()->routeIs('account-managers.show') ? 'active' : '' }}">
-            <a href="{{ route('account-managers.show', $defaultAm->id) }}">
-                <span>Detail Account Manager</span>
-                <span>›</span>
-            </a>
-        </li>
-
-        <li>
-            <a href="#">
-                <span>Contract Alerts</span>
-                <span>›</span>
-            </a>
-        </li>
-
-        <li>
-            <a href="#">
-                <span>Transfer Request</span>
-                <span>›</span>
-            </a>
-        </li>
-
-    </ul>
-
-    <div class="setting-title">
-        Settings
-    </div>
-
-    <ul>
-
-        <li class="{{ request()->routeIs('settings.email-notifications') ? 'active' : '' }}">
-            <a href="{{ route('settings.email-notifications') }}">
-                <span>Email Notifications</span>
-                <span>›</span>
-            </a>
-        </li>
-
-        <li class="{{ request()->routeIs('profile') ? 'active' : '' }}">
-
-            <a href="{{ route('profile') }}">
-
-                <span>Profile</span>
-
-                <span>›</span>
-
-            </a>
-
-        </li>
-
-    </ul>
-
-</div>
+</aside>

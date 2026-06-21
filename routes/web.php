@@ -28,10 +28,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contracts', ContractController::class);
 
-    Route::get(
-            '/email-notifications',
-            [NotificationSettingController::class, 'index']
-        )->name('settings.email-notifications');
+    Route::get('/email-notifications', function () {
+        return view('settings.email-notifications');
+    })->name('email.notifications');
 
     Route::post(
             '/email-notifications',
@@ -39,14 +38,14 @@ Route::middleware('auth')->group(function () {
         )->name('settings.email-notifications.update');
 
     Route::get(
-        '/contract-list',
-        [ContractController::class, 'index']
-    )->name('contract.list');
+    '/contract-list',
+    [ContractController::class, 'index']
+)->name('contract.list');
 
-    Route::get(
-        '/closed-contract',
-        [ContractController::class, 'closedContracts']
-    )->name('contract.closed');
+Route::get(
+    '/closed-contract',
+    [ContractController::class, 'closedContracts']
+)->name('contract.closed');
 
     Route::get(
         '/add-contract',
@@ -63,15 +62,9 @@ Route::middleware('auth')->group(function () {
     [ContractController::class, 'destroy']
     )->name('contracts.destroy');
 
-    Route::get(
-        '/account-manager/{user}',
-        [AmController::class, 'show']
-    )->name('account-managers.show');
-
-    Route::get(
-    '/account-manager/{user}/export',
-    [AmController::class, 'export']
-    )->name('account-managers.export');
+    Route::get('/detailam', function () {
+    return view('am.detail-am');
+})->name('detailam');
 
     Route::get(
     '/contracts/{contract}/edit',
@@ -83,29 +76,30 @@ Route::middleware('auth')->group(function () {
         [ContractController::class, 'update']
     )->name('contracts.update');
 
-    Route::get('/billing/outstanding', function () {
-        return view('billing.outstanding');
+
+    Route::get('/contract-alerts', function () {
+        return view('alerts.contract-alerts');
+    });
+
+    Route::get('/transfer-contract', function () {
+        return view('transfer.transfer-contract');
+    });
+
+   Route::get('/billing', function () {
+    return view('billing.outstanding');
     });
 
     Route::get('/billing/payment-history', function () {
         return view('billing.payment-history');
     });
 
-    Route::get('/contract-alerts', function () {
-        return view('alerts.contract-alerts');
-    });
-
     Route::get('/transfer-request', function () {
-        return view('transfer.transfer-request');
-    });
+    return view('transfer.transfer-request');
+});
 
-    Route::get('/direct-transfer', function () {
-        return view('transfer.direct-transfer');
-    });
-
-    Route::get('/transfer-contract', function () {
-        return view('transfer.transfer-contract');
-    });
+Route::get('/direct-transfer', function () {
+    return view('transfer.direct-transfer');
+});
 
     Route::get('acceptreject-transfer', function () {
         return view('transfer.acceptreject-transfer');

@@ -1,112 +1,134 @@
 @extends('layouts.app')
 
-@section('styles')
-    <link rel="stylesheet" href="{{ asset('css/email-notifications.css') }}">
-@endsection
+@section('title', 'Email Notifications | VasTrack')
 
 @section('content')
 
-<div class="email-page">
+<div class="email-notif-page">
 
-    <div class="email-container">
+    <div class="email-notif-header">
+        <h1>Email Notifications</h1>
+        <p>Configure automatic email alerts and delivery schedules for important contract notifications.</p>
+    </div>
 
-        @if(session('success'))
-            <div class="alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+    <form action="#" method="POST" class="email-notif-form">
+        @csrf
 
-        @if($errors->any())
-            <div class="alert-error">
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <section class="email-notif-card">
+            <div class="email-notif-card-header">
+                <div class="email-notif-header-icon mail">
+                    ✉
+                </div>
 
-        <div class="email-title">
-            ✉ Automatic Email Alert Settings
-        </div>
-
-        <hr>
-
-        <form
-            method="POST"
-            action="{{ route('settings.email-notifications.update') }}"
-        >
-            @csrf
-
-            <!-- Email -->
-
-            <div class="form-group">
-
-                <label>
-                    Email (notifications will be sent to this email address)
-                </label>
-
-                <input
-                    type="email"
-                    name="notification_email"
-                    value="{{ old(
-                        'notification_email',
-                        $setting?->notification_email
-                    ) }}"
-                    placeholder="manager@perusahaan.com"
-                    required
-                >
-
+                <div>
+                    <h2>Automatic Email Alert Settings</h2>
+                </div>
             </div>
 
-            <!-- Schedule Box -->
+            <div class="email-field-group">
+                <label for="manager_email">Manager Email</label>
+                <p>Recipient of all critical alerts</p>
 
-            <div class="schedule-box">
+                <div class="email-input-box">
+                    <div class="email-input-icon">✉</div>
+                    <input 
+                        type="email" 
+                        id="manager_email" 
+                        name="manager_email" 
+                        value="manager@perusahaan.com"
+                    >
+                </div>
+            </div>
 
-                <h3>
-                    Alert Email Delivery Schedule
-                </h3>
+            <div class="email-field-group">
+                <label for="support_email">Admin / Support Email</label>
+                <p>Recipient of overdue billing alerts</p>
 
+                <div class="email-input-box">
+                    <div class="email-input-icon">✉</div>
+                    <input 
+                        type="email" 
+                        id="support_email" 
+                        name="support_email" 
+                        value="admin@perusahaan.com"
+                    >
+                </div>
+            </div>
+        </section>
+
+        <section class="email-notif-card schedule-section">
+            <div class="email-notif-card-header">
+                <div class="email-notif-header-icon alert">
+                    🔔
+                </div>
+
+                <div>
+                    <h2>Alert Email Delivery Schedule</h2>
+                </div>
+            </div>
+
+            <div class="schedule-table-card">
                 <div class="schedule-row">
+                    <div class="schedule-info">
+                        <div class="schedule-icon urgent">
+                            📅
+                        </div>
 
-                    <div>
-                        Contracts expiring in &lt; 7 days
+                        <div>
+                            <h3>Contracts expiring in &lt; 7 days</h3>
+                            <p>Receive daily emails for contracts nearing expiration within the next 7 days.</p>
+                        </div>
                     </div>
 
-                    <div class="daily">
-                        Daily email (08:00 WIB)
-                    </div>
+                    <div class="schedule-action">
+                        <span class="schedule-badge urgent">Daily</span>
 
+                        <select name="daily_schedule">
+                            <option selected>08:00 WIB</option>
+                            <option>09:00 WIB</option>
+                            <option>10:00 WIB</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="schedule-row">
+                    <div class="schedule-info">
+                        <div class="schedule-icon warning">
+                            📅
+                        </div>
 
-                    <div>
-                        Contracts expiring in 8–30 days
+                        <div>
+                            <h3>Contracts expiring in 8–30 days</h3>
+                            <p>Receive weekly summary emails for contracts expiring in 8–30 days.</p>
+                        </div>
                     </div>
 
-                    <div class="weekly">
-                        Weekly email (Monday morning)
-                    </div>
+                    <div class="schedule-action">
+                        <span class="schedule-badge warning">Weekly</span>
 
+                        <select name="weekly_schedule">
+                            <option selected>Monday morning</option>
+                            <option>Monday afternoon</option>
+                            <option>Friday morning</option>
+                        </select>
+                    </div>
                 </div>
-
             </div>
 
-            <div class="button-wrapper">
+            <div class="email-notif-footer">
+                <div class="email-note">
+                    <span>i</span>
+                    <p>Emails will be sent to the recipients above based on the schedule you set.</p>
+                </div>
 
-                <button
-                    type="submit"
-                    class="save-btn"
-                >
+                <button type="submit" class="save-email-btn">
+                    <span>✓</span>
                     Save Settings
                 </button>
-
             </div>
+        </section>
 
-        </form>
-
-    </div>
+    </form>
 
 </div>
 

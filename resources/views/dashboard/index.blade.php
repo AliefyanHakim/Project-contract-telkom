@@ -1,305 +1,196 @@
 @extends('layouts.app')
 
-@section('styles')
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-@endsection
+@section('title', 'Dashboard | VasTrack')
 
 @section('content')
 
-<div class="content">
+@php
+    $cards = [
+        [
+            'title' => 'Total Active Contracts',
+            'value' => '123',
+            'unit' => 'Contracts',
+            'desc' => 'across 5 Account Managers',
+            'type' => 'blue',
+            'icon' => 'DOC'
+        ],
+        [
+            'title' => 'Expiring < 7 Days',
+            'value' => '2',
+            'unit' => 'Contracts',
+            'desc' => 'Immediate action required',
+            'type' => 'red',
+            'icon' => 'EXP'
+        ],
+        [
+            'title' => 'Expiring < 30 Days',
+            'value' => '45',
+            'unit' => 'Contracts',
+            'desc' => 'Follow up soon',
+            'type' => 'yellow',
+            'icon' => 'REM'
+        ],
+        [
+            'title' => 'Outstanding Invoices',
+            'value' => '145.000.000',
+            'unit' => 'Rupiah',
+            'desc' => '6 pending invoices',
+            'type' => 'green',
+            'icon' => 'INV'
+        ],
+    ];
 
-    <!-- Warning -->
-    <div class="warning-box">
+    $contracts = [
+        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Budi Santoso', 'end_date' => '29/05/2026', 'price' => 'Rp 5.000.000/month', 'days_left' => '0 days left', 'status' => 'danger'],
+        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Rina Dewi', 'end_date' => '29/05/2026', 'price' => 'Rp 4.500.000/month', 'days_left' => '3 days left', 'status' => 'danger'],
+        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Budi Santoso', 'end_date' => '31/05/2026', 'price' => 'Rp 12.000.000/month', 'days_left' => '12 days left', 'status' => 'warning'],
+        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Budi Santoso', 'end_date' => '01/06/2026', 'price' => 'Rp 10.000.000/month', 'days_left' => '23 days left', 'status' => 'warning'],
+    ];
 
-        <div class="warning-text">
-            4 contracts will expire within the next 30 days — follow up or renew immediately.
+    $summaries = [
+        ['name' => 'Account Manager 1', 'clients' => 16, 'active' => 14, 'expiring' => 3, 'value' => 'Rp 24.000.000', 'billing' => '4 invoices'],
+        ['name' => 'Account Manager 2', 'clients' => 12, 'active' => 12, 'expiring' => 2, 'value' => 'Rp 23.000.000', 'billing' => '2 invoices'],
+        ['name' => 'Account Manager 3', 'clients' => 14, 'active' => 11, 'expiring' => 1, 'value' => 'Rp 25.000.000', 'billing' => '3 invoices'],
+    ];
+@endphp
+
+<section class="vt-alert-box">
+    <div class="vt-alert-icon">!</div>
+
+    <p>
+        <strong>4 contracts</strong> will expire within the next 30 days —
+        follow up or renew immediately.
+    </p>
+
+    <a href="#">View All Alerts</a>
+</section>
+
+<section class="vt-kpi-grid">
+    @foreach ($cards as $card)
+        <div class="vt-kpi-card {{ $card['type'] }}">
+            <div class="vt-kpi-top">
+                <div class="vt-kpi-icon">{{ $card['icon'] }}</div>
+                <h3>{{ $card['title'] }}</h3>
+            </div>
+
+            <h2>{{ $card['value'] }}</h2>
+            <h4>{{ $card['unit'] }}</h4>
+            <p>{{ $card['desc'] }}</p>
+        </div>
+    @endforeach
+</section>
+
+<section class="vt-content-grid">
+    <div class="vt-panel">
+        <div class="vt-panel-header">
+            <div>
+                <h3>Contracts Near Expiration</h3>
+                <p>Attention needed for renewal and follow up</p>
+            </div>
+
+            <a href="#">View All</a>
         </div>
 
-        <div class="warning-view">
-            view
-        </div>
+        <div class="vt-contract-list">
+            @foreach ($contracts as $contract)
+                <div class="vt-contract-item">
+                    <div class="vt-contract-logo">PT</div>
 
+                    <div class="vt-contract-info">
+                        <h4>{{ $contract['company'] }} — {{ $contract['package'] }}</h4>
+                        <p>
+                            AM: {{ $contract['am'] }}
+                            <span>•</span>
+                            End date: {{ $contract['end_date'] }}
+                            <span>•</span>
+                            {{ $contract['price'] }}
+                        </p>
+                    </div>
+
+                    <div class="vt-contract-action">
+                        <span class="vt-badge {{ $contract['status'] }}">
+                            {{ $contract['days_left'] }}
+                        </span>
+
+                        <a href="#">Detail ›</a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
 
-
-    <!-- Cards -->
-    <div class="cards">
-
-        <div class="card card-blue">
-
-            <h3>Total Active Contracts</h3>
-
-            <div class="number">
-                123
+    <div class="vt-panel">
+        <div class="vt-panel-header">
+            <div>
+                <h3>Summary by Account Manager</h3>
+                <p>Contract performance overview</p>
             </div>
-
-            <div class="title">
-                Contracts
-            </div>
-
-            <p>
-                across 5 Account Managers
-            </p>
-
         </div>
 
+        <div class="vt-table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account Manager</th>
+                        <th>Clients</th>
+                        <th>Active</th>
+                        <th>Expiring</th>
+                        <th>Monthly Value</th>
+                    </tr>
+                </thead>
 
-
-        <div class="card card-red">
-
-            <h3>Expiring &lt; 7 Days</h3>
-
-            <div class="number">
-                2
-            </div>
-
-            <div class="title">
-                Contracts
-            </div>
-
-            <p>
-                Immediate action required
-            </p>
-
+                <tbody>
+                    @foreach ($summaries as $summary)
+                        <tr>
+                            <td>{{ $summary['name'] }}</td>
+                            <td>{{ $summary['clients'] }}</td>
+                            <td>{{ $summary['active'] }}</td>
+                            <td>{{ $summary['expiring'] }}</td>
+                            <td>{{ $summary['value'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
 
+        <a href="#" class="vt-summary-link">View Full Summary</a>
+    </div>
+</section>
 
-
-        <div class="card card-yellow">
-
-            <h3>Expiring &lt; 30 Days</h3>
-
-            <div class="number">
-                45
-            </div>
-
-            <div class="title">
-                Contracts
-            </div>
-
-            <p>
-                Follow up soon
-            </p>
-
+<section class="vt-quick-actions">
+    <div class="vt-panel-header">
+        <div>
+            <h3>Quick Actions</h3>
+            <p>Shortcut for contract management activities</p>
         </div>
-
-
-
-        <div class="card card-green">
-
-            <h3>Outstanding Invoices</h3>
-
-            <div class="money">
-                145.000.000
-            </div>
-
-            <div class="title">
-                Rupiah
-            </div>
-
-            <p>
-                6 pending invoices
-            </p>
-
-        </div>
-
     </div>
 
-    <div class="contract-section">
+    <div class="vt-action-grid">
+        <a href="#" class="vt-action-card">
+            <span>+</span>
+            Add New Contract
+        </a>
 
-    <h2>
-        Contracts Near Expiration — Attention Needed
-    </h2>
+        <a href="#" class="vt-action-card">
+            <span>↑</span>
+            Upload Contract
+        </a>
 
-    <div class="contract-box">
+        <a href="#" class="vt-action-card">
+            <span>⇄</span>
+            Request Transfer
+        </a>
 
-        <div class="contract-item">
+        <a href="#" class="vt-action-card">
+            <span>R</span>
+            Generate Report
+        </a>
 
-            <div class="contract-info">
-
-                <h3>PT Xxxxx Xxxxxxxx — Paket Enterprise</h3>
-
-                <p>
-                    AM: Budi Santoso · End date: 29/05/2026 · Rp 5.000.000/month
-                </p>
-
-            </div>
-
-            <div class="days red">
-                0 days left
-            </div>
-
-            <div class="detail">
-                detail >
-            </div>
-
-        </div>
-
-
-
-        <div class="contract-item">
-
-            <div class="contract-info">
-
-                <h3>PT Xxxxx Xxxxxxxx — Paket Enterprise</h3>
-
-                <p>
-                    AM: Rina Dewi · End date: 29/05/2026 · Rp 4.500.000/month
-                </p>
-
-            </div>
-
-            <div class="days red">
-                3 days left
-            </div>
-
-            <div class="detail">
-                detail >
-            </div>
-
-        </div>
-
-
-
-        <div class="contract-item">
-
-            <div class="contract-info">
-
-                <h3>PT Xxxxx Xxxxxxxx — Paket Enterprise</h3>
-
-                <p>
-                    AM: Budi Santoso · End date: 31/05/2026 · Rp 12.000.000/month
-                </p>
-
-            </div>
-
-            <div class="days yellow">
-                12 days left
-            </div>
-
-            <div class="detail">
-                detail >
-            </div>
-
-        </div>
-
-
-
-        <div class="contract-item">
-
-            <div class="contract-info">
-
-                <h3>PT Xxxxx Xxxxxxxx — Paket Enterprise</h3>
-
-                <p>
-                    AM: Budi Santoso · End date: 01/06/2026 · Rp 10.000.000/month
-                </p>
-
-            </div>
-
-            <div class="days yellow">
-                23 days left
-            </div>
-
-            <div class="detail">
-                detail >
-            </div>
-
-        </div>
-
+        <a href="#" class="vt-action-card danger">
+            <span>!</span>
+            Set Reminder
+        </a>
     </div>
-
-</div>
-
-<div class="summary-section">
-
-    <h2>
-        Summary by Account Manager
-    </h2>
-
-    <div class="summary-box">
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Account Manager</th>
-
-                    <th>Total Clients</th>
-
-                    <th>Active</th>
-
-                    <th>Expiring &lt; 30 days</th>
-
-                    <th>Monthly Value</th>
-
-                    <th>Billing Pending</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <tr>
-
-                    <td>Account Manager 1</td>
-
-                    <td>16</td>
-
-                    <td>14</td>
-
-                    <td>3</td>
-
-                    <td>Rp 24.000.000</td>
-
-                    <td>4 invoices</td>
-
-                </tr>
-
-                <tr>
-
-                    <td>Account Manager 2</td>
-
-                    <td>12</td>
-
-                    <td>12</td>
-
-                    <td>2</td>
-
-                    <td>Rp 23.000.000</td>
-
-                    <td>2 invoices</td>
-
-                </tr>
-
-                <tr>
-
-                    <td>Account Manager 3</td>
-
-                    <td>14</td>
-
-                    <td>11</td>
-
-                    <td>1</td>
-
-                    <td>Rp 25.000.000</td>
-
-                    <td>3 invoices</td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-</div>
+</section>
 
 @endsection
-
