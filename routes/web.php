@@ -118,6 +118,10 @@ Route::middleware('auth')->group(function () {
         return view('transfer.rejected-transfer');
     });
 
+    Route::get('profile', function () {
+        return view('settings.profile');
+    });
+
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
