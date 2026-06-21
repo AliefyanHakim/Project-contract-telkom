@@ -79,11 +79,16 @@
             </a>
         </li>
 
-        <li>
-            <a href="#">
+        <li class="{{ request()->routeIs('profile') ? 'active' : '' }}">
+
+            <a href="{{ route('profile') }}">
+
                 <span>Profile</span>
+
                 <span>›</span>
+
             </a>
+
         </li>
 
     </ul>

@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\AmController;
+use App\Http\Controllers\ProfileController;
 
 Route::middleware('guest')->group(function () {
 
@@ -118,9 +119,16 @@ Route::middleware('auth')->group(function () {
         return view('transfer.rejected-transfer');
     });
 
-    Route::get('profile', function () {
+    Route::get('/profile', function () {
         return view('settings.profile');
-    });
+    })->name('profile');
+
+    Route::get('/profile/edit', function () {
+        return view('settings.edit-profile');
+    })->name('profile.edit');
+
+    Route::put('/profile/update', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');

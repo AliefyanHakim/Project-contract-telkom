@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -56,5 +58,48 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+
+            'name' => [
+                'required',
+                'max:100'
+            ],
+
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')
+                    ->ignore($user->id),
+            ],
+
+            'password' => [
+                'nullable',
+                'min:8',
+                'confirmed'
+            ],
+        ]);
+
+        $user->name = $validated['name'];
+
+        $user->email = $validated['email'];
+
+        if (!empty($validated['password'])) {
+
+            $user->password = Hash::make(
+                $validated['password']
+            );
+        }
+
+        $user->save();
+
+        return back()->with(
+            'success',
+            'Profile updated successfully.'
+        );
     }
 }

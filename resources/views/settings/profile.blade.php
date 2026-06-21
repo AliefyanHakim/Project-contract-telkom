@@ -9,25 +9,52 @@ href="{{ asset('css/profile.css') }}">
 
 @section('content')
 
+@php
+
+    $user = auth()->user();
+
+    $roleName = match($user->role_id) {
+
+        \App\Models\User::ROLE_MANAGER
+            => 'Manager',
+
+        \App\Models\User::ROLE_ACCOUNT_MANAGER
+            => 'Account Manager',
+
+        \App\Models\User::ROLE_SUPPORT_INPUTTER
+            => 'Support Inputter',
+
+        \App\Models\User::ROLE_SUPPORT_PAYCALL
+            => 'Support Paycall',
+
+        default
+            => 'User'
+    };
+
+@endphp
+
 <div class="profile-page">
 
     <div class="page-title">
 
-        <span class="back-arrow">
+        <a
+            href="{{ route('dashboard') }}"
+            class="back-arrow"
+            style="text-decoration:none;">
 
             &#8249;
 
-        </span>
+        </a>
 
         <h1>
 
-            Account Manager
+            Profile
 
         </h1>
 
     </div>
 
-
+    {{-- Profile Header --}}
     <div class="profile-card">
 
         <div class="profile-section">
@@ -44,57 +71,110 @@ href="{{ asset('css/profile.css') }}">
 
                     <h2>
 
-                        Nama Manager
+                        {{ $user->name }}
 
                     </h2>
 
                     <p>
 
-                        Manager · manager@telkom.com
+                        {{ $roleName }}
+                        ·
+                        {{ $user->email }}
 
                     </p>
 
                 </div>
 
             </div>
+
         </div>
 
     </div>
 
+    {{-- Detail User --}}
     <div class="profile-card">
+
         <div class="form-group">
-            <label>Full Name</label>
-            <input type="text">
+
+            <label>
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                value="{{ $user->name }}"
+                readonly>
+
         </div>
 
         <div class="form-group">
-            <label>Employee ID</label>
-            <input type="text">
+
+            <label>
+                Position
+            </label>
+
+            <input
+                type="text"
+                value="{{ $roleName }}"
+                readonly>
+
         </div>
 
         <div class="form-group">
-            <label>Position</label>
-            <input type="text">
+
+            <label>
+                Email
+            </label>
+
+            <input
+                type="text"
+                value="{{ $user->email }}"
+                readonly>
+
         </div>
 
         <div class="form-group">
-            <label>Email</label>
-            <input type="text">
+
+            <label>
+                Status
+            </label>
+
+            <input
+                type="text"
+                value="{{ ucfirst($user->status) }}"
+                readonly>
+
         </div>
 
     </div>
 
+    {{-- Action Button --}}
     <div class="save-area">
 
-        <a href="#"
-        class="edit-btn">
-            Edit
+        <a
+            href="{{ route('profile.edit') }}"
+            class="edit-btn">
+
+            Edit Profile
+
         </a>
 
-        <a href="#"
-        class="logout-btn">
-            Logout
-        </a>
+        <form
+            action="{{ route('logout') }}"
+            method="POST"
+            style="display:inline;">
+
+            @csrf
+
+            <button
+                type="submit"
+                class="logout-btn">
+
+                Logout
+
+            </button>
+
+        </form>
 
     </div>
 
