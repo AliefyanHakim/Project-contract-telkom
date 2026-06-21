@@ -1,175 +1,206 @@
 @extends('layouts.app')
 
+@section('title', 'Billing & Invoices | VasTrack')
+
 @section('styles')
-
-<link rel="stylesheet"
-href="{{ asset('css/billing.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('css/billing.css') }}?v={{ time() }}">
 @endsection
 
 @section('content')
 
+@php
+    $rows = collect([
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-3026',
+            'period' => 'Mei 2026',
+            'price' => 15000000,
+            'due_date' => '2026-05-29',
+            'status' => 'followup',
+            'label' => 'Follow-up pending',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-8031',
+            'period' => 'Mei 2026',
+            'price' => 4000000,
+            'due_date' => '2026-05-29',
+            'status' => 'followup',
+            'label' => 'Follow-up pending',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-2484',
+            'period' => 'Mei 2026',
+            'price' => 16000000,
+            'due_date' => '2026-05-29',
+            'status' => 'followup',
+            'label' => 'Follow-up pending',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-1640',
+            'period' => 'Mei 2026',
+            'price' => 16000000,
+            'due_date' => '2026-05-29',
+            'status' => 'followup',
+            'label' => 'Follow-up pending',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-6371',
+            'period' => 'Mei 2026',
+            'price' => 12000000,
+            'due_date' => '2026-05-29',
+            'status' => 'followup',
+            'label' => 'Follow-up pending',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-7425',
+            'period' => 'Mei 2026',
+            'price' => 15000000,
+            'due_date' => '2026-05-30',
+            'status' => 'expiring',
+            'label' => 'Expiring soon',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-5903',
+            'period' => 'Mei 2026',
+            'price' => 2000000,
+            'due_date' => '2026-05-30',
+            'status' => 'expiring',
+            'label' => 'Expiring soon',
+        ],
+        [
+            'client' => 'PT Maju Bersama',
+            'contract' => '1234567890',
+            'invoice' => 'INV-2026-7353',
+            'period' => 'Mei 2026',
+            'price' => 4000000,
+            'due_date' => '2026-05-31',
+            'status' => 'expiring',
+            'label' => 'Expiring soon',
+        ],
+    ]);
+@endphp
+
 <div class="billing-page">
 
-    <div class="page-title">
+    <div class="billing-header">
+        <a href="{{ url('/dashboard') }}" class="billing-back-btn">
+            ‹
+        </a>
 
-        <span class="back-arrow">
-
-            &#8249;
-
-        </span>
-
-        <h1>
-
-            Billing & Invoices
-
-        </h1>
-
+        <div>
+            <h1>Billing & Invoices</h1>
+            <p>Monitor outstanding invoices, due dates, and billing status.</p>
+        </div>
     </div>
 
-</div>
+    <div class="billing-tabs">
+        <a href="{{ url('/billing') }}" class="billing-tab active">
+            Outstanding
+        </a>
 
-<div class="billing-tabs">
+        <a href="{{ url('/billing/payment-history') }}" class="billing-tab">
+            Payment History
+        </a>
+    </div>
 
-    <a href="#" class="active-tab">
-        Outstanding
-    </a>
+    <section class="billing-toolbar-card">
+        <form method="GET" action="{{ url('/billing') }}" class="billing-toolbar">
 
-    <a href="/billing/payment-history">
-        Payment History
-    </a>
+            <select name="account_manager">
+                <option value="">All Account Managers</option>
+                <option value="am1">Account Manager 1</option>
+                <option value="am2">Account Manager 2</option>
+            </select>
 
-</div>
+            <select name="status">
+                <option value="">All Statuses</option>
+                <option value="followup">Follow-up Pending</option>
+                <option value="expiring">Expiring Soon</option>
+            </select>
 
-<div class="filter-bar">
+            <div class="billing-search-box">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search client, invoice, or contract ID..."
+                >
 
-    <select>
+                <button type="submit">
+                    ⌕
+                </button>
+            </div>
 
-        <option>
-            All Account Managers
-        </option>
+        </form>
+    </section>
 
-    </select>
+    <section class="billing-table-card">
 
-    <select>
+        <div class="billing-table-wrapper">
 
-        <option>
-            All Statuses
-        </option>
+            <table class="billing-table">
 
-    </select>
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>ID Contract</th>
+                        <th>No. Invoice</th>
+                        <th>Period</th>
+                        <th>Price</th>
+                        <th>Due Date</th>
+                        <th>Billing State</th>
+                    </tr>
+                </thead>
 
+                <tbody>
 
-    <input
-        type="text"
-        name="search"
-        value="{{ request('search') }}"
-        placeholder="Search ..."
-    >
+                    @forelse ($rows as $row)
 
-</div>
+                        <tr class="billing-row {{ $row['status'] }}">
+                            <td>{{ $row['client'] }}</td>
+                            <td>{{ $row['contract'] }}</td>
+                            <td>{{ $row['invoice'] }}</td>
+                            <td>{{ $row['period'] }}</td>
+                            <td>Rp {{ number_format($row['price'], 0, ',', '.') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($row['due_date'])->format('d/m/Y') }}</td>
+                            <td>
+                                <span class="billing-status {{ $row['status'] }}">
+                                    {{ $row['label'] }}
+                                </span>
+                            </td>
+                        </tr>
 
-<div class="invoice-table">
-    <div class="table-wrapper">
-        <table>
+                    @empty
 
-            <thead>
+                        <tr>
+                            <td colspan="7" class="billing-empty">
+                                No billing data found.
+                            </td>
+                        </tr>
 
-                <tr>
+                    @endforelse
 
-                    <th>Client Name</th>
-                    <th>ID Contract</th>
-                    <th>No. Invoice</th>
-                    <th>Period</th>
-                    <th>Price</th>
-                    <th>Due Date</th>
-                    <th>Billing State</th>
+                </tbody>
 
-                </tr>
+            </table>
 
-            </thead>
+        </div>
 
+    </section>
 
-            <tbody>
-
-                <!-- MERAH -->
-
-                <tr class="critical">
-
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>INV-2026-3026</td>
-                    <td>Mei 2026</td>
-                    <td>Rp 15.000.000</td>
-                    <td>29/05/2026</td>
-
-                    <td class="red-status">
-
-                        Follow-up pending
-
-                    </td>
-
-                </tr>
-
-
-                <tr class="critical">
-
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>INV-2026-8031</td>
-                    <td>Mei 2026</td>
-                    <td>Rp 4.000.000</td>
-                    <td>29/05/2026</td>
-
-                    <td class="red-status">
-
-                        Follow-up pending
-
-                    </td>
-
-                </tr>
-
-
-                <!-- KUNING -->
-
-                <tr class="warning">
-
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>INV-2026-7425</td>
-                    <td>Mei 2026</td>
-                    <td>Rp 15.000.000</td>
-                    <td>30/05/2026</td>
-
-                    <td class="yellow-status">
-
-                        Expiring soon
-
-                    </td>
-
-                </tr>
-
-
-                <tr class="warning">
-
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>INV-2026-5903</td>
-                    <td>Mei 2026</td>
-                    <td>Rp 2.000.000</td>
-                    <td>30/05/2026</td>
-
-                    <td class="yellow-status">
-
-                        Expiring soon
-
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
 </div>
 
 @endsection

@@ -1,196 +1,387 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI',sans-serif;
-}
+/* =========================
+   TRANSFER REQUEST PAGE
+   VasTrack Theme
+========================= */
 
-body{
-    background:white;
-}
-
-.transfer-page{
-    padding:30px;
-}
-
-.transfer-page{
-    padding:5px 30px;
-}
-
-.page-title{
-    display:flex;
-    align-items:center;
-    gap:15px;
-}
-
-.back-arrow{
-    font-size:30px;
-    color:#111;
-    cursor:pointer;
-}
-
-.page-title h1{
-    font-size:25px;
-    color:#111;
-}
-
-.tabs{
-    display: flex;
-    gap: 10px;
-    width: fit-content;
-    margin: 0px auto 0px auto;
-}
-
-.tab{
-    text-decoration:none;
-    font-size:17px;
-    font-weight:600;
-    color:#888;
-}
-
-.tab.active{
-    color:black;
-    border-bottom:2px solid black;
-}
-
-.transfer-toolbar{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:15px;
-    margin-bottom:15px;
-    margin-top:20px;
-}
-
-.download-btn{
-    background:#5f87d6;
-    color:white;
-    border:2px solid #5f87d6;
-    padding:5px 25px;
-    border-radius:5px;
-    font-size:15px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-.download-btn i{
-    margin-left:center;
-}
-
-.search-box{
-    background:white;
-    border:2px solid #d7d7d7;
-    padding:5px 10px;
-    border-radius:5px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.search-box input{
-    border:none;
-    outline:none;
-    font-size:15px;
-    width:100%;
-}
-
-.search-box i{
-    font-size:15px;
-}
-
-.transfer-btn{
-    background:white;
-    border:2px solid #d7d7d7;
-    border-radius:5px;
-    padding:5px 20px;
-    font-size:15px;
-    cursor:pointer;
-}
-
-.transfer-btn i{
-    margin-right:5px;
-}
-
-.table-container{
-    background: white;
-    border: 2px solid #d3d3d3;
-    border-radius: 10px;
-    padding: 10px;
-    overflow:hidden;
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
-}
-
-.table-wrapper{
-    max-height:550px;
-    overflow-y:auto;
-}
-
-table{
+.transfer-page {
     width: 100%;
-    border-collapse: collapse;
+    color: var(--navy);
 }
 
-
-thead{
-    position:sticky;
-    top:0;
-    background:white;
-    z-index:1;
-    border-bottom:3px solid #ddd;
+.transfer-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 10px;
 }
 
-tbody tr{
-    border-bottom:1px solid rgba(0,0,0,.08);
+.transfer-back-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(229, 231, 235, 0.95);
+    color: var(--navy);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
 }
 
-tbody tr{
-    transition:.3s;
+.transfer-header h1 {
+    margin: 0 0 6px;
+    font-size: 34px;
+    font-weight: 900;
+    color: var(--navy);
+    letter-spacing: -0.8px;
 }
 
-tbody tr:hover{
-    transform:scale(1.005);
-    cursor:pointer;
-}
-
-th{
-    padding: 5px;
-    text-align: center;
+.transfer-header p {
+    margin: 0;
     font-size: 15px;
-    color:#222;
+    color: var(--muted);
 }
 
-td{
-    padding:15px;
-    font-size:15px;
+.transfer-tabs {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin: 0 0 18px 56px;
 }
 
-.rejected-row{
-    background: #f8e4e4;
+.transfer-tab {
+    position: relative;
+    padding: 10px 0;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--muted);
+    transition: 0.2s ease;
 }
 
-
-.approved-row{
-    background: #dff1df;
+.transfer-tab:hover,
+.transfer-tab.active {
+    color: var(--navy);
 }
 
-
-.pending-row{
-    background: #f3f3de;
+.transfer-tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--red);
 }
 
-
-.red{
-    color: red;
-    font-weight: 600;
+.transfer-toolbar-card {
+    background: #ffffff;
+    border: 1px solid rgba(229, 231, 235, 0.95);
+    border-radius: 22px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
 }
 
-
-.green{
-    color: limegreen;
-    font-weight: 600;
+.transfer-toolbar {
+    display: grid;
+    grid-template-columns: 190px minmax(300px, 1fr) 190px;
+    gap: 14px;
+    align-items: center;
 }
 
-.yellow{
-    color: #d4bf00;
-    font-weight: 600;
+.transfer-download-btn,
+.transfer-add-btn,
+.transfer-search-box {
+    height: 52px;
+    border-radius: 12px;
+}
+
+.transfer-download-btn {
+    background: var(--navy);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: 0 12px 22px rgba(7, 27, 82, 0.18);
+}
+
+.transfer-add-btn {
+    background: var(--red);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: none;
+    box-shadow: 0 12px 22px rgba(239, 43, 43, 0.18);
+}
+
+.transfer-download-btn span,
+.transfer-add-btn span {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.transfer-search-box {
+    border: 1px solid var(--border);
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: 0.2s ease;
+}
+
+.transfer-search-box:hover,
+.transfer-search-box:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(31, 111, 235, 0.10);
+}
+
+.transfer-search-box input {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0 16px;
+    font-size: 14px;
+    color: var(--navy);
+}
+
+.transfer-search-box input::placeholder {
+    color: #8a95a8;
+}
+
+.transfer-search-box button {
+    width: 48px;
+    height: 100%;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.transfer-table-card {
+    background: #ffffff;
+    border: 1px solid rgba(229, 231, 235, 0.95);
+    border-radius: 22px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+}
+
+.transfer-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.transfer-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.transfer-table thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--navy);
+    white-space: nowrap;
+}
+
+.transfer-table tbody tr {
+    transition: 0.2s ease;
+}
+
+.transfer-table tbody tr:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.99);
+}
+
+.transfer-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #1f2937;
+    vertical-align: middle;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.transfer-table tbody tr td:first-child {
+    border-radius: 14px 0 0 14px;
+    border-left: 1px solid transparent;
+}
+
+.transfer-table tbody tr td:last-child {
+    border-radius: 0 14px 14px 0;
+    border-right: 1px solid transparent;
+}
+
+.transfer-row.pending td {
+    background: #fffbea;
+    border-color: #f8e3a4;
+}
+
+.transfer-row.approved td {
+    background: #f2fbf3;
+    border-color: #ccebd1;
+}
+
+.transfer-row.rejected td {
+    background: #fff5f5;
+    border-color: #f4caca;
+}
+
+.transfer-client {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.transfer-client-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.transfer-client-icon.pending {
+    background: #fff4c2;
+    color: #d89b00;
+}
+
+.transfer-client-icon.approved {
+    background: #e7f8e9;
+    color: var(--green);
+}
+
+.transfer-client-icon.rejected {
+    background: #ffe3e3;
+    color: var(--red);
+}
+
+.transfer-status {
+    min-width: 150px;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.transfer-status.pending {
+    background: #fff4c2;
+    color: #d89b00;
+}
+
+.transfer-status.approved {
+    background: #e7f8e9;
+    color: var(--green);
+}
+
+.transfer-status.rejected {
+    background: #ffe3e3;
+    color: var(--red);
+}
+
+.transfer-empty {
+    text-align: center;
+    padding: 34px !important;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.transfer-table-footer {
+    padding: 14px 12px 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.transfer-table-footer p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.transfer-simple-pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.transfer-simple-pagination button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--navy);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.transfer-simple-pagination button.active {
+    background: var(--navy);
+    color: #ffffff;
+}
+
+@media (max-width: 1200px) {
+    .transfer-toolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .transfer-search-box {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .transfer-header h1 {
+        font-size: 28px;
+    }
+
+    .transfer-tabs {
+        margin-left: 0;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .transfer-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .transfer-search-box {
+        grid-column: auto;
+    }
+
+    .transfer-table-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
