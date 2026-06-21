@@ -719,4 +719,5 @@ public function index(Request $request)
                 'Contract updated successfully.'
             );
     }
+    
 }

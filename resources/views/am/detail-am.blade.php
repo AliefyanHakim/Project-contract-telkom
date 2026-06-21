@@ -14,21 +14,20 @@ href="{{ asset('css/detailam.css') }}">
 
     <div class="page-title">
 
-        <span class="back-arrow">
-
+        <a
+            href="{{ route('contract.list') }}"
+            class="back-arrow"
+            style="text-decoration:none;">
             &#8249;
-
-        </span>
+        </a>
 
         <h1>
-
             Account Manager
-
         </h1>
 
     </div>
 
-
+    {{-- AM CARD --}}
     <div class="am-card">
 
         <div class="profile-section">
@@ -36,36 +35,47 @@ href="{{ asset('css/detailam.css') }}">
             <div class="profile-left">
 
                 <div class="profile-icon">
-
                     👤
-
                 </div>
-
 
                 <div>
 
                     <h2>
-
-                        Xxxxxxx Xxxxxxx
-
+                        {{ $user->name }}
                     </h2>
 
                     <p>
-
-                        Account Manager · xxxx.xxxxxx@perusahaan.com
-
+                        Account Manager · {{ $user->email }}
                     </p>
 
                 </div>
 
             </div>
 
+            <div>
 
-            <button class="dropdown-btn">
+                <select
+                    onchange="
+                    if(this.value){
+                        window.location=this.value;
+                    }"
+                    class="am-dropdown">
 
-                ▼
+                    @foreach($accountManagers as $am)
 
-            </button>
+                        <option
+                            value="{{ route('account-managers.show', $am->id) }}"
+                            @selected($am->id == $user->id)>
+
+                            {{ $am->name }}
+
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
 
         </div>
 
@@ -73,27 +83,37 @@ href="{{ asset('css/detailam.css') }}">
 
             <div class="summary-card active-card">
 
-                <h3>Actives</h3>
+                <h3>
+                    Active
+                </h3>
 
-                <span>6</span>
+                <span>
+                    {{ $activeCount }}
+                </span>
 
             </div>
-
 
             <div class="summary-card critical-card">
 
-                <h3>Critical</h3>
+                <h3>
+                    Critical
+                </h3>
 
-                <span>1</span>
+                <span>
+                    {{ $criticalCount }}
+                </span>
 
             </div>
 
-
             <div class="summary-card expiring-card">
 
-                <h3>Expiring soon</h3>
+                <h3>
+                    Expiring Soon
+                </h3>
 
-                <span>2</span>
+                <span>
+                    {{ $expiringCount }}
+                </span>
 
             </div>
 
@@ -101,27 +121,98 @@ href="{{ asset('css/detailam.css') }}">
 
     </div>
 
-    <div class="filter-bar">
+    {{-- FILTER --}}
+    <form method="GET">
 
-        <select>
-            <option>All Statuses</option>
-        </select>
+        <div class="filter-bar">
 
-        <select>
-            <option>All Packages</option>
-        </select>
+            <select name="status">
 
-        <input type="text"
-            placeholder="Search ...">
+                <option value="">
+                    All Statuses
+                </option>
 
-        <button class="download-btn">
+                <option
+                    value="active"
+                    @selected(request('status') == 'active')>
 
-            Download
+                    Active
 
-        </button>
+                </option>
 
-    </div>
+                <option
+                    value="expiring"
+                    @selected(request('status') == 'expiring')>
 
+                    Expiring Soon
+
+                </option>
+
+                <option
+                    value="followup"
+                    @selected(request('status') == 'followup')>
+
+                    Follow-up Pending
+
+                </option>
+
+                <option
+                    value="expired"
+                    @selected(request('status') == 'expired')>
+
+                    Expired
+
+                </option>
+
+                <option
+                    value="terminated"
+                    @selected(request('status') == 'terminated')>
+
+                    Terminated
+
+                </option>
+
+            </select>
+
+            <select name="service">
+
+                <option value="">
+                    All Packages
+                </option>
+
+                @foreach($services as $service)
+
+                    <option
+                        value="{{ $service->id }}"
+                        @selected(
+                            request('service') == $service->id
+                        )>
+
+                        {{ $service->service_name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search ...">
+
+            <a href="{{ route('account-managers.export', $user->id) }}">
+                <button type="button" class="download-btn">
+                    Download Report
+                </button>
+            </a>
+
+        </div>
+
+    </form>
+
+    {{-- TABLE --}}
     <div class="contract-table">
 
         <table>
@@ -135,7 +226,7 @@ href="{{ asset('css/detailam.css') }}">
                     <th>Package</th>
                     <th>Start</th>
                     <th>End</th>
-                    <th>Price/month</th>
+                    <th>Price / Month</th>
                     <th>Billing State</th>
 
                 </tr>
@@ -144,62 +235,136 @@ href="{{ asset('css/detailam.css') }}">
 
             <tbody>
 
-                <tr class="critical-row">
+            @forelse($contracts as $contract)
 
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>Enterprise</td>
-                    <td>08/03/2026</td>
-                    <td>29/05/2026</td>
-                    <td>Rp 3.000.000</td>
+                <tr
+                    onclick="
+                    window.location='{{ route('contracts.show', $contract->id) }}'
+                    "
+                    style="cursor:pointer;">
 
-                    <td class="red-text">
+                    <td>
+                        {{ $contract->contract_name }}
+                    </td>
 
-                        Follow-up pending
+                    <td>
+                        {{ $contract->contract_number }}
+                    </td>
+
+                    <td>
+
+                        @foreach($contract->services as $contractService)
+
+                            {{ $contractService->service->service_name }}
+
+                            @if(!$loop->last)
+                                ,
+                            @endif
+
+                        @endforeach
+
+                    </td>
+
+                    <td>
+                        {{ $contract->start_date?->format('d/m/Y') }}
+                    </td>
+
+                    <td>
+                        {{ $contract->end_date?->format('d/m/Y') }}
+                    </td>
+
+                    <td>
+
+                        Rp {{ number_format(
+
+                            $contract->services->sum(
+                                fn($item)
+                                => $item->service->monthly_fee
+                            ),
+
+                            0,
+                            ',',
+                            '.'
+                        ) }}
+
+                    </td>
+
+                    <td>
+
+                        @if($contract->status === 'active')
+
+                            <span class="green-text">
+
+                                Active
+
+                            </span>
+
+                        @elseif($contract->status === 'expiring')
+
+                            <span class="yellow-text">
+
+                                Expiring Soon
+
+                            </span>
+
+                        @elseif($contract->status === 'followup')
+
+                            <span class="red-text">
+
+                                Follow-up Pending
+
+                            </span>
+
+                        @elseif($contract->status === 'expired')
+
+                            <span>
+
+                                Expired
+
+                            </span>
+
+                        @elseif($contract->status === 'terminated')
+
+                            <span>
+
+                                Terminated
+
+                            </span>
+
+                        @endif
 
                     </td>
 
                 </tr>
 
+            @empty
 
-                <tr class="expiring-row">
+                <tr>
 
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>Enterprise</td>
-                    <td>17/11/2025</td>
-                    <td>28/05/2026</td>
-                    <td>Rp 5.000.000</td>
+                    <td
+                        colspan="7"
+                        style="
+                            text-align:center;
+                            padding:20px;
+                        ">
 
-                    <td class="yellow-text">
-
-                        Expiring soon
-
-                    </td>
-
-                </tr>
-
-
-                <tr class="active-row">
-
-                    <td>PT Maju Bersama</td>
-                    <td>1234567890</td>
-                    <td>Enterprise</td>
-                    <td>13/11/2025</td>
-                    <td>30/05/2026</td>
-                    <td>Rp 7.000.000</td>
-
-                    <td class="green-text">
-
-                        Active
+                        No contracts found
 
                     </td>
 
                 </tr>
+
+            @endforelse
 
             </tbody>
 
         </table>
+
+    </div>
+
+    <div style="margin-top:20px">
+
+        {{ $contracts->links() }}
 
     </div>
 

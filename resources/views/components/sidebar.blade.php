@@ -35,9 +35,16 @@
                 <span>›</span>
             </a>
         </li>
+        
+        @php
+        $defaultAm = \App\Models\User::where(
+            'role_id',
+            \App\Models\User::ROLE_ACCOUNT_MANAGER
+        )->first();
+        @endphp
 
-                <li class="{{ request()->routeIs('am.detail-am') ? 'active' : '' }}">
-            <a href="{{ route('am.detail-am') }}">
+        <li class="{{ request()->routeIs('account-managers.show') ? 'active' : '' }}">
+            <a href="{{ route('account-managers.show', $defaultAm->id) }}">
                 <span>Detail Account Manager</span>
                 <span>›</span>
             </a>

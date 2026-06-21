@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\NotificationSettingController;
+use App\Http\Controllers\AmController;
 
 Route::middleware('guest')->group(function () {
 
@@ -62,9 +63,14 @@ Route::middleware('auth')->group(function () {
     )->name('contracts.destroy');
 
     Route::get(
-        '/account-manager-detail',function () {
-    return view('am.detail-am');
-    })->name('am.detail-am');
+        '/account-manager/{user}',
+        [AmController::class, 'show']
+    )->name('account-managers.show');
+
+    Route::get(
+    '/account-manager/{user}/export',
+    [AmController::class, 'export']
+    )->name('account-managers.export');
 
     Route::get(
     '/contracts/{contract}/edit',
