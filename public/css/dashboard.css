@@ -67,7 +67,6 @@ a {
 .vt-brand {
     display: flex;
     align-items: center;
-    gap: 3px;
     margin-bottom: 32px;
 }
 
@@ -88,7 +87,7 @@ a {
 }
 
 .vt-brand h1 {
-    font-size: 30px;
+    font-size: 25px;
     line-height: 1;
     letter-spacing: -1px;
     font-weight: 900;
@@ -97,7 +96,7 @@ a {
 }
 
 .vt-brand h1 span {
-    color: #ef2b2b;
+    color: #ff0c0c;
 }
 
 .vt-brand p {
