@@ -99,11 +99,53 @@
         </a>
     </nav>
 
+@php
+
+    $user = auth()->user();
+
+    $roleName = match($user->role_id) {
+
+        \App\Models\User::ROLE_MANAGER
+            => 'Manager',
+
+        \App\Models\User::ROLE_ACCOUNT_MANAGER
+            => 'Account Manager',
+
+        \App\Models\User::ROLE_SUPPORT_INPUTTER
+            => 'Support Inputter',
+
+        \App\Models\User::ROLE_SUPPORT_PAYCALL
+            => 'Support Paycall',
+
+        default
+            => 'User'
+    };
+
+@endphp
+
     <div class="vt-user-card">
-        <div class="vt-avatar">B</div>
-        <div>
-            <h4>Budi Santoso</h4>
-            <p>Account Manager</p>
+
+        <div class="vt-avatar">
+
+            {{ strtoupper(substr($user->name, 0, 1)) }}
+
         </div>
+
+        <div>
+
+            <h4>
+
+                {{ $user->name }}
+
+            </h4>
+
+            <p>
+
+                {{ $roleName }}
+
+            </p>
+
+        </div>
+
     </div>
 </aside>
