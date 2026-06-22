@@ -7,34 +7,20 @@
         ->implode('');
 @endphp
 
+
 <header class="vt-navbar">
-
     <div>
-
         <p>Welcome back,</p>
-
         <h2>{{ $user->name }}</h2>
-
     </div>
 
     <div class="vt-navbar-actions">
-
         <button class="vt-notification-btn">
-
             !
-
             <small>3</small>
-
         </button>
 
-        <a
-            href="{{ route('profile') }}"
-            class="vt-profile-btn">
-
-            {{ $initials }}
-
-        </a>
-
+        <button class="vt-profile-btn">{{ $initials }}</button>
     </div>
-
 </header>
+
