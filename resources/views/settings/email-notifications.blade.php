@@ -2,77 +2,70 @@
 
 @section('title', 'Email Notifications | VasTrack')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/email-notifications.css') }}?v={{ time() }}">
+@endsection
+
 @section('content')
 
-<div class="email-notif-page">
+<div class="email-page">
 
-    <div class="email-notif-header">
+    <div class="email-header">
         <h1>Email Notifications</h1>
         <p>Configure automatic email alerts and delivery schedules for important contract notifications.</p>
     </div>
 
-    <form action="#" method="POST" class="email-notif-form">
+    <form action="#" method="POST" class="email-form">
         @csrf
 
-        <section class="email-notif-card">
-            <div class="email-notif-card-header">
-                <div class="email-notif-header-icon mail">
-                    ✉
-                </div>
+        <section class="email-card">
+            <div class="email-card-title">
+                <div class="email-title-icon">✉</div>
 
                 <div>
                     <h2>Automatic Email Alert Settings</h2>
+                    <p>Set recipients for critical contract and billing notifications.</p>
                 </div>
             </div>
 
-            <div class="email-field-group">
-                <label for="manager_email">Manager Email</label>
-                <p>Recipient of all critical alerts</p>
+            <div class="email-grid">
+                <div class="email-field">
+                    <label>Manager Email</label>
+                    <p>Recipient of all critical alerts</p>
 
-                <div class="email-input-box">
-                    <div class="email-input-icon">✉</div>
-                    <input 
-                        type="email" 
-                        id="manager_email" 
-                        name="manager_email" 
-                        value="manager@perusahaan.com"
-                    >
+                    <div class="email-input">
+                        <span>✉</span>
+                        <input type="email" name="manager_email" value="manager@perusahaan.com">
+                    </div>
                 </div>
-            </div>
 
-            <div class="email-field-group">
-                <label for="support_email">Admin / Support Email</label>
-                <p>Recipient of overdue billing alerts</p>
+                <div class="email-field">
+                    <label>Admin / Support Email</label>
+                    <p>Recipient of overdue billing alerts</p>
 
-                <div class="email-input-box">
-                    <div class="email-input-icon">✉</div>
-                    <input 
-                        type="email" 
-                        id="support_email" 
-                        name="support_email" 
-                        value="admin@perusahaan.com"
-                    >
+                    <div class="email-input">
+                        <span>✉</span>
+                        <input type="email" name="admin_email" value="admin@perusahaan.com">
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="email-notif-card schedule-section">
-            <div class="email-notif-card-header">
-                <div class="email-notif-header-icon alert">
-                    🔔
-                </div>
+        <section class="email-card">
+            <div class="email-card-title">
+                <div class="email-title-icon warning">🔔</div>
 
                 <div>
                     <h2>Alert Email Delivery Schedule</h2>
+                    <p>Manage delivery frequency for contract expiration reminders.</p>
                 </div>
             </div>
 
-            <div class="schedule-table-card">
+            <div class="schedule-list">
+
                 <div class="schedule-row">
-                    <div class="schedule-info">
-                        <div class="schedule-icon urgent">
-                            📅
-                        </div>
+                    <div class="schedule-left">
+                        <div class="schedule-icon urgent">📅</div>
 
                         <div>
                             <h3>Contracts expiring in &lt; 7 days</h3>
@@ -80,7 +73,7 @@
                         </div>
                     </div>
 
-                    <div class="schedule-action">
+                    <div class="schedule-right">
                         <span class="schedule-badge urgent">Daily</span>
 
                         <select name="daily_schedule">
@@ -92,10 +85,8 @@
                 </div>
 
                 <div class="schedule-row">
-                    <div class="schedule-info">
-                        <div class="schedule-icon warning">
-                            📅
-                        </div>
+                    <div class="schedule-left">
+                        <div class="schedule-icon expiring">📅</div>
 
                         <div>
                             <h3>Contracts expiring in 8–30 days</h3>
@@ -103,8 +94,8 @@
                         </div>
                     </div>
 
-                    <div class="schedule-action">
-                        <span class="schedule-badge warning">Weekly</span>
+                    <div class="schedule-right">
+                        <span class="schedule-badge expiring">Weekly</span>
 
                         <select name="weekly_schedule">
                             <option selected>Monday morning</option>
@@ -113,15 +104,16 @@
                         </select>
                     </div>
                 </div>
+
             </div>
 
-            <div class="email-notif-footer">
+            <div class="email-footer">
                 <div class="email-note">
                     <span>i</span>
                     <p>Emails will be sent to the recipients above based on the schedule you set.</p>
                 </div>
 
-                <button type="submit" class="save-email-btn">
+                <button type="submit" class="email-save-btn">
                     <span>✓</span>
                     Save Settings
                 </button>
