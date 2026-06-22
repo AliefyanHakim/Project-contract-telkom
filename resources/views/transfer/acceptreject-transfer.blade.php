@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
+@section('title', 'Accept Reject Transfer | VasTrack')
+
 @section('styles')
-
-<link rel="stylesheet"
-href="{{ asset('css/transfer2.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('css/transfer2.css') }}?v={{ time() }}">
 @endsection
 
 @section('content')
