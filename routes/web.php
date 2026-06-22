@@ -101,11 +101,15 @@ Route::get(
 
     Route::get('/transfer-request', function () {
     return view('transfer.transfer-request');
-});
+    });
 
-Route::get('/direct-transfer', function () {
-    return view('transfer.direct-transfer');
-});
+    Route::get('/direct-transfer', function () {
+        return view('transfer.direct-transfer');
+    });
+
+        Route::get('/transfer-contract', function () {
+    return view('transfer.transfer-contract');
+    });
 
     Route::get('acceptreject-transfer', function () {
         return view('transfer.acceptreject-transfer');

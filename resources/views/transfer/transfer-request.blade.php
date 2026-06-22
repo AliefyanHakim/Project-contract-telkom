@@ -95,7 +95,7 @@
                 </button>
             </div>
 
-            <a href="#" class="transfer-add-btn">
+            <a href="{{ url('/transfer-contract') }}" class="transfer-add-btn">
                 <span>＋</span>
                 Transfer Contract
             </a>
