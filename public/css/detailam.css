@@ -429,3 +429,37 @@
         grid-column: auto;
     }
 }
+
+.am-dropdown{
+    width: 220px;
+    padding: 10px 40px 10px 15px;
+    border: 2px solid #d9d9d9;
+    border-radius: 12px;
+    background-color: white;
+    color: #002060;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+
+    /* Hilangkan tampilan default */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Icon panah */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%23002060' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+.am-dropdown:hover{
+    border-color: #007bff;
+}
+
+.am-dropdown:focus{
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0,123,255,0.2);
+}
