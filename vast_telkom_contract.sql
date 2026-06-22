@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 20, 2026 at 10:43 AM
+-- Generation Time: Jun 22, 2026 at 02:33 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -93,7 +93,8 @@ CREATE TABLE `contracts` (
 
 INSERT INTO `contracts` (`id`, `contract_number`, `contract_name`, `owner_am_id`, `start_date`, `end_date`, `status`, `created_by`, `created_at`, `updated_at`, `customer_id_number`, `telkom_name`, `telkom_position`, `telkom_unit`, `customer_address`, `customer_npwp`, `customer_pic_name`, `customer_pic_position`, `customer_phone`, `customer_email`, `generated_file`, `signing_date`, `signing_location`) VALUES
 (5, '1', 'a', 9, '2026-06-20', '2026-06-27', 'expired', 8, '2026-06-20 01:21:56', '2026-06-20 03:09:41', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', NULL, '2026-06-20', 'a'),
-(6, '12', 'a', 9, '2026-06-20', '2026-06-27', 'active', 8, '2026-06-20 01:23:29', '2026-06-20 01:23:29', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', NULL, '2026-06-20', 'a');
+(6, '12', 'a', 9, '2026-06-20', '2026-06-27', 'active', 8, '2026-06-20 01:23:29', '2026-06-20 01:23:29', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', NULL, '2026-06-20', 'a'),
+(7, '2', 'b', 9, '2026-06-22', '2026-07-22', 'active', 8, '2026-06-21 19:06:39', '2026-06-21 19:06:39', '1', 'b', 'b', 'b', 'b', 'b', 'b', 'b', '1', 'b@gmail.com', NULL, '2026-06-23', 'b');
 
 -- --------------------------------------------------------
 
@@ -151,9 +152,10 @@ INSERT INTO `contract_services` (`id`, `contract_id`, `service_id`, `created_at`
 (2, 2, 3, '2026-06-20 01:17:56', '2026-06-20 01:17:56'),
 (3, 3, 3, '2026-06-20 01:20:13', '2026-06-20 01:20:13'),
 (4, 4, 3, '2026-06-20 01:21:45', '2026-06-20 01:21:45'),
-(6, 6, 3, '2026-06-20 01:23:29', '2026-06-20 01:23:29'),
 (15, 5, 3, '2026-06-20 03:09:41', '2026-06-20 03:09:41'),
-(16, 5, 1, '2026-06-20 03:09:41', '2026-06-20 03:09:41');
+(16, 5, 1, '2026-06-20 03:09:41', '2026-06-20 03:09:41'),
+(17, 7, 3, '2026-06-21 19:06:39', '2026-06-21 19:06:39'),
+(20, 6, 3, '2026-06-21 19:29:43', '2026-06-21 19:29:43');
 
 -- --------------------------------------------------------
 
@@ -330,8 +332,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('ha1HkM468IDUV6KsVO36StNPqG4X5ex7bae8WLtp', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJDaHN0TTlQTnpOMUg4bVNqYUZZMlVmUWZHeThZdlNLRExrWmRYS0hPIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9jb250cmFjdC1saXN0Iiwicm91dGUiOiJjb250cmFjdC5saXN0In0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjh9', 1781951177),
-('XeIG7K65vmxgKYYMlhHeM2uyFJX3MLCrZGt4XIpl', 13, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJYNUVoWm9hSHlVZks2OEJscTZxYWlYU0lQZW1WOTlDbHFOMERFVUoxIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9jb250cmFjdHNcLzYiLCJyb3V0ZSI6ImNvbnRyYWN0cy5zaG93In0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjEzfQ==', 1781950209);
+('27cYCk6b2r1u63wM9VZjbWDDuCyZtDe9KRdKPDyS', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.125.1 Chrome/148.0.7778.97 Electron/42.2.0 Safari/537.36', 'eyJfdG9rZW4iOiJPelBqRjNkSFQxdjhUcG12WXNWNW1KTXpZeWJOZ1kwYmtVdmxYblk0IiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1782089250),
+('Xtlj20PdfNx9aXANhxrOxN6RE3mDjhZKxvKF3nux', 13, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJsbmxmaUpPYlFqZE5jdDZPNzNLSEJqSnRJR2RyR3ViVmRPUWY0ZW5MIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2NvbnRyYWN0cyIsInJvdXRlIjoiY29udHJhY3RzLmluZGV4In0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjoxM30=', 1782095387);
 
 -- --------------------------------------------------------
 
@@ -355,7 +357,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `role_id`, `name`, `email`, `password`, `status`, `created_at`, `updated_at`) VALUES
-(8, 1, 'Manager', 'manager@telkom.com', '$2y$12$x/jKf20Lo8Lck9FpPjqnJO9KV5TGrui//UDH/.vV.tf.o2PjibgiK', 'active', '2026-06-17 02:06:36', '2026-06-17 02:06:36'),
+(8, 1, 'Manager', 'manager@telkom.com', '$2y$12$x/jKf20Lo8Lck9FpPjqnJO9KV5TGrui//UDH/.vV.tf.o2PjibgiK', 'active', '2026-06-17 02:06:36', '2026-06-21 17:57:33'),
 (9, 2, 'Account Manager 1', 'AM1@telkom.com', '$2y$12$SdYtglKdH0H5ADuf16lEyeAsLgY2Sl8hOnR45qEcwWuSYJnc.fuH2', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
 (10, 2, 'Account Manager 2', 'AM2@telkom.com', '$2y$12$fwFUKh.sSsn6NmyyDsB/VujtpY7OtiH5koMosRT.qVfEePZM91ZrS', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
 (11, 2, 'Account Manager 3', 'AM3@telkom.com', '$2y$12$Mc2XZmFr0wOm4em/ZpaRdu7x9MJuMeGFC7Wn0pCZrg00JNWy2VlIC', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
@@ -508,7 +510,7 @@ ALTER TABLE `billings`
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `contract_extensions`
@@ -526,7 +528,7 @@ ALTER TABLE `contract_files`
 -- AUTO_INCREMENT for table `contract_services`
 --
 ALTER TABLE `contract_services`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `contract_transfer_history`
