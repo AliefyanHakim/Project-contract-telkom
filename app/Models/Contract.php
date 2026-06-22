@@ -99,29 +99,46 @@ class Contract extends Model
 
     public function getCalculatedStatusAttribute()
     {
-        if (!$this->end_date) {
-            return 'active';
+        /*
+        |--------------------------------------------------------------------------
+        | Prioritaskan status manual dari database
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->status === 'terminated') {
+            return 'terminated';
         }
 
-        $days = Carbon::today()->diffInDays(
-            Carbon::parse($this->end_date),
-            false
-        );
-
-        if ($days < 0) {
+        if ($this->status === 'expired') {
             return 'expired';
         }
 
-        if ($days <= 7) {
+        /*
+        |--------------------------------------------------------------------------
+        | Hitung berdasarkan end date
+        |--------------------------------------------------------------------------
+        */
+
+        $daysRemaining = now()->diffInDays(
+            $this->end_date,
+            false
+        );
+
+        if ($daysRemaining < 0) {
+            return 'expired';
+        }
+
+        if ($daysRemaining <= 7) {
             return 'followup';
         }
 
-        if ($days <= 30) {
+        if ($daysRemaining <= 30) {
             return 'expiring';
         }
 
         return 'active';
-    }
+    }   
+
     public function updateStatus()
     {
         $daysRemaining = now()

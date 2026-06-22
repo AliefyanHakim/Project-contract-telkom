@@ -264,28 +264,34 @@ class ContractController extends Controller
     }
 
     public function getCalculatedStatusAttribute()
-{
-    if (!$this->end_date) {
-        return $this->status;
+    {
+        if ($this->status === 'terminated') {
+            return 'terminated';
+        }
+
+        if ($this->status === 'expired') {
+            return 'expired';
+        }
+
+        $daysRemaining = now()->diffInDays(
+            $this->end_date,
+            false
+        );
+
+        if ($daysRemaining < 0) {
+            return 'expired';
+        }
+
+        if ($daysRemaining <= 7) {
+            return 'followup';
+        }
+
+        if ($daysRemaining <= 30) {
+            return 'expiring';
+        }
+
+        return 'active';
     }
-
-    $daysRemaining = Carbon::today()
-        ->diffInDays($this->end_date, false);
-
-    if ($daysRemaining < 0) {
-        return 'expired';
-    }
-
-    if ($daysRemaining <= 7) {
-        return 'followup';
-    }
-
-    if ($daysRemaining <= 30) {
-        return 'expiring';
-    }
-
-    return 'active';
-}
 
     public function updateStatus()
     {

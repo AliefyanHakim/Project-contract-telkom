@@ -141,7 +141,9 @@
 
             </select>
 
-            <select name="service">
+            <select 
+            name="service"
+            onchange="this.form.submit()">
 
                 <option value="">
                     All Packages
@@ -269,7 +271,6 @@
                     </td>
 
                     <td>
-
                         @if($contract->calculated_status === 'active')
 
                             <span class="am-status active">
