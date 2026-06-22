@@ -157,40 +157,4 @@
     </div>
 </section>
 
-<section class="vt-quick-actions">
-    <div class="vt-panel-header">
-        <div>
-            <h3>Quick Actions</h3>
-            <p>Shortcut for contract management activities</p>
-        </div>
-    </div>
-
-    <div class="vt-action-grid">
-        <a href="#" class="vt-action-card">
-            <span>+</span>
-            Add New Contract
-        </a>
-
-        <a href="#" class="vt-action-card">
-            <span>↑</span>
-            Upload Contract
-        </a>
-
-        <a href="#" class="vt-action-card">
-            <span>⇄</span>
-            Request Transfer
-        </a>
-
-        <a href="#" class="vt-action-card">
-            <span>R</span>
-            Generate Report
-        </a>
-
-        <a href="#" class="vt-action-card danger">
-            <span>!</span>
-            Set Reminder
-        </a>
-    </div>
-</section>
-
 @endsection
