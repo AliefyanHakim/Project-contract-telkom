@@ -8,19 +8,6 @@
 
 @section('content')
 
-@php
-    $rows = collect([
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-11', 'end' => '2026-05-29'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-18', 'end' => '2026-06-15'],
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-04', 'end' => '2026-05-31'],
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-16', 'end' => '2026-05-30'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-18', 'end' => '2026-06-18'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-17', 'end' => '2026-06-20'],
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-13', 'end' => '2026-05-29'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-12', 'end' => '2026-06-22'],
-    ]);
-@endphp
-
 <div class="contract-page">
 
     <div class="contract-header">
@@ -47,7 +34,9 @@
         action="{{ route('contract.closed') }}"
         class="contract-toolbar">
 
-            <select name="account_manager">
+            <select 
+            name="account_manager"
+            onchange="this.form.submit()">
 
                 <option value="">
                     All Account Managers
@@ -69,13 +58,17 @@
 
             </select>
 
-            <select name="status">
+            <select 
+                name="status"
+                onchange="this.form.submit()">
                 <option value="">All Statuses</option>
                 <option value="expired">Expired</option>
                 <option value="terminated">Terminated</option>
             </select>
 
-            <select name="service">
+            <select 
+                name="service"
+                onchange="this.form.submit()">
 
                 <option value="">
                     All Packages

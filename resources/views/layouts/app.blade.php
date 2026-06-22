@@ -12,6 +12,7 @@
 </head>
 <body>
 
+@yield('scripts')
 <div class="vt-app">
     @include('components.sidebar')
 

@@ -37,7 +37,9 @@
 
         @if(!auth()->user()->isAccountManager())
 
-        <select name="account_manager">
+        <select 
+        name="account_manager"
+        onchange="this.form.submit()">
 
             <option value="">
                 All Account Managers
@@ -59,14 +61,43 @@
 
         @endif
 
-        <select name="status"> 
-            <option value="">All Statuses</option> 
-            <option value="active">Active</option> 
-            <option value="expiring">Expiring Soon</option> 
-            <option value="followup">Follow-up Pending</option>
+        <select 
+        name="status"
+        onchange="this.form.submit()">
+
+            <option value="">
+                All Statuses
+            </option>
+
+            <option
+                value="active"
+                @selected(request('status') == 'active')>
+
+                Active
+
+            </option>
+
+            <option
+                value="expiring"
+                @selected(request('status') == 'expiring')>
+
+                Expiring Soon
+
+            </option>
+
+            <option
+                value="followup"
+                @selected(request('status') == 'followup')>
+
+                Follow-up Pending
+
+            </option>
+
         </select>
 
-        <select name="service">
+        <select 
+        name="service"
+        onchange="this.form.submit()">
 
                 <option value="">
                     All Packages
@@ -131,7 +162,7 @@
                 @forelse($contracts as $contract)
 
                 <tr
-                    class="contract-row {{ $contract->status }}"
+                    class="contract-row {{ $contract->calculated_status }}"
                     onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
                     style="cursor:pointer;">
 
@@ -171,7 +202,7 @@
 
                     <td>
 
-                        @if($contract->status === 'active')
+                        @if($contract->calculated_status === 'active')
 
                             <span class="contract-status active">
 
@@ -179,7 +210,7 @@
 
                             </span>
 
-                        @elseif($contract->status === 'expiring')
+                        @elseif($contract->calculated_status === 'expiring')
 
                             <span class="contract-status expiring">
 
@@ -187,7 +218,7 @@
 
                             </span>
 
-                        @elseif($contract->status === 'followup')
+                        @elseif($contract->calculated_status === 'followup')
 
                             <span class="contract-status followup">
 

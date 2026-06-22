@@ -325,6 +325,31 @@ href="{{ asset('css/create.css') }}">
 @section('scripts')
 
 <script>
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        console.log('LOADED');
+
+        const container =
+            document.getElementById('services-container');
+
+        const addButton =
+            document.getElementById('add-service');
+
+        console.log(container);
+        console.log(addButton);
+
+        addButton.addEventListener(
+            'click',
+            function () {
+
+                console.log('CLICKED');
+
+            }
+        );
+    }
+);
 
 document.addEventListener(
     'DOMContentLoaded',
@@ -425,3 +450,4 @@ document.addEventListener(
 </script>
 
 @endsection
+

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class Contract extends Model
 {
@@ -93,5 +95,59 @@ class Contract extends Model
         return $this->hasMany(
             ContractTransferHistory::class
         );
+    }
+
+    public function getCalculatedStatusAttribute()
+    {
+        if (!$this->end_date) {
+            return 'active';
+        }
+
+        $days = Carbon::today()->diffInDays(
+            Carbon::parse($this->end_date),
+            false
+        );
+
+        if ($days < 0) {
+            return 'expired';
+        }
+
+        if ($days <= 7) {
+            return 'followup';
+        }
+
+        if ($days <= 30) {
+            return 'expiring';
+        }
+
+        return 'active';
+    }
+    public function updateStatus()
+    {
+        $daysRemaining = now()
+            ->startOfDay()
+            ->diffInDays(
+                $this->end_date,
+                false
+            );
+
+        if ($daysRemaining < 0) {
+
+            $this->status = 'expired';
+
+        } elseif ($daysRemaining <= 7) {
+
+            $this->status = 'followup';
+
+        } elseif ($daysRemaining <= 30) {
+
+            $this->status = 'expiring';
+
+        } else {
+
+            $this->status = 'active';
+        }
+
+        $this->save();
     }
 }

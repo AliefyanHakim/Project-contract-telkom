@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Contract;
 use App\Models\User;
 use App\Models\Service;
@@ -15,138 +16,138 @@ class ContractController extends Controller
     /**
      * Display a listing of contracts.
      */
-public function index(Request $request)
-{
-    $query = Contract::with([
-        'owner',
-        'creator',
-        'services.service'
-    ]);
+    public function index(Request $request)
+    {
+        $query = Contract::with([
+            'owner',
+            'creator',
+            'services.service'
+        ]);
 
-    /** @var \App\Models\User $user */
-    $user = Auth::user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-    /*
-    |--------------------------------------------------------------------------
-    | AM hanya melihat kontrak miliknya
-    |--------------------------------------------------------------------------
-    */
-    if ($user->isAccountManager()) {
+        /*
+        |--------------------------------------------------------------------------
+        | AM hanya melihat kontrak miliknya
+        |--------------------------------------------------------------------------
+        */
+        if ($user->isAccountManager()) {
 
-        $query->where(
-            'owner_am_id',
-            $user->id
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Current Contract
-    |--------------------------------------------------------------------------
-    */
-    $query->where('status', 'active');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Search
-    |--------------------------------------------------------------------------
-    */
-    if ($request->filled('search')) {
-
-        $search = trim($request->search);
-
-        $query->where(function ($q) use ($search) {
-
-            $q->where(
-                'contract_name',
-                'like',
-                "%{$search}%"
-            )
-            ->orWhere(
-                'contract_number',
-                'like',
-                "%{$search}%"
+            $query->where(
+                'owner_am_id',
+                $user->id
             );
-        });
-    }
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Filter AM
-    |--------------------------------------------------------------------------
-    */
-    if (
-        $request->filled('account_manager')
-        && !$user->isAccountManager()
-    ) {
+        /*
+        |--------------------------------------------------------------------------
+        | Current Contract
+        |--------------------------------------------------------------------------
+        */
+        $query->where('status', 'active');
 
-        $query->where(
-            'owner_am_id',
-            $request->account_manager
-        );
-    }
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+        if ($request->filled('search')) {
 
-    /*
-    |--------------------------------------------------------------------------
-    | Filter Service
-    |--------------------------------------------------------------------------
-    */
-    if ($request->filled('service')) {
+            $search = trim($request->search);
 
-        $query->whereHas(
-            'services',
-            function ($q) use ($request) {
+            $query->where(function ($q) use ($search) {
 
                 $q->where(
-                    'service_id',
-                    $request->service
+                    'contract_name',
+                    'like',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'contract_number',
+                    'like',
+                    "%{$search}%"
                 );
-            }
-        );
-    }
+            });
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Filter Status
-    |--------------------------------------------------------------------------
-    */
-    if ($request->filled('status')) {
+        /*
+        |--------------------------------------------------------------------------
+        | Filter AM
+        |--------------------------------------------------------------------------
+        */
+        if (
+            $request->filled('account_manager')
+            && !$user->isAccountManager()
+        ) {
 
-        $query->where(
-            'status',
-            $request->status
-        );
-    }
+            $query->where(
+                'owner_am_id',
+                $request->account_manager
+            );
+        }
 
-    $contracts = $query
-        ->orderBy('end_date')
-        ->paginate(15)
-        ->withQueryString();
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Service
+        |--------------------------------------------------------------------------
+        */
+        if ($request->filled('service')) {
 
-    $accountManagers = User::where(
-        'role_id',
-        User::ROLE_ACCOUNT_MANAGER
-    )
-    ->where('status', 'active')
-    ->orderBy('name')
-    ->get();
+            $query->whereHas(
+                'services',
+                function ($q) use ($request) {
 
-    $services = Service::where(
-        'status',
-        'active'
-    )
-    ->orderBy('service_name')
-    ->get();
+                    $q->where(
+                        'service_id',
+                        $request->service
+                    );
+                }
+            );
+        }
 
-    return view(
-        'contracts.contract-list',
-        compact(
-            'contracts',
-            'accountManagers',
-            'services'
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Status
+        |--------------------------------------------------------------------------
+        */
+        if ($request->filled('status')) {
+
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+        $contracts = $query
+            ->orderBy('end_date')
+            ->paginate(15)
+            ->withQueryString();
+
+        $accountManagers = User::where(
+            'role_id',
+            User::ROLE_ACCOUNT_MANAGER
         )
-    );
-}
+        ->where('status', 'active')
+        ->orderBy('name')
+        ->get();
+
+        $services = Service::where(
+            'status',
+            'active'
+        )
+        ->orderBy('service_name')
+        ->get();
+
+        return view(
+            'contracts.contract-list',
+            compact(
+                'contracts',
+                'accountManagers',
+                'services'
+            )
+        );
+    }
 
     public function closedContracts(Request $request)
     {
@@ -262,6 +263,58 @@ public function index(Request $request)
         );
     }
 
+    public function getCalculatedStatusAttribute()
+{
+    if (!$this->end_date) {
+        return $this->status;
+    }
+
+    $daysRemaining = Carbon::today()
+        ->diffInDays($this->end_date, false);
+
+    if ($daysRemaining < 0) {
+        return 'expired';
+    }
+
+    if ($daysRemaining <= 7) {
+        return 'followup';
+    }
+
+    if ($daysRemaining <= 30) {
+        return 'expiring';
+    }
+
+    return 'active';
+}
+
+    public function updateStatus()
+    {
+        $daysRemaining = now()
+            ->startOfDay()
+            ->diffInDays(
+                $this->end_date,
+                false
+            );
+
+        if ($daysRemaining < 0) {
+
+            $this->status = 'expired';
+
+        } elseif ($daysRemaining <= 7) {
+
+            $this->status = 'followup';
+
+        } elseif ($daysRemaining <= 30) {
+
+            $this->status = 'expiring';
+
+        } else {
+
+            $this->status = 'active';
+        }
+
+        $this->save();
+    }
     /**
      * Show form create contract.
      */
@@ -461,6 +514,8 @@ public function index(Request $request)
                 'created_by'
                     => Auth::id(),
             ]);
+
+            $contract->updateStatus();
 
             foreach ($validated['services'] as $serviceId) {
 
@@ -666,6 +721,21 @@ public function index(Request $request)
             }
 
             $contract->update($data);
+
+            $contract->refresh();
+
+            $contract->updateStatus();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Hapus service lama
+            |--------------------------------------------------------------------------
+            */
+
+            ContractService::where(
+                'contract_id',
+                $contract->id
+            )->delete();
 
             /*
             |--------------------------------------------------------------------------

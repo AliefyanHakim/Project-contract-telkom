@@ -99,7 +99,9 @@
         action="{{ route('account-managers.show', $user->id) }}"
         class="am-filter-bar">
 
-            <select name="status">
+            <select 
+            name="status"
+            onchange="this.form.submit()">
 
                 <option value="">
                     All Statuses
@@ -126,6 +128,14 @@
                     @selected(request('status') == 'followup')>
 
                     Follow-up Pending
+
+                </option>
+
+                <option
+                    value="expired"
+                    @selected(request('status') == 'expired')>
+
+                    Expired
 
                 </option>
 
@@ -260,7 +270,7 @@
 
                     <td>
 
-                        @if($contract->status === 'active')
+                        @if($contract->calculated_status === 'active')
 
                             <span class="am-status active">
 
@@ -268,7 +278,7 @@
 
                             </span>
 
-                        @elseif($contract->status === 'expiring')
+                        @elseif($contract->calculated_status === 'expiring')
 
                             <span class="am-status expiring">
 
@@ -276,7 +286,7 @@
 
                             </span>
 
-                        @elseif($contract->status === 'followup')
+                        @elseif($contract->calculated_status === 'followup')
 
                             <span class="am-status followup">
 
@@ -284,7 +294,7 @@
 
                             </span>
 
-                        @elseif($contract->status === 'expired')
+                        @elseif($contract->calculated_status === 'expired')
 
                             <span class="am-status expired">
 
@@ -292,7 +302,7 @@
 
                             </span>
 
-                        @elseif($contract->status === 'terminated')
+                        @elseif($contract->calculated_status === 'terminated')
 
                             <span class="am-status terminated">
 
