@@ -62,9 +62,15 @@ Route::get(
     [ContractController::class, 'destroy']
     )->name('contracts.destroy');
 
-    Route::get('/detailam', function () {
-    return view('am.detail-am');
-})->name('detailam');
+    Route::get(
+        '/account-manager/{user}',
+        [AmController::class, 'show']
+    )->name('account-managers.show');
+
+    Route::get(
+    '/account-manager/{user}/export',
+    [AmController::class, 'export']
+    )->name('account-managers.export');
 
     Route::get(
     '/contracts/{contract}/edit',

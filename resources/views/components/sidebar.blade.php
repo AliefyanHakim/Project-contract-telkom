@@ -34,12 +34,39 @@
     <b>›</b>
 </a>
 
-<a href="{{ url('/detailam') }}"
-   class="vt-menu-item {{ request()->is('detailam') ? 'active' : '' }}">
-    <span class="vt-menu-icon">AM</span>
-    <span>By Account Manager</span>
-    <b>›</b>
-</a>
+        @php
+            $firstAm = \App\Models\User::where(
+                'role_id',
+                \App\Models\User::ROLE_ACCOUNT_MANAGER
+            )
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->first();
+        @endphp
+
+        @if($firstAm)
+
+        <a
+            href="{{ route('account-managers.show', $firstAm->id) }}"
+            class="vt-menu-item {{
+                request()->routeIs('account-managers.*')
+                    ? 'active'
+                    : ''
+            }}">
+
+            <span class="vt-menu-icon">
+                AM
+            </span>
+
+            <span>
+                By Account Manager
+            </span>
+
+            <b>›</b>
+
+        </a>
+
+        @endif
 
         <a href="{{ url('/contract-alerts') }}"
            class="vt-menu-item {{ request()->is('contract-alerts*') ? 'active' : '' }}">
@@ -49,11 +76,11 @@
         </a>
 
         <a href="{{ url('/transfer-request') }}"
-   class="vt-menu-item {{ request()->is('transfer-request') || request()->is('direct-transfer') ? 'active' : '' }}">
-    <span class="vt-menu-icon">⇄</span>
-    <span>Transfer Request</span>
-    <b>›</b>
-</a>
+        class="vt-menu-item {{ request()->is('transfer-request') || request()->is('direct-transfer') ? 'active' : '' }}">
+            <span class="vt-menu-icon">⇄</span>
+            <span>Transfer Request</span>
+            <b>›</b>
+        </a>
 
         <p class="vt-menu-title">Settings</p>
 
