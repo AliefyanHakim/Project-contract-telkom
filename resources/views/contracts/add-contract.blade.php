@@ -279,6 +279,17 @@ href="{{ asset('css/create.css') }}">
 
             <div class="form-group">
 
+                <label>Upload Contract File</label>
+
+                <input
+                    type="file"
+                    name="contract_file"
+                    accept=".pdf,.doc,.docx">
+
+            </div>
+
+            <div class="form-group">
+
                 <label>Assigned Account Manager</label>
 
                 <select name="owner_am_id">

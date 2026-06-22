@@ -82,6 +82,15 @@ Route::get(
         [ContractController::class, 'update']
     )->name('contracts.update');
 
+    Route::get(
+        '/contract-files/{file}/download',
+        [ContractController::class, 'download']
+    )->name('contracts.download');
+
+    Route::get(
+    '/contract-files/{file}/view',
+    [ContractController::class, 'viewFile']
+    )->name('contracts.view');
 
     Route::get('/contract-alerts', function () {
         return view('alerts.contract-alerts');

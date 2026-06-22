@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Contract;
 use App\Models\ContractFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -28,5 +29,42 @@ class ContractFileController extends Controller
             'file_path'   => $path,
             'uploaded_by' => Auth::id(),
         ]);
+    }
+
+    public static function upload(
+    Contract $contract,
+    $file
+    ) {
+        $path = $file->store('contracts');
+
+        return self::create([
+            'contract_id' => $contract->id,
+            'file_name'   => $file->getClientOriginalName(),
+            'file_path'   => $path,
+            'uploaded_by' => Auth::id(),
+        ]);
+    }
+
+    public function download(
+        ContractFile $file
+    )
+    {
+        if (!Storage::exists($file->file_path)) {
+
+            dd([
+                'file_path' => $file->file_path,
+                'absolute' => storage_path(
+                    'app/' . $file->file_path
+                ),
+                'exists' => Storage::exists(
+                    $file->file_path
+                ),
+            ]);
+        }
+
+        return Storage::download(
+            $file->file_path,
+            $file->file_name
+        );
     }
 }

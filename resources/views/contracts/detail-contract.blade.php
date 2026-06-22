@@ -323,20 +323,29 @@ href="{{ asset('css/create.css') }}">
 
         <div class="form-group">
 
-            <label>Contract File</label>
+            <label>Contract Files</label>
 
-            @if($contract->generated_file)
+            @forelse($contract->files as $file)
 
                 <div class="file-row">
 
                     <div class="file-name">
 
-                        {{ $contract->generated_file }}
+                        {{ $file->file_name }}
 
                     </div>
 
                     <a
-                        href="{{ route('contracts.download', $contract) }}"
+                        href="{{ route('contracts.view', $file->id) }}"
+                        target="_blank"
+                        class="view-btn">
+
+                        View
+
+                    </a>
+
+                    <a
+                        href="{{ route('contracts.download', $file->id) }}"
                         class="download-btn">
 
                         Download
@@ -345,19 +354,19 @@ href="{{ asset('css/create.css') }}">
 
                 </div>
 
-            @else
+            @empty
 
                 <div class="file-row">
 
                     <div class="file-name">
 
-                        Contract file has not been generated yet.
+                        No contract file available.
 
                     </div>
 
                 </div>
 
-            @endif
+            @endforelse
 
         </div>
 
