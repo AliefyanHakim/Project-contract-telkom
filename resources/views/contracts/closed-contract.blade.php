@@ -43,12 +43,30 @@
 </div>
 
     <section class="contract-toolbar-card">
-        <form method="GET" action="{{ url('contracts.closed') }}" class="contract-toolbar">
+    <form method="GET"
+        action="{{ route('contract.closed') }}"
+        class="contract-toolbar">
 
             <select name="account_manager">
-                <option value="">All Account Managers</option>
-                <option value="am1">Account Manager 1</option>
-                <option value="am2">Account Manager 2</option>
+
+                <option value="">
+                    All Account Managers
+                </option>
+
+                @foreach($accountManagers as $am)
+
+                    <option
+                        value="{{ $am->id }}"
+                        @selected(
+                            request('account_manager') == $am->id
+                        )>
+
+                        {{ $am->name }}
+
+                    </option>
+
+                @endforeach
+
             </select>
 
             <select name="status">
@@ -57,11 +75,26 @@
                 <option value="terminated">Terminated</option>
             </select>
 
-            <select name="package">
-                <option value="">All Packages</option>
-                <option value="Enterprise">Enterprise</option>
-                <option value="Premium">Premium</option>
-                <option value="Basic">Basic</option>
+            <select name="service">
+
+                <option value="">
+                    All Packages
+                </option>
+
+                @foreach($services as $service)
+
+                    <option
+                        value="{{ $service->id }}"
+                        @selected(
+                            request('service') == $service->id
+                        )>
+
+                        {{ $service->service_name }}
+
+                    </option>
+
+                @endforeach
+
             </select>
 
             <div class="contract-search-box">
@@ -105,31 +138,71 @@
 
                 <tbody>
 
-                    @forelse ($rows as $row)
+                @forelse($contracts as $contract)
 
-                        <tr class="contract-row expired">
-                            <td>{{ $row['client'] }}</td>
-                            <td>{{ $row['am'] }}</td>
-                            <td>{{ $row['id'] }}</td>
-                            <td>{{ $row['package'] }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row['start'])->format('d/m/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row['end'])->format('d/m/Y') }}</td>
-                            <td>
-                                <span class="contract-status expired">
-                                    Expired
-                                </span>
-                            </td>
-                        </tr>
+                <tr
+                    onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
+                    style="cursor:pointer;">
 
-                    @empty
+                    <td>
+                        {{ $contract->contract_name }}
+                    </td>
 
-                        <tr>
-                            <td colspan="7" class="contract-empty">
-                                No closed contracts found.
-                            </td>
-                        </tr>
+                    <td>
+                        {{ $contract->owner?->name }}
+                    </td>
 
-                    @endforelse
+                    <td>
+                        {{ $contract->contract_number }}
+                    </td>
+
+                    <td>
+
+                        @foreach($contract->services as $contractService)
+
+                            {{ $contractService->service?->service_name }}
+
+                            @if(!$loop->last)
+                                ,
+                            @endif
+
+                        @endforeach
+
+                    </td>
+
+                    <td>
+                        {{ $contract->start_date?->format('d/m/Y') }}
+                    </td>
+
+                    <td>
+                        {{ $contract->end_date?->format('d/m/Y') }}
+                    </td>
+
+                    <td>
+
+                        <span class="contract-status expired">
+
+                            Expired
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                @empty
+
+                <tr>
+
+                    <td colspan="7" class="contract-empty">
+
+                        No closed contracts found.
+
+                    </td>
+
+                </tr>
+
+                @endforelse
 
                 </tbody>
 

@@ -8,19 +8,6 @@
 
 @section('content')
 
-@php
-    $rows = collect([
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-11', 'end' => '2026-05-29', 'status' => 'followup', 'label' => 'Follow-up pending'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-18', 'end' => '2026-06-15', 'status' => 'active', 'label' => 'Active'],
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-04', 'end' => '2026-05-31', 'status' => 'expiring', 'label' => 'Expiring Soon'],
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-16', 'end' => '2026-05-30', 'status' => 'expiring', 'label' => 'Expiring Soon'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-18', 'end' => '2026-06-18', 'status' => 'active', 'label' => 'Active'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-17', 'end' => '2026-06-20', 'status' => 'active', 'label' => 'Active'],
-        ['client' => 'PT Maju Bersama', 'am' => 'XXXXXXX', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-13', 'end' => '2026-05-29', 'status' => 'followup', 'label' => 'Follow-up pending'],
-        ['client' => 'PT Maju Bersama', 'am' => 'BBBBBbbb', 'id' => '1234567890', 'package' => 'Enterprise', 'start' => '2026-04-12', 'end' => '2026-06-22', 'status' => 'active', 'label' => 'Active'],
-    ]);
-@endphp
-
 <div class="contract-page">
 
     <div class="contract-header">
@@ -43,27 +30,62 @@
 </div>
 
     <section class="contract-toolbar-card">
-        <form method="GET" action="{{ url('contracts.index') }}" class="contract-toolbar">
+    <form
+        method="GET"
+        action="{{ route('contract.list') }}"
+        class="contract-toolbar">
 
-            <select name="account_manager">
-                <option value="">All Account Managers</option>
-                <option value="am1">Account Manager 1</option>
-                <option value="am2">Account Manager 2</option>
+        @if(!auth()->user()->isAccountManager())
+
+        <select name="account_manager">
+
+            <option value="">
+                All Account Managers
+            </option>
+
+            @foreach($accountManagers as $am)
+
+                <option
+                    value="{{ $am->id }}"
+                    @selected(request('account_manager') == $am->id)>
+
+                    {{ $am->name }}
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+        @endif
+
+        <select name="status"> 
+            <option value="">All Statuses</option> 
+            <option value="active">Active</option> 
+            <option value="expiring">Expiring Soon</option> 
+            <option value="followup">Follow-up Pending</option>
+        </select>
+
+        <select name="service">
+
+                <option value="">
+                    All Packages
+                </option>
+
+                @foreach($services as $service)
+
+                    <option
+                        value="{{ $service->id }}"
+                        @selected(request('service') == $service->id)>
+
+                        {{ $service->service_name }}
+
+                    </option>
+
+                @endforeach
+
             </select>
 
-            <select name="status">
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="expiring">Expiring Soon</option>
-                <option value="followup">Follow-up Pending</option>
-            </select>
-
-            <select name="package">
-                <option value="">All Packages</option>
-                <option value="Enterprise">Enterprise</option>
-                <option value="Premium">Premium</option>
-                <option value="Basic">Basic</option>
-            </select>
 
             <div class="contract-search-box">
                 <input
@@ -106,31 +128,92 @@
 
                 <tbody>
 
-                    @forelse ($rows as $row)
+                @forelse($contracts as $contract)
 
-                        <tr class="contract-row {{ $row['status'] }}">
-                            <td>{{ $row['client'] }}</td>
-                            <td>{{ $row['am'] }}</td>
-                            <td>{{ $row['id'] }}</td>
-                            <td>{{ $row['package'] }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row['start'])->format('d/m/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row['end'])->format('d/m/Y') }}</td>
-                            <td>
-                                <span class="contract-status {{ $row['status'] }}">
-                                    {{ $row['label'] }}
-                                </span>
-                            </td>
-                        </tr>
+                <tr
+                    class="contract-row {{ $contract->status }}"
+                    onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
+                    style="cursor:pointer;">
 
-                    @empty
+                    <td>
+                        {{ $contract->contract_name }}
+                    </td>
 
-                        <tr>
-                            <td colspan="7" class="contract-empty">
-                                No contracts found.
-                            </td>
-                        </tr>
+                    <td>
+                        {{ $contract->owner?->name }}
+                    </td>
 
-                    @endforelse
+                    <td>
+                        {{ $contract->contract_number }}
+                    </td>
+
+                    <td>
+
+                        @foreach($contract->services as $contractService)
+
+                            {{ $contractService->service->service_name }}
+
+                            @if(!$loop->last)
+                                ,
+                            @endif
+
+                        @endforeach
+
+                    </td>
+
+                    <td>
+                        {{ $contract->start_date?->format('d/m/Y') }}
+                    </td>
+
+                    <td>
+                        {{ $contract->end_date?->format('d/m/Y') }}
+                    </td>
+
+                    <td>
+
+                        @if($contract->status === 'active')
+
+                            <span class="contract-status active">
+
+                                Active
+
+                            </span>
+
+                        @elseif($contract->status === 'expiring')
+
+                            <span class="contract-status expiring">
+
+                                Expiring Soon
+
+                            </span>
+
+                        @elseif($contract->status === 'followup')
+
+                            <span class="contract-status followup">
+
+                                Follow-up Pending
+
+                            </span>
+
+                        @endif
+
+                    </td>
+
+                </tr>
+
+                @empty
+
+                <tr>
+
+                    <td colspan="7" class="contract-empty">
+
+                        No contracts found.
+
+                    </td>
+
+                </tr>
+
+                @endforelse
 
                 </tbody>
 
@@ -139,6 +222,12 @@
         </div>
 
     </section>
+
+    <div style="margin-top:20px;">
+
+    {{ $contracts->links() }}
+
+    </div>
 
 </div>
 
