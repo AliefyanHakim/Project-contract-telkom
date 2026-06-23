@@ -6,6 +6,7 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\AmController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 
 Route::middleware('guest')->group(function () {
 
@@ -22,9 +23,10 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
+    Route::get(
+        '/dashboard',
+        [DashboardController::class, 'index']
+    )->name('dashboard');
 
     Route::resource('contracts', ContractController::class);
 

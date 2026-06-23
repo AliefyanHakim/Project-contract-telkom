@@ -5,53 +5,9 @@
 @section('content')
 
 @php
-    $cards = [
-        [
-            'title' => 'Total Active Contracts',
-            'value' => '123',
-            'unit' => 'Contracts',
-            'desc' => 'across 5 Account Managers',
-            'type' => 'blue',
-            'icon' => 'DOC'
-        ],
-        [
-            'title' => 'Expiring < 7 Days',
-            'value' => '2',
-            'unit' => 'Contracts',
-            'desc' => 'Immediate action required',
-            'type' => 'red',
-            'icon' => 'EXP'
-        ],
-        [
-            'title' => 'Expiring < 30 Days',
-            'value' => '45',
-            'unit' => 'Contracts',
-            'desc' => 'Follow up soon',
-            'type' => 'yellow',
-            'icon' => 'REM'
-        ],
-        [
-            'title' => 'Outstanding Invoices',
-            'value' => '145.000.000',
-            'unit' => 'Rupiah',
-            'desc' => '6 pending invoices',
-            'type' => 'green',
-            'icon' => 'INV'
-        ],
-    ];
-
-    $contracts = [
-        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Budi Santoso', 'end_date' => '29/05/2026', 'price' => 'Rp 5.000.000/month', 'days_left' => '0 days left', 'status' => 'danger'],
-        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Rina Dewi', 'end_date' => '29/05/2026', 'price' => 'Rp 4.500.000/month', 'days_left' => '3 days left', 'status' => 'danger'],
-        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Budi Santoso', 'end_date' => '31/05/2026', 'price' => 'Rp 12.000.000/month', 'days_left' => '12 days left', 'status' => 'warning'],
-        ['company' => 'PT Xxxxx Xxxxxxxxx', 'package' => 'Paket Enterprise', 'am' => 'Budi Santoso', 'end_date' => '01/06/2026', 'price' => 'Rp 10.000.000/month', 'days_left' => '23 days left', 'status' => 'warning'],
-    ];
-
-    $summaries = [
-        ['name' => 'Account Manager 1', 'clients' => 16, 'active' => 14, 'expiring' => 3, 'value' => 'Rp 24.000.000', 'billing' => '4 invoices'],
-        ['name' => 'Account Manager 2', 'clients' => 12, 'active' => 12, 'expiring' => 2, 'value' => 'Rp 23.000.000', 'billing' => '2 invoices'],
-        ['name' => 'Account Manager 3', 'clients' => 14, 'active' => 11, 'expiring' => 1, 'value' => 'Rp 25.000.000', 'billing' => '3 invoices'],
-    ];
+    $cards = $cards ?? [];
+    $contracts = $contracts ?? [];
+    $summaries = $summaries ?? [];
 @endphp
 
 <section class="vt-alert-box">
