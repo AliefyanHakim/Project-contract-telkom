@@ -320,7 +320,6 @@ href="{{ asset('css/create.css') }}">
         <br><hr><br>
 
         {{-- FILE SECTION --}}
-
         <div class="form-group">
 
             <label>Contract Files</label>
@@ -330,13 +329,11 @@ href="{{ asset('css/create.css') }}">
                 <div class="file-row">
 
                     <div class="file-name">
-
                         {{ $file->file_name }}
-
                     </div>
 
                     <a
-                        href="{{ route('contracts.view', $file->id) }}"
+                        href="{{ asset('storage/' . $file->file_path) }}"
                         target="_blank"
                         class="view-btn">
 
@@ -345,7 +342,7 @@ href="{{ asset('css/create.css') }}">
                     </a>
 
                     <a
-                        href="{{ route('contracts.download', $file->id) }}"
+                        href="{{ route('contract-files.download', $file->id) }}"
                         class="download-btn">
 
                         Download
@@ -359,9 +356,7 @@ href="{{ asset('css/create.css') }}">
                 <div class="file-row">
 
                     <div class="file-name">
-
-                        No contract file available.
-
+                        No contract file uploaded.
                     </div>
 
                 </div>

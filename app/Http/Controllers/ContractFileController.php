@@ -50,16 +50,7 @@ class ContractFileController extends Controller
     )
     {
         if (!Storage::exists($file->file_path)) {
-
-            dd([
-                'file_path' => $file->file_path,
-                'absolute' => storage_path(
-                    'app/' . $file->file_path
-                ),
-                'exists' => Storage::exists(
-                    $file->file_path
-                ),
-            ]);
+            abort(404, 'File not found');
         }
 
         return Storage::download(

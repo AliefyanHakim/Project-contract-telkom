@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\ContractService;
 use App\Models\ContractFile;
-use App\Services\ContractGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -296,25 +295,7 @@ class ContractController extends Controller
 
         return 'active';
     }
-
-    public function download(ContractFile $file)
-    {
-        $fullPath = storage_path('app/' . $file->file_path);
-
-        $fullPath = storage_path(
-            'app/' . $file->file_path
-        );
-
-        if (!File::exists($fullPath)) {
-            abort(404, 'File not found');
-        }
-
-        return response()->download(
-            $fullPath,
-            $file->file_name
-        );
-    }
-
+    
     public function viewFile(ContractFile $file)
     {
         $fullPath = storage_path(
@@ -565,7 +546,6 @@ class ContractController extends Controller
                     'max:10240'
                 ],
             ]);
-
             if ($request->hasFile('file')) {
 
                 $path = $request
@@ -578,20 +558,6 @@ class ContractController extends Controller
                         ->file('file')
                         ->getClientOriginalName(),
                     'file_path' => $path,
-                    'uploaded_by' => Auth::id(),
-                ]);
-
-            } else {
-
-                $generated =
-                    ContractGeneratorService::generate(
-                        $contract
-                    );
-
-                ContractFile::create([
-                    'contract_id' => $contract->id,
-                    'file_name' => $generated['filename'],
-                    'file_path' => $generated['path'],
                     'uploaded_by' => Auth::id(),
                 ]);
             }
