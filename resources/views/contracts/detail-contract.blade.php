@@ -37,11 +37,20 @@ href="{{ asset('css/create.css') }}">
 
             <div class="form-group half">
 
-                <label>Customer ID Number</label>
+                <label>Account Number</label>
 
                 <input
                     type="text"
-                    value="{{ $contract->customer_id_number }}"
+                    value="{{ $contract->account_number }}"
+                    readonly>
+
+            </div>
+
+                <label>S-ID</label>
+
+                <input
+                    type="text"
+                    value="{{ $contract->sid }}"
                     readonly>
 
             </div>
@@ -364,6 +373,45 @@ href="{{ asset('css/create.css') }}">
             @endforelse
 
         </div>
+
+        <h4>BASO Files</h4>
+
+        @forelse(
+            $contract->basoFiles
+            as $baso
+        )
+
+        <div class="file-row">
+
+            <div>
+
+                {{ $baso->file_name }}
+
+                @if($baso->baso_date)
+
+                    ({{ $baso->baso_date }})
+
+                @endif
+
+            </div>
+
+            <a
+                href="{{ route(
+                    'baso.download',
+                    $baso->id
+                ) }}">
+
+                Download
+
+            </a>
+
+        </div>
+
+        @empty
+
+            <p>No BASO uploaded.</p>
+
+        @endforelse
 
         <div class="save-area">
 

@@ -61,11 +61,14 @@ href="{{ asset('css/profile.css') }}">
 
             <div class="profile-left">
 
-                <div class="profile-icon">
-
-                    👤
-
-                </div>
+            <div class="profile-icon">
+                <img
+                    src="{{ $user->profile_photo
+                        ? asset('storage/' . $user->profile_photo)
+                        : asset('images/default-avatar.png') }}"
+                    alt="{{ $user->name }}"
+                >
+            </div>
 
                 <div>
 

@@ -103,11 +103,23 @@ href="{{ asset('css/profile.css') }}">
 
             <div class="profile-left">
 
-                <div class="profile-icon">
+            <div class="profile-icon">
 
-                    👤
+                @if($user->profile_photo)
 
-                </div>
+                    <img
+                        src="{{ asset('storage/' . $user->profile_photo) }}"
+                        alt="{{ $user->name }}">
+
+                @else
+
+                    <div class="default-avatar">
+                        👤
+                    </div>
+
+                @endif
+
+            </div>
 
                 <div>
 
@@ -135,12 +147,28 @@ href="{{ asset('css/profile.css') }}">
 
     <form
         action="{{ route('profile.update') }}"
-        method="POST">
+        method="POST"
+        enctype="multipart/form-data">
 
         @csrf
         @method('PUT')
 
         <div class="profile-card">
+
+            <div class="form-group">
+
+                <label>
+
+                    Profile Photo
+
+                </label>
+
+                <input
+                    type="file"
+                    name="profile_photo"
+                    accept="image/*">
+
+            </div>
 
             <div class="form-group">
 

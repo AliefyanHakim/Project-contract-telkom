@@ -68,6 +68,13 @@ class Contract extends Model
         return $this->hasMany(ContractFile::class);
     }
 
+    public function basoFiles()
+    {
+        return $this->hasMany(
+            BasoFile::class
+        );
+    }
+
     public function billings()
     {
         return $this->hasMany(Billing::class);
