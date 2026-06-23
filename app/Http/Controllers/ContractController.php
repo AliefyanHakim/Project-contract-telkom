@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\ContractService;
 use App\Models\ContractFile;
+use App\Models\BasoFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -57,7 +58,10 @@ private function ensureContractAccess(Contract $contract): void
         | Current Contract
         |--------------------------------------------------------------------------
         */
-        $query->where('status', 'active');
+        $query->whereNotIn('status', [
+            'expired',
+            'terminated'
+        ]);
 
         /*
         |--------------------------------------------------------------------------
@@ -304,7 +308,7 @@ private function ensureContractAccess(Contract $contract): void
 
         return 'active';
     }
-    
+
     public function viewFile(ContractFile $file)
     {
         $fullPath = storage_path(
@@ -392,7 +396,12 @@ private function ensureContractAccess(Contract $contract): void
                 'max:255'
             ],
 
-            'customer_id_number' => [
+            'account_number' => [
+                'nullable',
+                'max:100'
+            ],
+
+            'sid' => [
                 'nullable',
                 'max:100'
             ],
@@ -479,7 +488,22 @@ private function ensureContractAccess(Contract $contract): void
                 'exists:services,id'
             ],
 
-            'file' => 'nullable|file|max:10240'
+            'file' => [
+                'nullable',
+                'file',
+                'max:10240'
+            ],
+
+            'baso_files.*' => [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx'
+            ],
+
+            'baso_dates.*' => [
+                'nullable',
+                'date'
+            ],
         ]);
 
         $contract = null;
@@ -497,8 +521,11 @@ private function ensureContractAccess(Contract $contract): void
                 'contract_name'
                     => $validated['contract_name'],
 
-                'customer_id_number'
-                    => $validated['customer_id_number'] ?? null,
+                'account_number'
+                    => $validated['account_number'] ?? null,
+                
+                'sid' 
+                    => $validated['sid'] ?? null,
 
                 'telkom_name'
                     => $validated['telkom_name'] ?? null,
@@ -555,6 +582,46 @@ private function ensureContractAccess(Contract $contract): void
                     'max:10240'
                 ],
             ]);
+
+            if ($request->filled('custom_service_name')) {
+
+            $newService = Service::create([
+
+                'service_name'
+                    => $request->custom_service_name,
+
+                'installation_fee'
+                    => $request->custom_installation_fee ?? 0,
+
+                'monthly_fee'
+                    => $request->custom_monthly_fee ?? 0,
+
+                'status'
+                    => 'active',
+            ]);
+
+            $validated['services'][] =
+                $newService->id;
+        }
+
+            foreach ($request->services as $serviceId) {
+
+                $service = Service::findOrFail($serviceId);
+
+                ContractService::create([
+
+                    'contract_id' => $contract->id,
+
+                    'service_id' => $service->id,
+
+                    'installation_fee'
+                        => $service->installation_fee,
+
+                    'monthly_fee'
+                        => $service->monthly_fee,
+                ]);
+            }
+
             if ($request->hasFile('file')) {
 
                 $path = $request
@@ -570,6 +637,44 @@ private function ensureContractAccess(Contract $contract): void
                     'uploaded_by' => Auth::id(),
                 ]);
             }
+
+            if ($request->hasFile('baso_files')) {
+
+            foreach (
+                $request->file('baso_files')
+                as $index => $file
+            ) {
+
+                if (!$file) {
+                    continue;
+                }
+
+                $path = $file->store(
+                    'baso'
+                );
+
+                BasoFile::create([
+
+                    'contract_id'
+                        => $contract->id,
+
+                    'file_name'
+                        => $file
+                        ->getClientOriginalName(),
+
+                    'file_path'
+                        => $path,
+
+                    'baso_date'
+                        => $request
+                        ->baso_dates[$index]
+                        ?? null,
+
+                    'uploaded_by'
+                        => Auth::id(),
+                ]);
+            }
+        }
             
 
             $contract->updateStatus();
@@ -700,7 +805,7 @@ private function ensureContractAccess(Contract $contract): void
                 'max:255'
             ],
 
-            'customer_id_number' => [
+            'account_number' => [
                 'nullable'
             ],
 
@@ -744,10 +849,28 @@ private function ensureContractAccess(Contract $contract): void
                 'date'
             ],
 
-            'services' => [
-                'required',
-                'array',
-                'min:1'
+            'services.*' => [
+                'exists:services,id'
+            ],
+
+            'sid' => [
+                'nullable'
+            ],
+
+            'custom_services' => [
+                'nullable',
+                'array'
+            ],
+
+            'baso_files.*' => [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx,pdf'
+            ],
+
+            'baso_dates.*' => [
+                'nullable',
+                'date'
             ],
         ]);
 
@@ -768,8 +891,11 @@ private function ensureContractAccess(Contract $contract): void
                 'contract_name'
                     => $validated['contract_name'],
 
-                'customer_id_number'
-                    => $validated['customer_id_number'] ?? null,
+                'account_number'
+                    => $validated['account_number'] ?? null,
+
+                'sid'
+                    => $request->sid,
 
                 'customer_address'
                     => $validated['customer_address'] ?? null,
@@ -845,7 +971,83 @@ private function ensureContractAccess(Contract $contract): void
                         => $serviceId,
                 ]);
             }
+
+            foreach (
+                $request->custom_services ?? []
+                as $customService
+            ) {
+
+                if (
+                    empty(
+                        $customService['service_name']
+                    )
+                ) {
+                    continue;
+                }
+
+                $service = Service::create([
+
+                    'service_name'
+                        => $customService['service_name'],
+
+                    'installation_fee'
+                        => $customService['installation_fee']
+                        ?? 0,
+
+                    'monthly_fee'
+                        => $customService['monthly_fee']
+                        ?? 0,
+
+                    'status'
+                        => 'active',
+                ]);
+
+                ContractService::create([
+
+                    'contract_id'
+                        => $contract->id,
+
+                    'service_id'
+                        => $service->id,
+                ]);
+            }
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | BASO Upload
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('baso_files')) {
+
+        foreach (
+            $request->file('baso_files')
+            as $index => $file
+        ) {
+
+            $path = $file->store('baso');
+
+            BasoFile::create([
+
+                'contract_id'
+                    => $contract->id,
+
+                'file_name'
+                    => $file->getClientOriginalName(),
+
+                'file_path'
+                    => $path,
+
+                'baso_date'
+                    => $request->baso_dates[$index]
+                    ?? null,
+
+                'uploaded_by'
+                    => Auth::id(),
+            ]);
+        }
+    }
 
         return redirect()
             ->route(

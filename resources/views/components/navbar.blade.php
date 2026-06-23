@@ -20,7 +20,29 @@
             <small>3</small>
         </button>
 
-        <button class="vt-profile-btn">{{ $initials }}</button>
+        <button class="vt-profile-btn">
+
+            @if($user->profile_photo)
+
+                <div class="vt-avatar">
+
+                    <img
+                        src="{{ asset('storage/' . $user->profile_photo) }}"
+                        alt="{{ $user->name }}">
+
+                </div>
+
+            @else
+
+                <div class="vt-avatar">
+
+                    {{ $initials }}
+
+                </div>
+
+            @endif
+
+        </button>
     </div>
 </header>
 

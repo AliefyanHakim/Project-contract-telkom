@@ -160,17 +160,30 @@ a {
     gap: 12px;
 }
 
-.vt-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: white;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    flex-shrink: 0;
+.vt-avatar{
+    width:48px;
+    height:48px;
+
+    border-radius:50%;
+    overflow:hidden;
+
+    background:white;
+    color:var(--navy);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-weight:900;
+    flex-shrink:0;
+}
+
+.vt-avatar img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+    display:block;
 }
 
 .vt-user-card h4 {

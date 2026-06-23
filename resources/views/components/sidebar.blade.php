@@ -125,11 +125,21 @@
 
     <div class="vt-user-card">
 
-        <div class="vt-avatar">
+            <div class="vt-avatar">
 
-            {{ strtoupper(substr($user->name, 0, 1)) }}
+                @if($user->profile_photo)
 
-        </div>
+                    <img
+                        src="{{ asset('storage/' . $user->profile_photo) }}"
+                        alt="{{ $user->name }}">
+
+                @else
+
+                    {{ strtoupper(substr($user->name, 0, 1)) }}
+
+                @endif
+
+            </div>
 
         <div>
 

@@ -20,6 +20,12 @@ class ProfileController extends Controller
                 'max:255',
             ],
 
+            'profile_photo' => [
+                'nullable',
+                'image',
+                'max:2048'
+            ],
+
             'email' => [
                 'required',
                 'email',
@@ -42,6 +48,18 @@ class ProfileController extends Controller
             $user->password = Hash::make(
                 $validated['password']
             );
+        }
+
+        if ($request->hasFile('profile_photo')) {
+
+            $path = $request
+                ->file('profile_photo')
+                ->store(
+                    'profile-photos',
+                    'public'
+                );
+
+            $user->profile_photo = $path;
         }
 
         $user->save();

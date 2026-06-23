@@ -40,12 +40,21 @@ href="{{ asset('css/create.css') }}">
             <div class="form-row">
 
                 <div class="form-group half">
-                    <label>Customer ID Number</label>
+                    <label>Account Number</label>
 
                     <input
                         type="text"
-                        name="customer_id_number"
-                        value="{{ old('customer_id_number', $contract->customer_id_number) }}">
+                        name="account_number"
+                        value="{{ old('account_number', $contract->account_number) }}">
+                </div>
+
+                <div class="form-group half">
+                    <label>S-ID</label>
+
+                    <input
+                        type="text"
+                        name="sid"
+                        value="{{ old('sid', $contract->sid) }}">
                 </div>
 
                 <div class="form-group half">
@@ -237,6 +246,21 @@ href="{{ asset('css/create.css') }}">
 
             </button>
 
+            <h4>Custom Services</h4>
+
+            <div id="custom-services-container">
+
+            </div>
+
+            <button
+                type="button"
+                id="add-custom-service"
+                class="upload-btn">
+
+                + Add Custom Service
+
+            </button>
+
             <br><hr>
 
             <div class="form-row">
@@ -316,15 +340,72 @@ href="{{ asset('css/create.css') }}">
             @endif
 
             <!-- Upload -->
-            <div class="form-group">
+            <h4>Contract File</h4>
 
-                <label>Replace Contract File</label>
+            @foreach($contract->files as $file)
+
+            <div class="file-row">
+
+                <span>
+
+                    {{ $file->file_name }}
+
+                </span>
+
+            </div>
+
+            @endforeach
+
+            <input
+            type="file"
+            name="file">
+
+            <h4>BASO Files</h4>
+
+            @foreach($contract->basoFiles as $baso)
+
+            <div class="file-row">
+
+                <span>
+
+                    {{ $baso->file_name }}
+
+                </span>
+
+                <span>
+
+                    {{ $baso->baso_date }}
+
+                </span>
+
+            </div>
+
+            @endforeach
+
+            <div id="baso-container">
+
+            <div class="baso-row">
 
                 <input
                     type="file"
-                    name="contract_file">
+                    name="baso_files[]">
+
+                <input
+                    type="date"
+                    name="baso_dates[]">
 
             </div>
+
+        </div>
+
+        <button
+            type="button"
+            id="add-baso"
+            class="upload-btn">
+
+            + Add BASO
+
+        </button>
 
             <!-- Save button -->
             <div class="save-area">
@@ -349,87 +430,297 @@ href="{{ asset('css/create.css') }}">
 @section('scripts')
 
 <script>
-
-let serviceIndex =
-    document.querySelectorAll('.service-item').length;
-
-document
-.getElementById('add-service')
-.addEventListener('click', function () {
-
-    const html = `
-    <div class="service-item" style="margin-top:20px">
-
-        <hr>
-
-        <div class="form-row">
-
-            <div class="form-group half">
-
-                <label>Service</label>
-
-                <select name="services[]">
-
-                    @foreach($services as $service)
-
-                        <option value="{{ $service->id }}">
-                            {{ $service->service_name }}
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="form-group half">
-
-                <button
-                    type="button"
-                    class="remove-service upload-btn">
-
-                    Remove
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-    `;
-
-    document
-        .getElementById('services-container')
-        .insertAdjacentHTML(
-            'beforeend',
-            html
-        );
-});
-
-/*
-|--------------------------------------------------------------------------
-| Remove Service
-|--------------------------------------------------------------------------
-*/
-
 document.addEventListener(
-    'click',
-    function (e) {
+    'DOMContentLoaded',
+    function () {
 
-        if (
-            e.target.classList.contains(
-                'remove-service'
-            )
-        ) {
+        console.log('LOADED');
 
-            e.target
-                .closest('.service-item')
-                .remove();
-        }
+        const container =
+            document.getElementById('services-container');
+
+        const addButton =
+            document.getElementById('add-service');
+
+        console.log(container);
+        console.log(addButton);
+
+        addButton.addEventListener(
+            'click',
+            function () {
+
+                console.log('CLICKED');
+
+            }
+        );
     }
 );
 
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const container =
+            document.getElementById(
+                'services-container'
+            );
+
+        const addButton =
+            document.getElementById(
+                'add-service'
+            );
+
+        addButton.addEventListener(
+            'click',
+            function () {
+
+                const html = `
+                    <div class="service-row"
+                         style="margin-bottom:15px;">
+
+                        <div class="form-row">
+
+                            <div class="form-group half">
+
+                                <label>Service</label>
+
+                                <select
+                                    name="services[]"
+                                    required>
+
+                                    <option value="">
+                                        -- Select Service --
+                                    </option>
+
+                                    @foreach($services as $service)
+
+                                        <option
+                                            value="{{ $service->id }}">
+
+                                            {{ $service->service_name }}
+
+                                        </option>
+
+                                    @endforeach
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-group half">
+
+                                <label>&nbsp;</label>
+
+                                <button
+                                    type="button"
+                                    class="remove-service upload-btn">
+
+                                    Remove
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+
+                container.insertAdjacentHTML(
+                    'beforeend',
+                    html
+                );
+            }
+        );
+
+        container.addEventListener(
+            'click',
+            function (e) {
+
+                if (
+                    e.target.classList.contains(
+                        'remove-service'
+                    )
+                ) {
+
+                    e.target
+                        .closest('.service-row')
+                        .remove();
+                }
+            }
+        );
+    }
+);
+
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        let customIndex = 1;
+
+        const button =
+            document.getElementById(
+                'add-custom-service'
+            );
+
+        const container =
+            document.getElementById(
+                'custom-services-container'
+            );
+
+        console.log(button);
+        console.log(container);
+
+        if (!button || !container) {
+            return;
+        }
+
+        button.addEventListener(
+            'click',
+            function () {
+
+                const row =
+                    document.createElement('div');
+
+                row.classList.add(
+                    'custom-service-row'
+                );
+
+                row.style.marginTop = '15px';
+
+                row.innerHTML = `
+                    <div class="form-row">
+
+                        <div class="form-group half">
+
+                            <label>Service Name</label>
+
+                            <input
+                                type="text"
+                                name="custom_services[${customIndex}][service_name]">
+
+                        </div>
+
+                        <div class="form-group half">
+
+                            <label>&nbsp;</label>
+
+                            <button
+                                type="button"
+                                class="remove-custom-service upload-btn">
+
+                                Remove
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group half">
+
+                            <label>Installation Fee</label>
+
+                            <input
+                                type="number"
+                                name="custom_services[${customIndex}][installation_fee]">
+
+                        </div>
+
+                        <div class="form-group half">
+
+                            <label>Monthly Fee</label>
+
+                            <input
+                                type="number"
+                                name="custom_services[${customIndex}][monthly_fee]">
+
+                        </div>
+
+                    </div>
+                `;
+
+                container.appendChild(row);
+
+                customIndex++;
+            }
+        );
+
+        container.addEventListener(
+            'click',
+            function (e) {
+
+                if (
+                    e.target.classList.contains(
+                        'remove-custom-service'
+                    )
+                ) {
+
+                    e.target
+                        .closest(
+                            '.custom-service-row'
+                        )
+                        .remove();
+                }
+            }
+        );
+    }
+);
+
+document
+.getElementById('add-baso')
+.addEventListener('click', function () {
+
+    const container =
+        document.getElementById(
+            'baso-container'
+        );
+
+    const row =
+        document.createElement('div');
+
+    row.classList.add('baso-row');
+
+    row.innerHTML = `
+        <input
+            type="file"
+            name="baso_files[]">
+
+        <input
+            type="date"
+            name="baso_dates[]">
+
+        <button
+            type="button"
+            class="remove-baso upload-btn">
+
+            Remove
+
+        </button>
+    `;
+
+    container.appendChild(row);
+});
+
+document.addEventListener(
+'click',
+function(e){
+
+    if(
+        e.target.classList.contains(
+            'remove-baso'
+        )
+    ){
+        e.target.closest(
+            '.baso-row'
+        ).remove();
+    }
+});
 </script>
+
+
 
 @endsection
