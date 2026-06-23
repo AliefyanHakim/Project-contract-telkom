@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\File;
 
 class ContractController extends Controller
 {
+
+private function ensureContractAccess(Contract $contract): void
+{
+    $user = Auth::user();
+
+    if ($user->isAccountManager() && $contract->owner_am_id !== $user->id) {
+        abort(403, 'Anda tidak memiliki akses ke kontrak ini.');
+    }
+}
     /**
      * Display a listing of contracts.
      */
@@ -593,17 +602,19 @@ class ContractController extends Controller
      * Show contract detail.
      */
     public function show(Contract $contract)
-    {
-        $contract->load([
-            'owner',
-            'services.service',
-            'files'
-        ]);
+{
+    $this->ensureContractAccess($contract);
 
-        return view(
-            'contracts.detail-contract',
-            compact('contract')
-        );
+    $contract->load([
+        'owner',
+        'services.service',
+        'files'
+    ]);
+
+    return view(
+        'contracts.detail-contract',
+        compact('contract')
+    );
     }
 
     public function destroy(Contract $contract)
@@ -620,6 +631,8 @@ class ContractController extends Controller
 
     public function edit(Contract $contract)
     {
+        $this->ensureContractAccess($contract);
+
     $contract->load([
         'services'
     ]);
@@ -649,9 +662,37 @@ class ContractController extends Controller
     public function update(
         Request $request,
         Contract $contract
-    )
-    
+    )    
     {
+        $this->ensureContractAccess($contract);
+
+        if (Auth::user()->isSupportPaycall()) {
+            $validated = $request->validate([
+                'start_date' => [
+                    'required',
+                    'date',
+                ],
+
+                'end_date' => [
+                    'required',
+                    'date',
+                    'after:start_date',
+                ],
+            ]);
+
+            $contract->update([
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
+            ]);
+
+            $contract->refresh();
+            $contract->updateStatus();
+
+            return redirect()
+                ->route('contracts.show', $contract->id)
+                ->with('success', 'Start date dan end date kontrak berhasil diperbarui.');
+        }
+
         $validated = $request->validate([
 
             'contract_name' => [
@@ -758,17 +799,7 @@ class ContractController extends Controller
                     => $validated['end_date'],
             ];
 
-            /*
-            |--------------------------------------------------------------------------
-            | Support Paycall boleh ubah status
-            |--------------------------------------------------------------------------
-            */
-
-            if (Auth::user()->isSupportPaycall()) {
-
-                $data['status'] = $request->status;
-            }
-
+           
             $contract->update($data);
 
             $contract->refresh();

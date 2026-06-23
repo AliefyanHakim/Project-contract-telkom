@@ -66,33 +66,28 @@
 </div>
 
     <section class="transfer-toolbar-card">
-        <form method="GET" action="{{ url('/direct-transfer') }}" class="transfer-toolbar">
+    <form method="GET" action="{{ url('/direct-transfer') }}" class="transfer-toolbar no-add">
 
-            <a href="#" class="transfer-download-btn">
-                <span>↓</span>
-                Download Report
-            </a>
+        <a href="#" class="transfer-download-btn">
+            <span>↓</span>
+            Download Report
+        </a>
 
-            <div class="transfer-search-box">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Search client, contract ID, or AM..."
-                >
+        <div class="transfer-search-box">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search client, contract ID, or AM..."
+            >
 
-                <button type="submit">
-                    ⌕
-                </button>
-            </div>
+            <button type="submit">
+                ⌕
+            </button>
+        </div>
 
-            <a href="#" class="transfer-add-btn direct">
-                <span>＋</span>
-                Direct Transfer
-            </a>
-
-        </form>
-    </section>
+    </form>
+</section>
 
     <section class="transfer-table-card">
 
