@@ -107,12 +107,18 @@ class DashboardController extends Controller
                 ];
             });
 
+        $expiring30Days = Contract::whereBetween(
+            'end_date',
+            [now(), now()->addDays(30)]
+        )->count();
+
         return view(
             'dashboard.index',
             compact(
                 'cards',
                 'contracts',
-                'summaries'
+                'summaries',
+                'expiring30Days'
             )
         );
     }

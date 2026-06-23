@@ -10,16 +10,19 @@
     $summaries = $summaries ?? [];
 @endphp
 
+@if($expiring30Days > 0)
 <section class="vt-alert-box">
     <div class="vt-alert-icon">!</div>
 
     <p>
-        <strong>4 contracts</strong> will expire within the next 30 days —
+        <strong>{{ $expiring30Days }} contracts</strong>
+        will expire within the next 30 days —
         follow up or renew immediately.
     </p>
 
     <a href="#">View All Alerts</a>
 </section>
+@endif
 
 <section class="vt-kpi-grid">
     @foreach ($cards as $card)
