@@ -84,8 +84,8 @@ Route::get(
 
     Route::get(
         '/contract-files/{file}/download',
-        [ContractController::class, 'download']
-    )->name('contracts.download');
+        [ContractController::class, 'downloadFile']
+    )->name('contract-files.download');
 
     Route::get(
     '/contract-files/{file}/view',
