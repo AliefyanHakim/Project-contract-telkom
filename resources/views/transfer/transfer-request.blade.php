@@ -74,34 +74,42 @@
     </a>
 </div>
 
-    <section class="transfer-toolbar-card">
-        <form method="GET" action="" class="transfer-toolbar">
+    @php
+    $canAddTransferContract = auth()->user()->isManager() || auth()->user()->isAccountManager();
+@endphp
 
-            <a href="#" class="transfer-download-btn">
-                <span>↓</span>
-                Download Report
-            </a>
+<section class="transfer-toolbar-card">
+    <form method="GET"
+          action="{{ url('/transfer-request') }}"
+          class="transfer-toolbar {{ $canAddTransferContract ? '' : 'no-add' }}">
 
-            <div class="transfer-search-box">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Search client or contract ID..."
-                >
+        <a href="#" class="transfer-download-btn">
+            <span>↓</span>
+            Download Report
+        </a>
 
-                <button type="submit">
-                    ⌕
-                </button>
-            </div>
+        <div class="transfer-search-box">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search client, contract ID, or AM..."
+            >
 
+            <button type="submit">
+                ⌕
+            </button>
+        </div>
+
+        @if($canAddTransferContract)
             <a href="{{ url('/transfer-contract') }}" class="transfer-add-btn">
                 <span>＋</span>
                 Transfer Contract
             </a>
+        @endif
 
-        </form>
-    </section>
+    </form>
+</section>
 
     <section class="transfer-table-card">
 

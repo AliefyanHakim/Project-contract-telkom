@@ -117,12 +117,14 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    /*
+   /*
 |--------------------------------------------------------------------------
 | Transfer
 |--------------------------------------------------------------------------
-| Account Manager membuat request transfer.
-| Manager melihat request, approve/reject, dan bisa direct transfer.
+| Transfer Contract: Manager + Account Manager
+| Transfer Request: Manager + Account Manager + Support Inputter
+| Direct Transfer: Manager + Account Manager + Support Inputter
+| Paycall tidak bisa akses transfer
 */
 
 Route::middleware('role:manager,account_manager')->group(function () {
@@ -131,11 +133,24 @@ Route::middleware('role:manager,account_manager')->group(function () {
     });
 });
 
-Route::middleware('role:manager')->group(function () {
+Route::middleware('role:manager,account_manager,support_inputter')->group(function () {
     Route::get('/transfer-request', function () {
         return view('transfer.transfer-request');
     });
 
+    Route::get('/direct-transfer', function () {
+        return view('transfer.direct-transfer');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Transfer Approval
+|--------------------------------------------------------------------------
+| Accept dan Reject tetap khusus Manager.
+*/
+
+Route::middleware('role:manager')->group(function () {
     Route::get('/acceptreject-transfer', function () {
         return view('transfer.acceptreject-transfer');
     });
@@ -146,10 +161,6 @@ Route::middleware('role:manager')->group(function () {
 
     Route::get('/rejected-transfer', function () {
         return view('transfer.rejected-transfer');
-    });
-
-    Route::get('/direct-transfer', function () {
-        return view('transfer.direct-transfer');
     });
 });
 
