@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BasoFileController;
 use App\Http\Controllers\ContractFileController;
 use App\Http\Controllers\TransferController;
+use App\Http\Controllers\BillingController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLogin']);
@@ -65,13 +66,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/baso/{baso}/download',[BasoFileController::class, 'download']
             )->name('baso.download');
 
-        Route::get('/billing', function () {
-            return view('billing.outstanding');
-        });
+        Route::get('/billing',
+            [BillingController::class,'outstanding']);
 
-        Route::get('/billing/payment-history', function () {
-            return view('billing.payment-history');
-        });
+        Route::get('/billing/payment-history',
+            [BillingController::class,'paymentHistory']);   
+            
+        Route::patch('/billing/{billing}/status', [BillingController::class, 'updateStatus'])
+            ->name('billing.update-status');
 
         Route::get('/contract-alerts', function () {
             return view('alerts.contract-alerts');

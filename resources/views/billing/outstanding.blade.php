@@ -8,91 +8,6 @@
 
 @section('content')
 
-@php
-    $rows = collect([
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-3026',
-            'period' => 'Mei 2026',
-            'price' => 15000000,
-            'due_date' => '2026-05-29',
-            'status' => 'followup',
-            'label' => 'Follow-up pending',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-8031',
-            'period' => 'Mei 2026',
-            'price' => 4000000,
-            'due_date' => '2026-05-29',
-            'status' => 'followup',
-            'label' => 'Follow-up pending',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-2484',
-            'period' => 'Mei 2026',
-            'price' => 16000000,
-            'due_date' => '2026-05-29',
-            'status' => 'followup',
-            'label' => 'Follow-up pending',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-1640',
-            'period' => 'Mei 2026',
-            'price' => 16000000,
-            'due_date' => '2026-05-29',
-            'status' => 'followup',
-            'label' => 'Follow-up pending',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-6371',
-            'period' => 'Mei 2026',
-            'price' => 12000000,
-            'due_date' => '2026-05-29',
-            'status' => 'followup',
-            'label' => 'Follow-up pending',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-7425',
-            'period' => 'Mei 2026',
-            'price' => 15000000,
-            'due_date' => '2026-05-30',
-            'status' => 'expiring',
-            'label' => 'Expiring soon',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-5903',
-            'period' => 'Mei 2026',
-            'price' => 2000000,
-            'due_date' => '2026-05-30',
-            'status' => 'expiring',
-            'label' => 'Expiring soon',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-7353',
-            'period' => 'Mei 2026',
-            'price' => 4000000,
-            'due_date' => '2026-05-31',
-            'status' => 'expiring',
-            'label' => 'Expiring soon',
-        ],
-    ]);
-@endphp
-
 <div class="billing-page">
 
     <div class="billing-header">
@@ -162,6 +77,7 @@
                         <th>Price</th>
                         <th>Due Date</th>
                         <th>Billing State</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
@@ -169,19 +85,88 @@
 
                     @forelse ($rows as $row)
 
-                        <tr class="billing-row {{ $row['status'] }}">
-                            <td>{{ $row['client'] }}</td>
-                            <td>{{ $row['contract'] }}</td>
-                            <td>{{ $row['invoice'] }}</td>
-                            <td>{{ $row['period'] }}</td>
-                            <td>Rp {{ number_format($row['price'], 0, ',', '.') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row['due_date'])->format('d/m/Y') }}</td>
-                            <td>
-                                <span class="billing-status {{ $row['status'] }}">
-                                    {{ $row['label'] }}
+                    <tr class="billing-row">
+
+                        <td>
+                            {{ $row->contract->contract_name ?? '-' }}
+                        </td>
+
+                        <td>
+                            {{ $row->contract->contract_number ?? '-' }}
+                        </td>
+
+                        <td>
+                            INV-{{ $row->id }}
+                        </td>
+
+                        <td>
+                            {{ $row->billing_period }}
+                        </td>
+
+                        <td>
+                            Rp {{ number_format($row->amount,0,',','.') }}
+                        </td>
+
+                        <td>
+                            {{ optional($row->payment_date)->format('d/m/Y') }}
+                        </td>
+
+                        <td>
+
+                            @if($row->payment_status=='pending')
+
+                                <span class="billing-status followup">
+                                    Follow-up pending
                                 </span>
-                            </td>
-                        </tr>
+
+                            @elseif($row->payment_status=='paid')
+
+                                <span class="billing-status paid">
+                                    Paid
+                                </span>
+
+                            @else
+
+                                <span class="billing-status expiring">
+                                    Overdue
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        <td>
+                            <form
+                                action="{{ route('billing.update-status', $row->id) }}"
+                                method="POST"
+                                class="billing-status-form">
+
+                                @csrf
+                                @method('PATCH')
+
+                                <select
+                                    name="payment_status"
+                                    class="billing-status-select"
+                                    onchange="this.form.submit()">
+
+                                    <option value="">
+                                        Change Status
+                                    </option>
+
+                                    <option value="pending">
+                                        Pending
+                                    </option>
+
+                                    <option value="paid">
+                                        Paid
+                                    </option>
+
+                                </select>
+
+                            </form>
+                        </td>
+
+                    </tr>
 
                     @empty
 
