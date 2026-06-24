@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -39,6 +40,10 @@ class AuthController extends Controller
         ) {
             $request->session()->regenerate();
 
+            ActivityLogger::log(
+                'AUTH',
+                'Login'
+            );
             return redirect()->intended('/dashboard');
         }
 
@@ -51,6 +56,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        ActivityLogger::log(
+            'AUTH',
+            'Logout'
+        );
         Auth::logout();
 
         $request->session()->invalidate();

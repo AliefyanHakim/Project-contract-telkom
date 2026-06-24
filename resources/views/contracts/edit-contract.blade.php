@@ -291,21 +291,11 @@ href="{{ asset('css/create.css') }}">
 
 
             <!-- Assigned AM -->
-            <select name="owner_am_id">
-
-            @foreach($accountManagers as $am)
-
-            <option
-                value="{{ $am->id }}"
-                @selected($contract->owner_am_id == $am->id)>
-
-                {{ $am->name }}
-
-            </option>
-
-            @endforeach
-
-            </select>
+            <input
+                type="text"
+                value="{{ $contract->owner->name }}"
+                readonly
+            >
 
             @if(auth()->user()->isSupportPaycall())
 

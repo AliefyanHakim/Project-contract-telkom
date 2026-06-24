@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Contract;
 use App\Models\User;
 
 class ContractPolicy
@@ -9,19 +10,40 @@ class ContractPolicy
     /**
      * Create a new policy instance.
      */
-    public function __construct()
+    public function view(User $user, Contract $contract): bool
     {
-        //
+        if (
+            $user->isManager() ||
+            $user->isSupportInputter() ||
+            $user->isSupportPaycall()
+        ) {
+            return true;
+        }
+
+    return $contract->owner_am_id === $user->id;
     }
-   public function create(User $user)
+
+    public function create(User $user): bool
     {
-        return in_array(
-            $user->role_id,
-            [
-                User::ROLE_ACCOUNT_MANAGER,
-                User::ROLE_SUPPORT_INPUTTER,
-                User::ROLE_SUPPORT_PAYCALL,
-            ]
-        );
-    } 
+        return
+            $user->isManager()
+            || $user->isAccountManager()
+            || $user->isSupportInputter();
+    }
+
+    public function update(User $user, Contract $contract): bool
+    {
+        if (
+            $user->isManager() ||
+            $user->isSupportInputter()
+        ) {
+            return true;
+        }
+
+        if ($user->isSupportPaycall()) {
+            return true;
+        }
+
+        return $contract->owner_am_id === $user->id;
+    }
 }

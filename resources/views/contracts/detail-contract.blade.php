@@ -46,6 +46,8 @@ href="{{ asset('css/create.css') }}">
 
             </div>
 
+            <div class="form-group half">
+
                 <label>S-ID</label>
 
                 <input
@@ -374,44 +376,60 @@ href="{{ asset('css/create.css') }}">
 
         </div>
 
-        <h4>BASO Files</h4>
+        <div class="form-group">
 
-        @forelse(
-            $contract->basoFiles
-            as $baso
-        )
+            <label>BASO Files</label>
 
-        <div class="file-row">
+            @forelse($contract->basoFiles as $baso)
 
-            <div>
+                <div class="file-row">
 
-                {{ $baso->file_name }}
+                    <div class="file-name">
 
-                @if($baso->baso_date)
+                        {{ $baso->file_name }}
 
-                    ({{ $baso->baso_date }})
+                        @if($baso->baso_date)
 
-                @endif
+                            <small>
+                                ({{ \Carbon\Carbon::parse($baso->baso_date)->format('d/m/Y') }})
+                            </small>
 
-            </div>
+                        @endif
 
-            <a
-                href="{{ route(
-                    'baso.download',
-                    $baso->id
-                ) }}">
+                    </div>
 
-                Download
+                    <a
+                        href="{{ asset('storage/' . $baso->file_path) }}"
+                        target="_blank"
+                        class="view-btn">
 
-            </a>
+                        View
+
+                    </a>
+
+                    <a
+                        href="{{ route('baso.download', $baso->id) }}"
+                        class="download-btn">
+
+                        Download
+
+                    </a>
+
+                </div>
+
+            @empty
+
+                <div class="file-row">
+
+                    <div class="file-name">
+                        No BASO file uploaded.
+                    </div>
+
+                </div>
+
+            @endforelse
 
         </div>
-
-        @empty
-
-            <p>No BASO uploaded.</p>
-
-        @endforelse
 
         <div class="save-area">
 

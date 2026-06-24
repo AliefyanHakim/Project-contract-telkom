@@ -29,8 +29,10 @@ href="{{ asset('css/create.css') }}">
             <br>
         @endif
 
-        <form method="POST"
-              action="{{ route('contracts.store') }}">
+            <form
+                method="POST"
+                action="{{ route('contracts.store') }}"
+                enctype="multipart/form-data">
 
             @csrf
 
@@ -365,7 +367,7 @@ href="{{ asset('css/create.css') }}">
 
                 <input
                     type="file"
-                    name="contract_file"
+                    name="file"
                     accept=".pdf,.doc,.docx">
 
             </div>
