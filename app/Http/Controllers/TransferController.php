@@ -10,43 +10,64 @@ use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TransferController extends Controller
 {
     public function requests(Request $request)
-    {
-        $query = ContractTransferRequest::with([
-            'contract.services.service',
-            'requester',
-            'currentAM',
-            'targetAM',
-            'approver',
-        ]);
+{
+    $user = Auth::user();
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
+    $query = ContractTransferRequest::with([
+        'contract.services.service',
+        'requester',
+        'currentAM',
+        'targetAM',
+        'approver',
+    ]);
 
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('contract', function ($contractQuery) use ($search) {
-                    $contractQuery->where('contract_name', 'like', "%{$search}%")
-                        ->orWhere('contract_number', 'like', "%{$search}%");
-                })
-                ->orWhereHas('currentAM', function ($amQuery) use ($search) {
-                    $amQuery->where('name', 'like', "%{$search}%");
-                })
-                ->orWhereHas('targetAM', function ($amQuery) use ($search) {
-                    $amQuery->where('name', 'like', "%{$search}%");
-                });
-            });
-        }
-
-        $transferRequests = $query
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view('transfer.transfer-request', compact('transferRequests'));
+    /*
+    |--------------------------------------------------------------------------
+    | Role filter
+    |--------------------------------------------------------------------------
+    | Manager dan Support Inputter boleh lihat semua request.
+    | Account Manager hanya lihat request yang berkaitan dengan dirinya.
+    */
+    if ($user->isAccountManager()) {
+        $query->where(function ($q) use ($user) {
+            $q->where('requested_by', $user->id)
+                ->orWhere('current_am_id', $user->id)
+                ->orWhere('target_am_id', $user->id);
+        });
     }
+
+    if ($request->filled('search')) {
+        $search = trim($request->search);
+
+        $query->where(function ($q) use ($search) {
+            $q->whereHas('contract', function ($contractQuery) use ($search) {
+                $contractQuery->where('contract_name', 'like', "%{$search}%")
+                    ->orWhere('contract_number', 'like', "%{$search}%");
+            })
+            ->orWhereHas('currentAM', function ($amQuery) use ($search) {
+                $amQuery->where('name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('targetAM', function ($amQuery) use ($search) {
+                $amQuery->where('name', 'like', "%{$search}%");
+            })
+            ->orWhereHas('requester', function ($requesterQuery) use ($search) {
+                $requesterQuery->where('name', 'like', "%{$search}%");
+            });
+        });
+    }
+
+    $transferRequests = $query
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('transfer.transfer-request', compact('transferRequests'));
+}
 
     public function directHistory(Request $request)
     {
@@ -446,5 +467,160 @@ class TransferController extends Controller
 
         return redirect('/direct-transfer')
             ->with('success', 'Direct transfer kontrak berhasil dilakukan.');
+    }
+
+        public function exportReport(string $type): StreamedResponse
+        {
+            $allowedTypes = [
+                'pending',
+                'direct',
+                'approved',
+                'rejected',
+            ];
+
+            if (!in_array($type, $allowedTypes)) {
+                abort(404);
+            }
+
+            $fileName = match ($type) {
+                'pending' => 'Transfer_Request_Report.csv',
+                'direct' => 'Direct_Transfer_Report.csv',
+                'approved' => 'Accepted_Transfer_Report.csv',
+                'rejected' => 'Rejected_Transfer_Report.csv',
+                default => 'Transfer_Report.csv',
+            };
+
+            return response()->streamDownload(function () use ($type) {
+                $handle = fopen('php://output', 'w');
+
+                if ($type === 'direct') {
+                    fputcsv($handle, [
+                        'Client Name',
+                        'Contract Number',
+                        'Package',
+                        'From AM',
+                        'To AM',
+                        'Transferred By',
+                        'Transfer Type',
+                        'Notes',
+                        'Transfer Date',
+                    ]);
+
+                    $user = auth()->user();
+
+                    $query = ContractTransferHistory::with([
+                        'contract.services.service',
+                        'fromAM',
+                        'toAM',
+                        'transferredBy',
+                    ]);
+
+                    if ($user->isManager()) {
+                        $query->where('transfer_type', 'direct');
+                    }
+
+                    if ($user->isAccountManager()) {
+                        $query->where('transfer_type', 'approved_request')
+                            ->where(function ($q) use ($user) {
+                                $q->where('from_am_id', $user->id)
+                                    ->orWhere('to_am_id', $user->id);
+                            });
+                    }
+
+                    $query->latest('transfer_date')->chunk(200, function ($rows) use ($handle) {
+                        foreach ($rows as $row) {
+                            fputcsv($handle, [
+                                $row->contract?->contract_name ?? '-',
+                                $row->contract?->contract_number ?? '-',
+                                $row->contract?->services
+                                    ? $row->contract->services->pluck('service.service_name')->implode(', ')
+                                    : '-',
+                                $row->fromAM?->name ?? '-',
+                                $row->toAM?->name ?? '-',
+                                $row->transferredBy?->name ?? '-',
+                                $row->transfer_type === 'direct'
+                                    ? 'Direct Transfer'
+                                    : 'Approved Transfer Request',
+                                $row->notes ?? '-',
+                                $row->transfer_date
+                                    ? \Carbon\Carbon::parse($row->transfer_date)->format('d/m/Y H:i')
+                                    : '-',
+                            ]);
+                        }
+                    });
+                } else {
+                    fputcsv($handle, [
+                        'Client Name',
+                        'Contract Number',
+                        'Package',
+                        'Requested By',
+                        'From AM',
+                        'To AM',
+                        'Reason',
+                        'Status',
+                        'Approved / Rejected By',
+                        'Approved / Rejected At',
+                        'Created At',
+                    ]);
+
+                    $user = auth()->user();
+
+                    $query = ContractTransferRequest::with([
+                        'contract.services.service',
+                        'requester',
+                        'currentAM',
+                        'targetAM',
+                        'approver',
+                    ]);
+
+                    if ($type === 'pending') {
+                        $query->where('status', 'pending');
+                    }
+
+                    if ($type === 'approved') {
+                        $query->where('status', 'approved');
+                    }
+
+                    if ($type === 'rejected') {
+                        $query->where('status', 'rejected');
+                    }
+
+                    if ($user->isAccountManager()) {
+                        $query->where(function ($q) use ($user) {
+                            $q->where('requested_by', $user->id)
+                                ->orWhere('current_am_id', $user->id)
+                                ->orWhere('target_am_id', $user->id);
+                        });
+                    }
+
+                    $query->latest()->chunk(200, function ($rows) use ($handle) {
+                        foreach ($rows as $row) {
+                            fputcsv($handle, [
+                                $row->contract?->contract_name ?? '-',
+                                $row->contract?->contract_number ?? '-',
+                                $row->contract?->services
+                                    ? $row->contract->services->pluck('service.service_name')->implode(', ')
+                                    : '-',
+                                $row->requester?->name ?? '-',
+                                $row->currentAM?->name ?? '-',
+                                $row->targetAM?->name ?? '-',
+                                $row->reason ?? '-',
+                                ucfirst($row->status),
+                                $row->approver?->name ?? '-',
+                                $row->approved_at
+                                    ? \Carbon\Carbon::parse($row->approved_at)->format('d/m/Y H:i')
+                                    : '-',
+                                $row->created_at
+                                    ? \Carbon\Carbon::parse($row->created_at)->format('d/m/Y H:i')
+                                    : '-',
+                            ]);
+                        }
+                    });
+                }
+
+                fclose($handle);
+            }, $fileName, [
+                'Content-Type' => 'text/csv',
+            ]);
     }
 }

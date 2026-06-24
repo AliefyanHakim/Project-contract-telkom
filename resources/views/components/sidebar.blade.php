@@ -15,7 +15,7 @@
 
         <a href="{{ url('/dashboard') }}"
            class="vt-menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
-            <span class="vt-menu-icon">⌂</span>
+            <span class="vt-menu-icon">D</span>
             <span>Dashboard</span>
             <b>›</b>
         </a>
@@ -44,36 +44,23 @@
             ->first();
         @endphp
 
-        @if($firstAm)
+        @if(auth()->user()->isManager() || auth()->user()->isSupportInputter())
+    <a href="{{ url('/detailam') }}"
+       class="vt-menu-item {{ request()->is('detailam') || request()->is('account-manager*') ? 'active' : '' }}">
+        <span class="vt-menu-icon">AM</span>
+        <span>Account Manager</span>
+        <b>›</b>
+    </a>
+@endif
 
-        <a
-            href="{{ route('account-managers.show', $firstAm->id) }}"
-            class="vt-menu-item {{
-                request()->routeIs('account-managers.*')
-                    ? 'active'
-                    : ''
-            }}">
-
-            <span class="vt-menu-icon">
-                AM
-            </span>
-
-            <span>
-                By Account Manager
-            </span>
-
-            <b>›</b>
-
-        </a>
-
-        @endif
-
-        <a href="{{ url('/contract-alerts') }}"
-           class="vt-menu-item {{ request()->is('contract-alerts*') ? 'active' : '' }}">
-            <span class="vt-menu-icon">!</span>
-            <span>Contract Alerts</span>
-            <b>›</b>
-        </a>
+        @if(auth()->user()->isAccountManager())
+    <a href="{{ url('/contract-alerts') }}"
+       class="vt-menu-item {{ request()->is('contract-alerts') ? 'active' : '' }}">
+        <span class="vt-menu-icon">!</span>
+        <span>Contract Alerts</span>
+        <b>›</b>
+    </a>
+@endif
 
         @if(auth()->user()->isManager() || auth()->user()->isAccountManager() || auth()->user()->isSupportInputter())
     <a href="{{ url('/transfer-request') }}"
@@ -86,12 +73,23 @@
 
         <p class="vt-menu-title">Settings</p>
 
-        <a href="{{ url('/email-notifications') }}"
-           class="vt-menu-item {{ request()->is('email-notifications') ? 'active' : '' }}">
-            <span class="vt-menu-icon">✉</span>
-            <span>Email Notifications</span>
-            <b>›</b>
-        </a>
+        @if(auth()->user()->isAccountManager() || auth()->user()->isSupportInputter())
+            <a href="{{ url('/email-notifications') }}"
+            class="vt-menu-item {{ request()->is('email-notifications') ? 'active' : '' }}">
+                <span class="vt-menu-icon">✉</span>
+                <span>Email Notifications</span>
+                <b>›</b>
+            </a>
+        @endif
+
+        @if(auth()->user()->isManager())
+    <a href="{{ url('/activity-logs') }}"
+       class="vt-menu-item {{ request()->is('activity-logs') ? 'active' : '' }}">
+        <span class="vt-menu-icon">=</span>
+        <span>Activity Logs</span>
+        <b>›</b>
+    </a>
+@endif
 
         <a href="{{ url('/profile') }}"
            class="vt-menu-item {{ request()->is('profile') || request()->is('settings/profile') ? 'active' : '' }}">

@@ -360,3 +360,304 @@
         grid-column: auto;
     }
 }
+
+/* ===== NICE CONTRACT ALERT SUMMARY ===== */
+
+.nice-alert-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-bottom: 28px;
+}
+
+.nice-alert-card {
+    min-height: 145px;
+    border-radius: 26px;
+    padding: 26px 34px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    text-decoration: none;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    transition: 0.2s ease;
+}
+
+.nice-alert-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 55px rgba(15, 23, 42, 0.12);
+}
+
+.nice-alert-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    flex: 0 0 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.nice-alert-content h3 {
+    margin: 0 0 10px;
+    color: var(--navy);
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+.nice-alert-content strong {
+    display: block;
+    color: var(--navy);
+    font-size: 58px;
+    font-weight: 900;
+    line-height: 0.95;
+    margin-bottom: 10px;
+}
+
+.nice-alert-content p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+/* Active Card */
+.nice-alert-card.active {
+    background: #f4fcf5;
+    border: 1.5px solid #ccefd0;
+}
+
+.nice-alert-card.active .nice-alert-icon {
+    background: #65c86b;
+}
+
+/* Critical Card */
+.nice-alert-card.critical {
+    background: #fff6f6;
+    border: 1.5px solid #f2caca;
+}
+
+.nice-alert-card.critical .nice-alert-icon {
+    background: #e43d35;
+}
+
+/* Expiring Card */
+.nice-alert-card.expiring {
+    background: #fffdf0;
+    border: 1.5px solid #f5dea0;
+}
+
+.nice-alert-card.expiring .nice-alert-icon {
+    background: #f4bf35;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .nice-alert-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .nice-alert-card {
+        min-height: 130px;
+    }
+}
+
+@media (max-width: 600px) {
+    .nice-alert-card {
+        padding: 22px;
+        gap: 18px;
+    }
+
+    .nice-alert-icon {
+        width: 70px;
+        height: 70px;
+        flex-basis: 70px;
+        font-size: 36px;
+    }
+
+    .nice-alert-content h3 {
+        font-size: 21px;
+    }
+
+    .nice-alert-content strong {
+        font-size: 44px;
+    }
+
+    .nice-alert-content p {
+        font-size: 14px;
+    }
+}
+
+/* ===== FIX CONTRACT ALERT CARD SIZE + SEARCH FULL WIDTH ===== */
+
+/* Card summary jadi lebih compact */
+.contract-alert-summary.nice-alert-summary {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    margin-bottom: 24px !important;
+}
+
+.nice-alert-card {
+    min-height: 90px !important;
+    padding: 15px 28px !important;
+    border-radius: 22px !important;
+    gap: 22px !important;
+    align-items: center !important;
+}
+
+.nice-alert-icon {
+    width: 66px !important;
+    height: 66px !important;
+    flex: 0 0 74px !important;
+    font-size: 30px !important;
+}
+
+.nice-alert-content {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.nice-alert-content h3 {
+    font-size: 20px !important;
+    line-height: 1.05 !important;
+    margin: 0 0 8px !important;
+    white-space: nowrap !important;
+}
+
+.nice-alert-content strong {
+    font-size: 30px !important;
+    line-height: 0.9 !important;
+    margin-bottom: 8px !important;
+}
+
+.nice-alert-content p {
+    font-size: 15px !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+}
+
+/* Toolbar filter + search rapi sampai ujung */
+.contract-toolbar.alert-toolbar {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 300px minmax(0, 1fr) !important;
+    gap: 16px !important;
+    align-items: center !important;
+}
+
+.contract-toolbar.alert-toolbar select {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.contract-toolbar.alert-toolbar .contract-search-box {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.contract-toolbar.alert-toolbar .contract-search-box input {
+    width: 100% !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.contract-toolbar.alert-toolbar .contract-search-box button {
+    flex: 0 0 auto !important;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .contract-alert-summary.nice-alert-summary {
+        grid-template-columns: 1fr !important;
+    }
+
+    .contract-toolbar.alert-toolbar {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .nice-alert-card {
+        padding: 18px 20px !important;
+        gap: 16px !important;
+    }
+
+    .nice-alert-icon {
+        width: 60px !important;
+        height: 60px !important;
+        flex-basis: 60px !important;
+        font-size: 32px !important;
+    }
+
+    .nice-alert-content h3 {
+        font-size: 21px !important;
+    }
+
+    .nice-alert-content strong {
+        font-size: 40px !important;
+    }
+
+    .nice-alert-content p {
+        font-size: 13px !important;
+    }
+}
+
+/* ===== CONTRACT ALERT REPORT BUTTON ===== */
+
+.contract-toolbar.alert-toolbar {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 260px minmax(0, 1fr) 180px !important;
+    gap: 16px !important;
+    align-items: center !important;
+}
+
+.contract-alert-report-btn {
+    height: 52px;
+    min-width: 170px;
+    border-radius: 16px;
+    background: var(--navy);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 900;
+    white-space: nowrap;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
+    transition: 0.2s ease;
+}
+
+.contract-alert-report-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22);
+}
+
+.contract-toolbar.alert-toolbar .contract-search-box {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.contract-toolbar.alert-toolbar .contract-search-box input {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+@media (max-width: 1100px) {
+    .contract-toolbar.alert-toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    .contract-alert-report-btn {
+        width: 100%;
+    }
+}

@@ -51,7 +51,7 @@
           action="{{ url('/transfer-request') }}"
           class="transfer-toolbar {{ $canAddTransferContract ? '' : 'no-add' }}">
 
-        <a href="#" class="transfer-download-btn">
+        <a href="{{ route('transfer.report', 'pending') }}" class="transfer-download-btn">
             <span>↓</span>
             Download Report
         </a>

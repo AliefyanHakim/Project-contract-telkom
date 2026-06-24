@@ -8,6 +8,19 @@
 
 @section('content')
 
+@php
+    $user = auth()->user();
+
+    $isAccountManager = $user->isAccountManager();
+    $canUpdateBilling = $user->isSupportPaycall();
+
+    $toolbarClass = 'billing-toolbar';
+
+    if ($isAccountManager) {
+        $toolbarClass .= ' am-toolbar';
+    }
+@endphp
+
 <div class="billing-page">
 
     <div class="billing-header">
@@ -32,18 +45,34 @@
     </div>
 
     <section class="billing-toolbar-card">
-        <form method="GET" action="{{ url('/billing') }}" class="billing-toolbar">
+        <form method="GET" action="{{ url('/billing') }}" class="{{ $toolbarClass }}">
 
-            <select name="account_manager">
-                <option value="">All Account Managers</option>
-                <option value="am1">Account Manager 1</option>
-                <option value="am2">Account Manager 2</option>
-            </select>
+            @unless($isAccountManager)
+                <select name="account_manager" onchange="this.form.submit()">
+                    <option value="">
+                        All Account Managers
+                    </option>
 
-            <select name="status">
-                <option value="">All Statuses</option>
-                <option value="followup">Follow-up Pending</option>
-                <option value="expiring">Expiring Soon</option>
+                    @foreach(($accountManagers ?? collect()) as $am)
+                        <option value="{{ $am->id }}" @selected(request('account_manager') == $am->id)>
+                            {{ $am->name }}
+                        </option>
+                    @endforeach
+                </select>
+            @endunless
+
+            <select name="status" onchange="this.form.submit()">
+                <option value="">
+                    All Statuses
+                </option>
+
+                <option value="pending" @selected(request('status') === 'pending')>
+                    Pending
+                </option>
+
+                <option value="overdue" @selected(request('status') === 'overdue')>
+                    Overdue
+                </option>
             </select>
 
             <div class="billing-search-box">
@@ -85,93 +114,103 @@
 
                     @forelse ($rows as $row)
 
-                    <tr class="billing-row">
+                        @php
+                            $status = $row->payment_status ?? 'pending';
 
-                        <td>
-                            {{ $row->contract->contract_name ?? '-' }}
-                        </td>
+                            $rowClass = $status === 'overdue'
+                                ? 'expiring'
+                                : 'followup';
 
-                        <td>
-                            {{ $row->contract->contract_number ?? '-' }}
-                        </td>
+                            $statusLabel = $status === 'overdue'
+                                ? 'Overdue'
+                                : 'Pending';
+                        @endphp
 
-                        <td>
-                            INV-{{ $row->id }}
-                        </td>
+                        <tr class="billing-row {{ $rowClass }}">
 
-                        <td>
-                            {{ $row->billing_period }}
-                        </td>
+                            <td>
+                                {{ $row->contract->contract_name ?? '-' }}
+                            </td>
 
-                        <td>
-                            Rp {{ number_format($row->amount,0,',','.') }}
-                        </td>
+                            <td>
+                                {{ $row->contract->contract_number ?? '-' }}
+                            </td>
 
-                        <td>
-                            {{ optional($row->payment_date)->format('d/m/Y') }}
-                        </td>
+                            <td>
+                                INV-{{ $row->id }}
+                            </td>
 
-                        <td>
+                            <td>
+                                {{ $row->billing_period }}
+                            </td>
 
-                            @if($row->payment_status=='pending')
+                            <td>
+                                Rp {{ number_format($row->amount, 0, ',', '.') }}
+                            </td>
 
-                                <span class="billing-status followup">
-                                    Follow-up pending
-                                </span>
+                            <td>
+                                {{ $row->due_date ? \Carbon\Carbon::parse($row->due_date)->format('d/m/Y') : '-' }}
+                            </td>
 
-                            @elseif($row->payment_status=='paid')
-
-                                <span class="billing-status paid">
-                                    Paid
-                                </span>
-
-                            @else
-
-                                <span class="billing-status expiring">
-                                    Overdue
-                                </span>
-
-                            @endif
-
-                        </td>
-
-                        <td>
-                            <form
-                                action="{{ route('billing.update-status', $row->id) }}"
-                                method="POST"
-                                class="billing-status-form">
-
-                                @csrf
-                                @method('PATCH')
-
-                                <select
-                                    name="payment_status"
-                                    class="billing-status-select"
-                                    onchange="this.form.submit()">
-
-                                    <option value="">
-                                        Change Status
-                                    </option>
-
-                                    <option value="pending">
+                            <td>
+                                @if($status === 'overdue')
+                                    <span class="billing-status expiring">
+                                        Overdue
+                                    </span>
+                                @else
+                                    <span class="billing-status followup">
                                         Pending
-                                    </option>
+                                    </span>
+                                @endif
+                            </td>
 
-                                    <option value="paid">
-                                        Paid
-                                    </option>
+                            <td>
+                                @if($canUpdateBilling)
+                                    <form
+                                        action="{{ route('billing.update-status', $row->id) }}"
+                                        method="POST"
+                                        class="billing-status-form">
 
-                                </select>
+                                        @csrf
+                                        @method('PATCH')
 
-                            </form>
-                        </td>
+                                        <select
+                                            name="payment_status"
+                                            class="billing-status-select"
+                                            onchange="this.form.submit()">
 
-                    </tr>
+                                            <option value="">
+                                                Change Status
+                                            </option>
+
+                                            <option value="pending" @selected($status === 'pending')>
+                                                Pending
+                                            </option>
+
+                                            <option value="overdue" @selected($status === 'overdue')>
+                                                Overdue
+                                            </option>
+
+                                            <option value="paid">
+                                                Paid
+                                            </option>
+
+                                        </select>
+
+                                    </form>
+                                @else
+                                    <span class="billing-readonly-badge">
+                                        View Only
+                                    </span>
+                                @endif
+                            </td>
+
+                        </tr>
 
                     @empty
 
                         <tr>
-                            <td colspan="7" class="billing-empty">
+                            <td colspan="8" class="billing-empty">
                                 No billing data found.
                             </td>
                         </tr>
@@ -183,6 +222,12 @@
             </table>
 
         </div>
+
+        @if(method_exists($rows, 'total') && $rows->total() > 0)
+            <div style="margin-top: 18px;">
+                {{ $rows->links() }}
+            </div>
+        @endif
 
     </section>
 

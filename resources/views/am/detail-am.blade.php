@@ -177,11 +177,12 @@
             </div>
 
             <a
-                href="{{ route('account-managers.export', $user->id) }}"
-                class="am-download-btn">
-                <span>↓</span>
-                Download
-            </a>
+    href="javascript:void(0)"
+    class="am-download-btn disabled"
+    title="Export report belum tersedia">
+    <span>↓</span>
+    Download
+</a>
 
         </form>
 

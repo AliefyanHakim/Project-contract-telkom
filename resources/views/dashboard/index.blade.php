@@ -20,7 +20,7 @@
         follow up or renew immediately.
     </p>
 
-    <a href="#">View All Alerts</a>
+    <a href="{{ url('/contract-alerts') }}">View All Alerts</a>
 </section>
 @endif
 
@@ -47,7 +47,7 @@
                 <p>Attention needed for renewal and follow up</p>
             </div>
 
-            <a href="#">View All</a>
+            <a href="{{ url('/contract-alerts') }}">View All</a>
         </div>
 
         <div class="vt-contract-list">
@@ -71,7 +71,7 @@
                             {{ $contract['days_left'] }}
                         </span>
 
-                        <a href="#">Detail ›</a>
+                        <a href="{{ route('contracts.show', $contract['id']) }}">Detail ›</a>
                     </div>
                 </div>
             @endforeach
@@ -112,7 +112,15 @@
             </table>
         </div>
 
-        <a href="#" class="vt-summary-link">View Full Summary</a>
+        @if(auth()->user()->isAccountManager())
+            <a href="{{ url('/contract-list') }}" class="vt-summary-link">
+                View My Contracts
+            </a>
+        @else
+            <a href="{{ url('/detailam') }}" class="vt-summary-link">
+                View Full Summary
+            </a>
+        @endif
     </div>
 </section>
 

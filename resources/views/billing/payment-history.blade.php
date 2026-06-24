@@ -8,16 +8,28 @@
 
 @section('content')
 
+@php
+    $user = auth()->user();
+
+    $isAccountManager = $user->isAccountManager();
+
+    $toolbarClass = 'billing-toolbar';
+
+    if ($isAccountManager) {
+        $toolbarClass .= ' am-toolbar';
+    }
+@endphp
+
 <div class="billing-page">
 
     <div class="billing-header">
-        <a href="{{ url('/billing') }}" class="billing-back-btn">
+        <a href="{{ url('/dashboard') }}" class="billing-back-btn">
             ‹
         </a>
 
         <div>
             <h1>Billing & Invoices</h1>
-            <p>Review completed invoice payments and billing history.</p>
+            <p>View completed payment records and paid invoices.</p>
         </div>
     </div>
 
@@ -32,17 +44,26 @@
     </div>
 
     <section class="billing-toolbar-card">
-        <form method="GET" action="{{ url('/billing/payment-history') }}" class="billing-toolbar">
+        <form method="GET" action="{{ url('/billing/payment-history') }}" class="{{ $toolbarClass }}">
 
-            <select name="account_manager">
-                <option value="">All Account Managers</option>
-                <option value="am1">Account Manager 1</option>
-                <option value="am2">Account Manager 2</option>
-            </select>
+            @unless($isAccountManager)
+                <select name="account_manager" onchange="this.form.submit()">
+                    <option value="">
+                        All Account Managers
+                    </option>
 
-            <select name="status">
-                <option value="">All Statuses</option>
-                <option value="paid">Paid</option>
+                    @foreach(($accountManagers ?? collect()) as $am)
+                        <option value="{{ $am->id }}" @selected(request('account_manager') == $am->id)>
+                            {{ $am->name }}
+                        </option>
+                    @endforeach
+                </select>
+            @endunless
+
+            <select disabled>
+                <option>
+                    Paid
+                </option>
             </select>
 
             <div class="billing-search-box">
@@ -75,7 +96,7 @@
                         <th>Period</th>
                         <th>Price</th>
                         <th>Payment Date</th>
-                        <th>Status</th>
+                        <th>Billing State</th>
                     </tr>
                 </thead>
 
@@ -83,47 +104,47 @@
 
                     @forelse ($rows as $row)
 
-                    <tr class="billing-row paid">
+                        <tr class="billing-row active">
 
-                        <td>
-                            {{ $row->contract->client_name ?? '-' }}
-                        </td>
+                            <td>
+                                {{ $row->contract->contract_name ?? '-' }}
+                            </td>
 
-                        <td>
-                            {{ $row->contract_id }}
-                        </td>
+                            <td>
+                                {{ $row->contract->contract_number ?? '-' }}
+                            </td>
 
-                        <td>
-                            INV-{{ str_pad($row->id, 4, '0', STR_PAD_LEFT) }}
-                        </td>
+                            <td>
+                                INV-{{ $row->id }}
+                            </td>
 
-                        <td>
-                            {{ $row->billing_period }}
-                        </td>
+                            <td>
+                                {{ $row->billing_period }}
+                            </td>
 
-                        <td>
-                            Rp {{ number_format($row->amount, 0, ',', '.') }}
-                        </td>
+                            <td>
+                                Rp {{ number_format($row->amount, 0, ',', '.') }}
+                            </td>
 
-                        <td>
-                            {{ $row->payment_date?->format('d/m/Y') ?? '-' }}
-                        </td>
+                            <td>
+                                {{ $row->payment_date ? \Carbon\Carbon::parse($row->payment_date)->format('d/m/Y') : '-' }}
+                            </td>
 
-                        <td>
-                            <span class="billing-status paid">
-                                Paid
-                            </span>
-                        </td>
+                            <td>
+                                <span class="billing-status active">
+                                    Paid
+                                </span>
+                            </td>
 
-                    </tr>
+                        </tr>
 
                     @empty
 
-                    <tr>
-                        <td colspan="7" class="billing-empty">
-                            No payment history found.
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="7" class="billing-empty">
+                                No payment history found.
+                            </td>
+                        </tr>
 
                     @endforelse
 
@@ -132,6 +153,12 @@
             </table>
 
         </div>
+
+        @if(method_exists($rows, 'total') && $rows->total() > 0)
+            <div style="margin-top: 18px;">
+                {{ $rows->links() }}
+            </div>
+        @endif
 
     </section>
 

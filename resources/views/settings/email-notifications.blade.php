@@ -41,7 +41,7 @@
 
             <div class="email-grid">
                 <div class="email-field">
-                    <label>Manager Email</label>
+                    <label>Notification Recipient Email</label>
                     <p>Recipient of all critical alerts</p>
 
                     <div class="email-input">
@@ -55,7 +55,7 @@
                     </div>
 
                     <small class="email-help">
-                        Manager email is required. Notification settings cannot be saved if this field is empty.
+                        Set the email address that will receive contract reminder notifications.
                     </small>
 
                     @error('manager_email')
@@ -68,8 +68,7 @@
                 <div class="email-field">
                 <label>Support Recipients</label>
                 <p>
-                All Support Inputter and Support Paycall users
-                will automatically receive notifications.</p>
+                Recipient of all critical alerts</p>
 
                     <div class="email-input readonly">
                         <span>✉</span>
@@ -79,6 +78,9 @@
                             readonly
                         >
                     </div>
+                    <small class="email-help">
+                        All Support users will automatically receive notifications.
+                    </small>
                 </div>
             </div>
         </section>

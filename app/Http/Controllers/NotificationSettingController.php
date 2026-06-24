@@ -2,50 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\NotificationSetting;
+use App\Support\ActivityLogger;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationSettingController extends Controller
 {
     public function index()
     {
-        $settings = NotificationSetting::first();
+        $user = Auth::user();
 
-        if (!$settings) {
-
-            $settings = NotificationSetting::create([
-                'manager_email' => '',
-                'daily_schedule' => '08:00',
-                'weekly_schedule' => 'monday_morning',
-            ]);
+        if (!$user->isAccountManager() && !$user->isSupportInputter()) {
+            abort(403, 'Hanya Account Manager dan Support Inputter yang dapat mengatur email reminder.');
         }
 
-        return view(
-            'settings.email-notifications',
-            compact('settings')
+        $settings = NotificationSetting::firstOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'manager_email' => $user->email,
+                'daily_schedule' => '08:00',
+                'weekly_schedule' => 'monday_morning',
+            ]
         );
+
+        return view('settings.email-notifications', compact('settings'));
     }
 
     public function update(Request $request)
     {
+        $user = Auth::user();
+
+        if (!$user->isAccountManager() && !$user->isSupportInputter()) {
+            abort(403, 'Hanya Account Manager dan Support Inputter yang dapat mengatur email reminder.');
+        }
+
         $validated = $request->validate([
             'manager_email' => [
                 'required',
-                'email'
+                'email',
+                'max:255',
             ],
 
             'daily_schedule' => [
                 'required',
-                'in:08:00,09:00,10:00'
+                'max:20',
             ],
 
             'weekly_schedule' => [
                 'required',
-                'in:monday_morning,monday_afternoon,friday_morning'
+                'max:50',
             ],
         ]);
 
-        $settings = NotificationSetting::first();
+        $settings = NotificationSetting::firstOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'manager_email' => $user->email,
+                'daily_schedule' => '08:00',
+                'weekly_schedule' => 'monday_morning',
+            ]
+        );
 
         $settings->update([
             'manager_email' => $validated['manager_email'],
@@ -53,9 +74,11 @@ class NotificationSettingController extends Controller
             'weekly_schedule' => $validated['weekly_schedule'],
         ]);
 
-        return back()->with(
-            'success',
-            'Notification settings updated successfully.'
+        ActivityLogger::log(
+            'EMAIL_NOTIFICATION',
+            'Updated email notification settings'
         );
+
+        return back()->with('success', 'Email reminder settings updated successfully.');
     }
 }

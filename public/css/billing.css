@@ -286,3 +286,75 @@
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
+
+/* ===== FIX BILLING ROLE UI ===== */
+
+.billing-toolbar {
+    display: grid;
+    grid-template-columns: 240px 220px minmax(320px, 1fr);
+    gap: 14px;
+    align-items: center;
+}
+
+.billing-toolbar.am-toolbar {
+    grid-template-columns: 220px minmax(420px, 1fr);
+}
+
+.billing-toolbar select,
+.billing-search-box {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.billing-search-box input {
+    width: 100%;
+    min-width: 0;
+}
+
+.billing-readonly-badge {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #f3f6fb;
+    color: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.billing-status-select {
+    height: 40px;
+    min-width: 150px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--navy);
+    padding: 0 12px;
+    font-weight: 800;
+    outline: none;
+}
+
+.billing-status-form {
+    margin: 0;
+}
+
+@media (max-width: 1100px) {
+    .billing-toolbar,
+    .billing-toolbar.am-toolbar {
+        grid-template-columns: 1fr;
+    }
+}
+
+.billing-row.active td {
+    background: #f2fbf3;
+    border-color: #ccebd1;
+}
+
+.billing-status.active {
+    background: #e7f8e9;
+    color: var(--green);
+}

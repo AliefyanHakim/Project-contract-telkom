@@ -9,6 +9,7 @@ class Billing extends Model
     protected $fillable = [
         'contract_id',
         'billing_period',
+        'due_date',
         'amount',
         'payment_status',
         'payment_date',
@@ -19,6 +20,7 @@ class Billing extends Model
     protected function casts(): array
     {
         return [
+            'due_date' => 'date',
             'payment_date' => 'date',
             'amount' => 'decimal:2',
         ];

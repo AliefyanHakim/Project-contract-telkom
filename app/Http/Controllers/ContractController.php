@@ -16,6 +16,7 @@ use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Models\Billing;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContractController extends Controller
 {
@@ -26,6 +27,42 @@ private function ensureContractAccess(Contract $contract): void
 
     if ($user->isAccountManager() && $contract->owner_am_id !== $user->id) {
         abort(403, 'Anda tidak memiliki akses ke kontrak ini.');
+    }
+}
+
+private function generateBillingsForContract(Contract $contract): void
+{
+    $contract->loadMissing('services.service');
+
+    $monthlyAmount = $contract->services->sum(function ($contractService) {
+        return (float) (
+            $contractService->monthly_fee
+            ?? $contractService->service?->monthly_fee
+            ?? 0
+        );
+    });
+
+    if ($monthlyAmount <= 0) {
+        return;
+    }
+
+    $start = Carbon::parse($contract->start_date)->startOfMonth();
+    $end = Carbon::parse($contract->end_date)->startOfMonth();
+
+    while ($start->lte($end)) {
+        Billing::firstOrCreate(
+            [
+                'contract_id' => $contract->id,
+                'billing_period' => $start->format('Y-m'),
+            ],
+            [
+                'due_date' => $start->copy()->day(20)->toDateString(),
+                'amount' => $monthlyAmount,
+                'payment_status' => 'pending',
+            ]
+        );
+
+        $start->addMonth();
     }
 }
     /**
@@ -364,334 +401,276 @@ private function ensureContractAccess(Contract $contract): void
     /**
      * Store contract.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
+public function store(Request $request)
+{
+    $user = Auth::user();
 
-            'contract_number' => [
-                'required',
-                'max:100',
-                'unique:contracts,contract_number'
-            ],
+    $validated = $request->validate([
+        'contract_number' => [
+            'required',
+            'max:100',
+            'unique:contracts,contract_number',
+        ],
 
-            'contract_name' => [
-                'required',
-                'max:255'
-            ],
+        'contract_name' => [
+            'required',
+            'max:255',
+        ],
 
-            'account_number' => [
-                'nullable',
-                'max:100'
-            ],
+        'account_number' => [
+            'nullable',
+            'max:100',
+        ],
 
-            'sid' => [
-                'nullable',
-                'max:100'
-            ],
+        'sid' => [
+            'nullable',
+            'max:100',
+        ],
 
-            'telkom_name' => [
-                'nullable',
-                'max:255'
-            ],
+        'telkom_name' => [
+            'nullable',
+            'max:255',
+        ],
 
-            'telkom_position' => [
-                'nullable',
-                'max:255'
-            ],
+        'telkom_position' => [
+            'nullable',
+            'max:255',
+        ],
 
-            'telkom_unit' => [
-                'nullable',
-                'max:255'
-            ],
+        'telkom_unit' => [
+            'nullable',
+            'max:255',
+        ],
 
-            'customer_address' => [
-                'nullable'
-            ],
+        'customer_address' => [
+            'nullable',
+        ],
 
-            'customer_npwp' => [
-                'nullable',
-                'max:100'
-            ],
+        'customer_npwp' => [
+            'nullable',
+            'max:100',
+        ],
 
-            'customer_pic_name' => [
-                'nullable',
-                'max:255'
-            ],
+        'customer_pic_name' => [
+            'nullable',
+            'max:255',
+        ],
 
-            'customer_pic_position' => [
-                'nullable',
-                'max:255'
-            ],
+        'customer_pic_position' => [
+            'nullable',
+            'max:255',
+        ],
 
-            'customer_phone' => [
-                'nullable',
-                'max:50'
-            ],
+        'customer_phone' => [
+            'nullable',
+            'max:50',
+        ],
 
-            'customer_email' => [
-                'nullable',
-                'email',
-                'max:255'
-            ],
+        'customer_email' => [
+            'nullable',
+            'email',
+            'max:255',
+        ],
 
-            'owner_am_id' => [
-                'required',
-                'exists:users,id'
-            ],
+        'owner_am_id' => [
+            'nullable',
+            'exists:users,id',
+        ],
 
-            'start_date' => [
-                'required',
-                'date'
-            ],
+        'start_date' => [
+            'required',
+            'date',
+        ],
 
-            'end_date' => [
-                'required',
-                'date',
-                'after:start_date'
-            ],
+        'end_date' => [
+            'required',
+            'date',
+            'after:start_date',
+        ],
 
-            'signing_date' => [
-                'nullable',
-                'date'
-            ],
+        'signing_date' => [
+            'nullable',
+            'date',
+        ],
 
-            'signing_location' => [
-                'nullable',
-                'max:255'
-            ],
+        'signing_location' => [
+            'nullable',
+            'max:255',
+        ],
 
-            'services' => [
-                'required',
-                'array',
-                'min:1'
-            ],
+        'services' => [
+            'required',
+            'array',
+            'min:1',
+        ],
 
-            'services.*' => [
-                'required',
-                'exists:services,id'
-            ],
+        'services.*' => [
+            'required',
+            'exists:services,id',
+        ],
 
-            'file' => [
-                'nullable',
-                'file',
-                'mimes:pdf,doc,docx',
-                'max:10240'
-            ],
+        'file' => [
+            'nullable',
+            'file',
+            'mimes:pdf,doc,docx',
+            'max:10240',
+        ],
 
-            'baso_files.*' => [
-                'nullable',
-                'file',
-                'mimes:pdf,doc,docx'
-            ],
+        'contract_file' => [
+            'nullable',
+            'file',
+            'mimes:pdf,doc,docx',
+            'max:10240',
+        ],
 
-            'baso_dates.*' => [
-                'nullable',
-                'date'
-            ],
+        'baso_files.*' => [
+            'nullable',
+            'file',
+            'mimes:pdf,doc,docx',
+        ],
+
+        'baso_dates.*' => [
+            'nullable',
+            'date',
+        ],
+
+        'custom_service_name' => [
+            'nullable',
+            'max:255',
+        ],
+
+        'custom_installation_fee' => [
+            'nullable',
+            'numeric',
+        ],
+
+        'custom_monthly_fee' => [
+            'nullable',
+            'numeric',
+        ],
+    ]);
+
+    if ($user->isAccountManager()) {
+        $ownerAmId = $user->id;
+    } else {
+        $ownerAmId = $validated['owner_am_id'] ?? null;
+    }
+
+    if (!$ownerAmId) {
+        return back()
+            ->withInput()
+            ->withErrors([
+                'owner_am_id' => 'Account Manager wajib dipilih.',
+            ]);
+    }
+
+    $contract = null;
+
+    DB::transaction(function () use ($validated, $request, &$contract, $ownerAmId) {
+        $contract = Contract::create([
+            'contract_number' => $validated['contract_number'],
+            'contract_name' => $validated['contract_name'],
+            'account_number' => $validated['account_number'] ?? null,
+            'sid' => $validated['sid'] ?? null,
+
+            'telkom_name' => $validated['telkom_name'] ?? null,
+            'telkom_position' => $validated['telkom_position'] ?? null,
+            'telkom_unit' => $validated['telkom_unit'] ?? null,
+
+            'customer_address' => $validated['customer_address'] ?? null,
+            'customer_npwp' => $validated['customer_npwp'] ?? null,
+            'customer_pic_name' => $validated['customer_pic_name'] ?? null,
+            'customer_pic_position' => $validated['customer_pic_position'] ?? null,
+            'customer_phone' => $validated['customer_phone'] ?? null,
+            'customer_email' => $validated['customer_email'] ?? null,
+
+            'signing_date' => $validated['signing_date'] ?? null,
+            'signing_location' => $validated['signing_location'] ?? null,
+
+            'owner_am_id' => $ownerAmId,
+
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+
+            'status' => 'active',
+            'created_by' => Auth::id(),
         ]);
 
-        $contract = null;
-
-        DB::transaction(function () use (
-            $validated,
-            $request,
-            &$contract) {
-
-            $contract = Contract::create([
-
-                'contract_number'
-                    => $validated['contract_number'],
-
-                'contract_name'
-                    => $validated['contract_name'],
-
-                'account_number'
-                    => $validated['account_number'] ?? null,
-                
-                'sid' 
-                    => $validated['sid'] ?? null,
-
-                'telkom_name'
-                    => $validated['telkom_name'] ?? null,
-
-                'telkom_position'
-                    => $validated['telkom_position'] ?? null,
-
-                'telkom_unit'
-                    => $validated['telkom_unit'] ?? null,
-
-                'customer_address'
-                    => $validated['customer_address'] ?? null,
-
-                'customer_npwp'
-                    => $validated['customer_npwp'] ?? null,
-
-                'customer_pic_name'
-                    => $validated['customer_pic_name'] ?? null,
-
-                'customer_pic_position'
-                    => $validated['customer_pic_position'] ?? null,
-
-                'customer_phone'
-                    => $validated['customer_phone'] ?? null,
-
-                'customer_email'
-                    => $validated['customer_email'] ?? null,
-
-                'signing_date'
-                    => $validated['signing_date'] ?? null,
-
-                'signing_location'
-                    => $validated['signing_location'] ?? null,
-
-                'owner_am_id'
-                    => $validated['owner_am_id'],
-
-                'start_date'
-                    => $validated['start_date'],
-
-                'end_date'
-                    => $validated['end_date'],
-
-                'status'
-                    => 'active',
-
-                'created_by'
-                    => Auth::id(),
-                
-                'contract_file' => [
-                    'nullable',
-                    'file',
-                    'mimes:pdf,doc,docx',
-                    'max:10240'
-                ],
-            ]);
-
-            if ($request->filled('custom_service_name')) {
-
+        if ($request->filled('custom_service_name')) {
             $newService = Service::create([
-
-                'service_name'
-                    => $request->custom_service_name,
-
-                'installation_fee'
-                    => $request->custom_installation_fee ?? 0,
-
-                'monthly_fee'
-                    => $request->custom_monthly_fee ?? 0,
-
-                'status'
-                    => 'active',
+                'service_name' => $request->custom_service_name,
+                'installation_fee' => $request->custom_installation_fee ?? 0,
+                'monthly_fee' => $request->custom_monthly_fee ?? 0,
+                'status' => 'active',
             ]);
 
-            $validated['services'][] =
-                $newService->id;
+            $validated['services'][] = $newService->id;
         }
 
-            foreach ($request->services as $serviceId) {
+        foreach ($validated['services'] as $serviceId) {
+            $service = Service::findOrFail($serviceId);
 
-                $service = Service::findOrFail($serviceId);
-
-                ContractService::create([
-
-                    'contract_id' => $contract->id,
-
-                    'service_id' => $service->id,
-
-                    'installation_fee'
-                        => $service->installation_fee,
-
-                    'monthly_fee'
-                        => $service->monthly_fee,
-                ]);
-            }
-
-            $totalMonthlyFee = Service::whereIn(
-                'id',
-                $request->services
-            )->sum('monthly_fee');
-
-            Billing::create([
-                'contract_id'     => $contract->id,
-                'billing_period'  => now()->format('F Y'),
-                'amount'          => $totalMonthlyFee,
-                'payment_status'  => 'pending',
-                'updated_by'      => Auth::id(),
+            ContractService::create([
+                'contract_id' => $contract->id,
+                'service_id' => $service->id,
+                'installation_fee' => $service->installation_fee ?? 0,
+                'monthly_fee' => $service->monthly_fee ?? 0,
             ]);
+        }
 
-            if ($request->hasFile('file')) {
+        $this->generateBillingsForContract($contract);
 
-                $path = $request
-                    ->file('file')
-                    ->store('contracts');
+        $contractFileInput = null;
 
-                ContractFile::create([
-                    'contract_id' => $contract->id,
-                    'file_name' => $request
-                        ->file('file')
-                        ->getClientOriginalName(),
-                    'file_path' => $path,
-                    'uploaded_by' => Auth::id(),
-                ]);
-            }
+        if ($request->hasFile('file')) {
+            $contractFileInput = 'file';
+        } elseif ($request->hasFile('contract_file')) {
+            $contractFileInput = 'contract_file';
+        }
 
-            if ($request->hasFile('baso_files')) {
+        if ($contractFileInput) {
+            $file = $request->file($contractFileInput);
+            $path = $file->store('contracts');
 
-            foreach (
-                $request->file('baso_files')
-                as $index => $file
-            ) {
+            ContractFile::create([
+                'contract_id' => $contract->id,
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'uploaded_by' => Auth::id(),
+            ]);
+        }
 
+        if ($request->hasFile('baso_files')) {
+            foreach ($request->file('baso_files') as $index => $file) {
                 if (!$file) {
                     continue;
                 }
 
-                $path = $file->store(
-                    'baso'
-                );
+                $path = $file->store('baso');
 
                 BasoFile::create([
-
-                    'contract_id'
-                        => $contract->id,
-
-                    'file_name'
-                        => $file
-                        ->getClientOriginalName(),
-
-                    'file_path'
-                        => $path,
-
-                    'baso_date'
-                        => $request
-                        ->baso_dates[$index]
-                        ?? null,
-
-                    'uploaded_by'
-                        => Auth::id(),
+                    'contract_id' => $contract->id,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'baso_date' => $request->baso_dates[$index] ?? null,
+                    'uploaded_by' => Auth::id(),
                 ]);
             }
         }
-            
 
-            $contract->updateStatus();
-        });
+        $contract->refresh();
+        $contract->updateStatus();
+    });
 
     ActivityLogger::log(
-    'CONTRACT',
-    'Created contract ' . $contract->contract_number
+        'CONTRACT',
+        'Created contract ' . $contract->contract_number
     );
 
     return redirect()
-        ->route(
-            'contracts.show',
-            $contract->id
-        )
-        ->with(
-            'success',
-            'Contract created successfully.'
-        );
-    }
+        ->route('contracts.show', $contract->id)
+        ->with('success', 'Contract created successfully.');
+}
 
     /**
      * Show contract detail.
@@ -742,309 +721,350 @@ private function ensureContractAccess(Contract $contract): void
     );
     }
 
-    public function update(
-        Request $request,
-        Contract $contract
-    )    
-    {
-        $this->ensureContractAccess($contract);
+    public function update(Request $request, Contract $contract)
+{
+    $this->ensureContractAccess($contract);
 
-        if (Auth::user()->isSupportPaycall()) {
-            $validated = $request->validate([
-                'start_date' => [
-                    'required',
-                    'date',
-                ],
+    $user = Auth::user();
 
-                'end_date' => [
-                    'required',
-                    'date',
-                    'after:start_date',
-                ],
-            ]);
-
-            $contract->update([
-                'start_date' => $validated['start_date'],
-                'end_date' => $validated['end_date'],
-            ]);
-
-            $contract->refresh();
-            $contract->updateStatus();
-
-            ActivityLogger::log(
-            'CONTRACT',
-            'Updated contract date/status ' . $contract->contract_number
-);
-            return redirect()
-                ->route('contracts.show', $contract->id)
-                ->with('success', 'Start date dan end date kontrak berhasil diperbarui.');
-        }
-
+    if ($user->isSupportPaycall()) {
         $validated = $request->validate([
-
-            'contract_name' => [
-                'required',
-                'max:255'
-            ],
-
-            'account_number' => [
-                'nullable'
-            ],
-
-            'customer_address' => [
-                'nullable'
-            ],
-
-            'customer_npwp' => [
-                'nullable'
-            ],
-
-            'customer_pic_name' => [
-                'nullable'
-            ],
-
-            'customer_pic_position' => [
-                'nullable'
-            ],
-
-            'customer_phone' => [
-                'nullable'
-            ],
-
-            'customer_email' => [
-                'nullable',
-                'email'
-            ],
-
-            'owner_am_id' => [
-                'required',
-                'exists:users,id'
-            ],
-
             'start_date' => [
                 'required',
-                'date'
+                'date',
             ],
 
             'end_date' => [
                 'required',
-                'date'
-            ],
-
-            'services.*' => [
-                'exists:services,id'
-            ],
-
-            'sid' => [
-                'nullable'
-            ],
-
-            'custom_services' => [
-                'nullable',
-                'array'
-            ],
-
-            'baso_files.*' => [
-                'nullable',
-                'file',
-                'mimes:pdf,doc,docx,pdf'
-            ],
-
-            'baso_dates.*' => [
-                'nullable',
-                'date'
+                'date',
+                'after:start_date',
             ],
         ]);
 
-        DB::transaction(function () use (
-            $validated,
-            $request,
-            $contract
-        ) {
+        $contract->update([
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+        ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Data contract
-            |--------------------------------------------------------------------------
-            */
+        $contract->refresh();
+        $contract->updateStatus();
 
-            $data = [
+        ActivityLogger::log(
+            'CONTRACT',
+            'Updated contract date/status ' . $contract->contract_number
+        );
 
-                'contract_name'
-                    => $validated['contract_name'],
+        return redirect()
+            ->route('contracts.show', $contract->id)
+            ->with('success', 'Start date dan end date kontrak berhasil diperbarui.');
+    }
 
-                'account_number'
-                    => $validated['account_number'] ?? null,
+    $validated = $request->validate([
+        'contract_name' => [
+            'required',
+            'max:255',
+        ],
 
-                'sid'
-                    => $request->sid,
+        'account_number' => [
+            'nullable',
+            'max:100',
+        ],
 
-                'customer_address'
-                    => $validated['customer_address'] ?? null,
+        'sid' => [
+            'nullable',
+            'max:100',
+        ],
 
-                'customer_npwp'
-                    => $validated['customer_npwp'] ?? null,
+        'customer_address' => [
+            'nullable',
+        ],
 
-                'customer_pic_name'
-                    => $validated['customer_pic_name'] ?? null,
+        'customer_npwp' => [
+            'nullable',
+            'max:100',
+        ],
 
-                'customer_pic_position'
-                    => $validated['customer_pic_position'] ?? null,
+        'customer_pic_name' => [
+            'nullable',
+            'max:255',
+        ],
 
-                'customer_phone'
-                    => $validated['customer_phone'] ?? null,
+        'customer_pic_position' => [
+            'nullable',
+            'max:255',
+        ],
 
-                'customer_email'
-                    => $validated['customer_email'] ?? null,
+        'customer_phone' => [
+            'nullable',
+            'max:50',
+        ],
 
-                'owner_am_id'
-                    => $validated['owner_am_id'],
+        'customer_email' => [
+            'nullable',
+            'email',
+            'max:255',
+        ],
 
-                'start_date'
-                    => $validated['start_date'],
+        'owner_am_id' => [
+            'nullable',
+            'exists:users,id',
+        ],
 
-                'end_date'
-                    => $validated['end_date'],
-            ];
+        'start_date' => [
+            'required',
+            'date',
+        ],
 
-           
-            $contract->update($data);
+        'end_date' => [
+            'required',
+            'date',
+            'after:start_date',
+        ],
 
-            $contract->refresh();
+        'services' => [
+            'required',
+            'array',
+            'min:1',
+        ],
 
-            $contract->updateStatus();
+        'services.*' => [
+            'required',
+            'exists:services,id',
+        ],
 
-            /*
-            |--------------------------------------------------------------------------
-            | Hapus service lama
-            |--------------------------------------------------------------------------
-            */
+        'custom_services' => [
+            'nullable',
+            'array',
+        ],
 
-            ContractService::where(
-                'contract_id',
-                $contract->id
-            )->delete();
+        'baso_files.*' => [
+            'nullable',
+            'file',
+            'mimes:pdf,doc,docx',
+        ],
 
-            /*
-            |--------------------------------------------------------------------------
-            | Hapus service lama
-            |--------------------------------------------------------------------------
-            */
+        'baso_dates.*' => [
+            'nullable',
+            'date',
+        ],
+    ]);
 
-            ContractService::where(
-                'contract_id',
-                $contract->id
-            )->delete();
+    $ownerAmId = $contract->owner_am_id;
 
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan service baru
-            |--------------------------------------------------------------------------
-            */
+    if ($user->isAccountManager()) {
+        $ownerAmId = $user->id;
+    } elseif ($request->filled('owner_am_id')) {
+        $ownerAmId = $request->owner_am_id;
+    }
 
-            foreach ($validated['services'] as $serviceId) {
+    DB::transaction(function () use ($validated, $request, $contract, $ownerAmId) {
+        $contract->update([
+            'contract_name' => $validated['contract_name'],
+            'account_number' => $validated['account_number'] ?? null,
+            'sid' => $validated['sid'] ?? null,
 
-                ContractService::create([
+            'customer_address' => $validated['customer_address'] ?? null,
+            'customer_npwp' => $validated['customer_npwp'] ?? null,
+            'customer_pic_name' => $validated['customer_pic_name'] ?? null,
+            'customer_pic_position' => $validated['customer_pic_position'] ?? null,
+            'customer_phone' => $validated['customer_phone'] ?? null,
+            'customer_email' => $validated['customer_email'] ?? null,
 
-                    'contract_id'
-                        => $contract->id,
+            'owner_am_id' => $ownerAmId,
 
-                    'service_id'
-                        => $serviceId,
-                ]);
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+        ]);
+
+        ContractService::where('contract_id', $contract->id)->delete();
+
+        foreach ($validated['services'] as $serviceId) {
+            $service = Service::findOrFail($serviceId);
+
+            ContractService::create([
+                'contract_id' => $contract->id,
+                'service_id' => $service->id,
+                'installation_fee' => $service->installation_fee ?? 0,
+                'monthly_fee' => $service->monthly_fee ?? 0,
+            ]);
+        }
+
+        $this->generateBillingsForContract($contract);
+
+        foreach ($request->custom_services ?? [] as $customService) {
+            if (empty($customService['service_name'])) {
+                continue;
             }
 
-            foreach (
-                $request->custom_services ?? []
-                as $customService
-            ) {
+            $service = Service::create([
+                'service_name' => $customService['service_name'],
+                'installation_fee' => $customService['installation_fee'] ?? 0,
+                'monthly_fee' => $customService['monthly_fee'] ?? 0,
+                'status' => 'active',
+            ]);
 
-                if (
-                    empty(
-                        $customService['service_name']
-                    )
-                ) {
+            ContractService::create([
+                'contract_id' => $contract->id,
+                'service_id' => $service->id,
+                'installation_fee' => $service->installation_fee ?? 0,
+                'monthly_fee' => $service->monthly_fee ?? 0,
+            ]);
+        }
+
+        if ($request->hasFile('baso_files')) {
+            foreach ($request->file('baso_files') as $index => $file) {
+                if (!$file) {
                     continue;
                 }
 
-                $service = Service::create([
+                $path = $file->store('baso');
 
-                    'service_name'
-                        => $customService['service_name'],
-
-                    'installation_fee'
-                        => $customService['installation_fee']
-                        ?? 0,
-
-                    'monthly_fee'
-                        => $customService['monthly_fee']
-                        ?? 0,
-
-                    'status'
-                        => 'active',
+                BasoFile::create([
+                    'contract_id' => $contract->id,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'baso_date' => $request->baso_dates[$index] ?? null,
+                    'uploaded_by' => Auth::id(),
                 ]);
+            }
+        }
 
-                ContractService::create([
+        $contract->refresh();
+        $contract->updateStatus();
+    });
 
-                    'contract_id'
-                        => $contract->id,
+    ActivityLogger::log(
+        'CONTRACT',
+        'Updated contract ' . $contract->contract_number
+    );
 
-                    'service_id'
-                        => $service->id,
+    return redirect()
+        ->route('contracts.show', $contract->id)
+        ->with('success', 'Contract updated successfully.');
+    }
+
+    public function exportReport(string $type): StreamedResponse
+{
+    $allowedTypes = [
+        'current',
+        'closed',
+    ];
+
+    if (!in_array($type, $allowedTypes)) {
+        abort(404);
+    }
+
+    $user = auth()->user();
+
+    $query = Contract::with([
+        'owner',
+        'services.service',
+    ]);
+
+    if ($type === 'current') {
+        $query->whereIn('status', [
+            'active',
+            'expiring',
+            'followup',
+        ]);
+    }
+
+    if ($type === 'closed') {
+        $query->whereIn('status', [
+            'expired',
+            'closed',
+        ]);
+    }
+
+    if ($user->isAccountManager()) {
+        $query->where('owner_am_id', $user->id);
+    }
+
+    if ($user->isSupportInputter()) {
+        $query->where('created_by', $user->id);
+    }
+
+    if (request()->filled('status')) {
+        $query->where('status', request('status'));
+    }
+
+    if (request()->filled('account_manager') && !$user->isAccountManager()) {
+        $query->where('owner_am_id', request('account_manager'));
+    }
+
+    if (request()->filled('search')) {
+        $search = trim(request('search'));
+
+        $query->where(function ($q) use ($search) {
+            $q->where('contract_name', 'like', "%{$search}%")
+                ->orWhere('contract_number', 'like', "%{$search}%")
+                ->orWhere('account_number', 'like', "%{$search}%")
+                ->orWhere('sid', 'like', "%{$search}%")
+                ->orWhereHas('owner', function ($ownerQuery) use ($search) {
+                    $ownerQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    $fileName = $type === 'current'
+        ? 'Current_Contracts_Report.csv'
+        : 'Closed_Contracts_Report.csv';
+
+    return response()->streamDownload(function () use ($query) {
+        $handle = fopen('php://output', 'w');
+
+        fputcsv($handle, [
+            'Client Name',
+            'Contract Number',
+            'Account Number',
+            'SID',
+            'Account Manager',
+            'Package / Services',
+            'Start Date',
+            'End Date',
+            'Status',
+            'Monthly Value',
+        ]);
+
+        $query->orderBy('end_date')->chunk(200, function ($contracts) use ($handle) {
+            foreach ($contracts as $contract) {
+                $services = $contract->services
+                    ? $contract->services->pluck('service.service_name')->implode(', ')
+                    : '-';
+
+                $monthlyValue = $contract->services
+                    ? $contract->services->sum(function ($contractService) {
+                        return (float) (
+                            $contractService->monthly_fee
+                            ?? $contractService->service?->monthly_fee
+                            ?? 0
+                        );
+                    })
+                    : 0;
+
+                fputcsv($handle, [
+                    $contract->contract_name ?? '-',
+                    $contract->contract_number ?? '-',
+                    $contract->account_number ?? '-',
+                    $contract->sid ?? '-',
+                    $contract->owner?->name ?? '-',
+                    $services ?: '-',
+                    $contract->start_date
+                        ? \Carbon\Carbon::parse($contract->start_date)->format('d/m/Y')
+                        : '-',
+                    $contract->end_date
+                        ? \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y')
+                        : '-',
+                    ucfirst($contract->status ?? '-'),
+                    $monthlyValue,
                 ]);
             }
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | BASO Upload
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->hasFile('baso_files')) {
-
-        foreach (
-            $request->file('baso_files')
-            as $index => $file
-        ) {
-
-            $path = $file->store('baso');
-
-            BasoFile::create([
-
-                'contract_id'
-                    => $contract->id,
-
-                'file_name'
-                    => $file->getClientOriginalName(),
-
-                'file_path'
-                    => $path,
-
-                'baso_date'
-                    => $request->baso_dates[$index]
-                    ?? null,
-
-                'uploaded_by'
-                    => Auth::id(),
-            ]);
-        }
+        fclose($handle);
+    }, $fileName, [
+        'Content-Type' => 'text/csv',
+    ]);
     }
-
-        ActivityLogger::log(
-        'CONTRACT',
-        'Updated contract ' . $contract->contract_number
-        );
-
-        return redirect()
-            ->route(
-                'contracts.show',
-                $contract->id
-            )
-            ->with(
-                'success',
-                'Contract updated successfully.'
-            );
-    }
-    
 }

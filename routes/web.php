@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AmController;
@@ -11,6 +12,8 @@ use App\Http\Controllers\BasoFileController;
 use App\Http\Controllers\ContractFileController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\AlertController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLogin']);
@@ -28,6 +31,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Logs
+    |--------------------------------------------------------------------------
+    | Hanya Manager yang dapat memonitor aktivitas sistem.
+    */
+    Route::middleware('role:manager')->group(function () {
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])
+            ->name('activity.logs');
+    });
     /*
     |--------------------------------------------------------------------------
     | Dashboard
@@ -54,6 +67,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/closed-contract', [ContractController::class, 'closedContracts'])
             ->name('contract.closed');
 
+        Route::get('/contract-report/{type}', [ContractController::class, 'exportReport'])
+            ->name('contracts.report');
+
         Route::get('/contracts/{contract}', [ContractController::class, 'show'])
             ->name('contracts.show');
 
@@ -71,22 +87,44 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/billing/payment-history',
             [BillingController::class,'paymentHistory']);   
-            
-        Route::patch('/billing/{billing}/status', [BillingController::class, 'updateStatus'])
-            ->name('billing.update-status');
-
-        Route::get('/contract-alerts', function () {
-            return view('alerts.contract-alerts');
-        });
     });
 
     /*
+|--------------------------------------------------------------------------
+| Contract Alerts
+|--------------------------------------------------------------------------
+| Hanya Account Manager yang bisa melihat alert kontraknya sendiri.
+*/
+Route::middleware('role:account_manager')->group(function () {
+
+    Route::get('/contract-alerts', [AlertController::class, 'index'])
+        ->name('contract.alerts');
+
+    Route::get('/contract-alerts/report', [AlertController::class, 'exportReport'])
+        ->name('contract.alerts.report');
+
+});
+
+    /*
+|--------------------------------------------------------------------------
+| Billing Action
+|--------------------------------------------------------------------------
+| Semua role tertentu boleh lihat billing.
+| Hanya Support Paycall yang boleh update status pembayaran.
+*/
+Route::middleware('role:support_paycall')->group(function () {
+    Route::patch('/billing/{billing}/status', [BillingController::class, 'updateStatus'])
+        ->name('billing.update-status');
+});
+
+   /*
     |--------------------------------------------------------------------------
     | Tambah Kontrak
     |--------------------------------------------------------------------------
     | Manager tidak boleh tambah kontrak.
+    | Paycall tidak boleh tambah kontrak.
     */
-    Route::middleware('role:account_manager,support_inputter,support_paycall')->group(function () {
+    Route::middleware('role:account_manager,support_inputter')->group(function () {
         Route::get('/add-contract', [ContractController::class, 'create'])
             ->name('contracts.create');
 
@@ -94,37 +132,47 @@ Route::middleware('auth')->group(function () {
             ->name('contracts.store');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | Edit Kontrak
-    |--------------------------------------------------------------------------
-    | Manager tidak boleh edit kontrak.
-    | Support Paycall tidak boleh edit kontrak.
-    */
-    Route::middleware('role:account_manager,support_inputter,support_paycall')->group(function () {
-        Route::get('/contracts/{contract}/edit', [ContractController::class, 'edit'])
-            ->name('contracts.edit');
+   /*
+|--------------------------------------------------------------------------
+| Edit Kontrak
+|--------------------------------------------------------------------------
+| Manager tidak boleh edit kontrak.
+| AM dan Inputter boleh edit kontrak.
+| Paycall hanya boleh edit start/end date, dibatasi di ContractController.
+*/
+Route::middleware('role:account_manager,support_inputter,support_paycall')->group(function () {
+    Route::get('/contracts/{contract}/edit', [ContractController::class, 'edit'])
+        ->name('contracts.edit');
 
-        Route::put('/contracts/{contract}', [ContractController::class, 'update'])
-            ->name('contracts.update');
+    Route::put('/contracts/{contract}', [ContractController::class, 'update'])
+        ->name('contracts.update');
+});
+
+    /*
+|--------------------------------------------------------------------------
+| By Account Manager
+|--------------------------------------------------------------------------
+| Hanya Manager dan Support Inputter yang bisa melihat ringkasan per AM.
+*/
+Route::middleware('role:manager,support_inputter')->group(function () {
+
+    Route::get('/detailam', function () {
+        $firstAm = User::where('role_id', User::ROLE_ACCOUNT_MANAGER)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->first();
+
+        if (!$firstAm) {
+            abort(404, 'No active Account Manager found.');
+        }
+
+        return redirect()->route('account-managers.show', $firstAm->id);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | By Account Manager
-    |--------------------------------------------------------------------------
-    */
-    Route::middleware('role:manager,support_inputter,support_paycall')->group(function () {
-        Route::get('/account-manager/{user}', [AmController::class, 'show'])
-            ->name('account-managers.show');
+    Route::get('/account-manager/{user}', [AmController::class, 'show'])
+        ->name('account-managers.show');
 
-        Route::get('/account-manager/{user}/export', [AmController::class, 'export'])
-            ->name('account-managers.export');
-
-        Route::get('/detailam', function () {
-            return view('am.detail-am');
-        });
-    });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -144,6 +192,9 @@ Route::middleware('role:manager,account_manager,support_inputter')->group(functi
 
     Route::get('/transfer-contract', [TransferController::class, 'create'])
         ->name('transfer.create');
+        
+    Route::get('/transfer-report/{type}', [TransferController::class, 'exportReport'])
+        ->name('transfer.report');
 });
 
 Route::middleware('role:manager,account_manager')->group(function () {
@@ -182,12 +233,15 @@ Route::middleware('role:manager')->group(function () {
         ->name('transfer.rejected');
 });
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Email Notifications / Reminder
     |--------------------------------------------------------------------------
+    | Account Manager mengatur reminder kontrak miliknya.
+    | Support Inputter mengatur reminder kontrak yang dia input.
+    | Manager dan Paycall tidak mengatur email notification di halaman ini.
     */
-    Route::middleware('role:manager,support_inputter,support_paycall')->group(function () {
+    Route::middleware('role:account_manager,support_inputter')->group(function () {
 
         Route::get(
             '/email-notifications',

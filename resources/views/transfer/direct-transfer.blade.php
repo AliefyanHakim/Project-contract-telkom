@@ -46,7 +46,7 @@
     <section class="transfer-toolbar-card">
     <form method="GET" action="{{ url('/direct-transfer') }}" class="transfer-toolbar no-add">
 
-        <a href="#" class="transfer-download-btn">
+        <a href="{{ route('transfer.report', 'direct') }}" class="transfer-download-btn">
             <span>↓</span>
             Download Report
         </a>
