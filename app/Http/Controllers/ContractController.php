@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use App\Models\Billing;
 
 class ContractController extends Controller
 {
@@ -604,6 +605,19 @@ private function ensureContractAccess(Contract $contract): void
                         => $service->monthly_fee,
                 ]);
             }
+
+            $totalMonthlyFee = Service::whereIn(
+                'id',
+                $request->services
+            )->sum('monthly_fee');
+
+            Billing::create([
+                'contract_id'     => $contract->id,
+                'billing_period'  => now()->format('F Y'),
+                'amount'          => $totalMonthlyFee,
+                'payment_status'  => 'pending',
+                'updated_by'      => Auth::id(),
+            ]);
 
             if ($request->hasFile('file')) {
 

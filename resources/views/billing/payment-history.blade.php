@@ -8,71 +8,6 @@
 
 @section('content')
 
-@php
-    $rows = collect([
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-0722',
-            'period' => 'Mei 2026',
-            'price' => 16000000,
-            'payment_date' => '2026-05-25',
-            'status' => 'paid',
-            'label' => 'Paid',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-0848',
-            'period' => 'Mei 2026',
-            'price' => 4000000,
-            'payment_date' => '2026-05-24',
-            'status' => 'paid',
-            'label' => 'Paid',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-1540',
-            'period' => 'Mei 2026',
-            'price' => 16000000,
-            'payment_date' => '2026-05-21',
-            'status' => 'paid',
-            'label' => 'Paid',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-2506',
-            'period' => 'Mei 2026',
-            'price' => 16000000,
-            'payment_date' => '2026-05-16',
-            'status' => 'paid',
-            'label' => 'Paid',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-3324',
-            'period' => 'Mei 2026',
-            'price' => 14000000,
-            'payment_date' => '2026-05-15',
-            'status' => 'paid',
-            'label' => 'Paid',
-        ],
-        [
-            'client' => 'PT Maju Bersama',
-            'contract' => '1234567890',
-            'invoice' => 'INV-2026-3815',
-            'period' => 'Mei 2026',
-            'price' => 14000000,
-            'payment_date' => '2026-05-15',
-            'status' => 'paid',
-            'label' => 'Paid',
-        ],
-    ]);
-@endphp
-
 <div class="billing-page">
 
     <div class="billing-header">
@@ -148,27 +83,47 @@
 
                     @forelse ($rows as $row)
 
-                        <tr class="billing-row {{ $row['status'] }}">
-                            <td>{{ $row['client'] }}</td>
-                            <td>{{ $row['contract'] }}</td>
-                            <td>{{ $row['invoice'] }}</td>
-                            <td>{{ $row['period'] }}</td>
-                            <td>Rp {{ number_format($row['price'], 0, ',', '.') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($row['payment_date'])->format('d/m/Y') }}</td>
-                            <td>
-                                <span class="billing-status {{ $row['status'] }}">
-                                    {{ $row['label'] }}
-                                </span>
-                            </td>
-                        </tr>
+                    <tr class="billing-row paid">
+
+                        <td>
+                            {{ $row->contract->client_name ?? '-' }}
+                        </td>
+
+                        <td>
+                            {{ $row->contract_id }}
+                        </td>
+
+                        <td>
+                            INV-{{ str_pad($row->id, 4, '0', STR_PAD_LEFT) }}
+                        </td>
+
+                        <td>
+                            {{ $row->billing_period }}
+                        </td>
+
+                        <td>
+                            Rp {{ number_format($row->amount, 0, ',', '.') }}
+                        </td>
+
+                        <td>
+                            {{ $row->payment_date?->format('d/m/Y') ?? '-' }}
+                        </td>
+
+                        <td>
+                            <span class="billing-status paid">
+                                Paid
+                            </span>
+                        </td>
+
+                    </tr>
 
                     @empty
 
-                        <tr>
-                            <td colspan="7" class="billing-empty">
-                                No payment history found.
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="billing-empty">
+                            No payment history found.
+                        </td>
+                    </tr>
 
                     @endforelse
 
