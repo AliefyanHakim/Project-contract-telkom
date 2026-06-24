@@ -12,6 +12,7 @@ use App\Models\BasoFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
@@ -311,6 +312,10 @@ private function ensureContractAccess(Contract $contract): void
 
     public function viewFile(ContractFile $file)
     {
+        $this->ensureContractAccess(
+        $file->contract
+        );
+
         $fullPath = storage_path(
             'app/' . $file->file_path
         );
@@ -318,6 +323,11 @@ private function ensureContractAccess(Contract $contract): void
         if (!File::exists($fullPath)) {
             abort(404);
         }
+
+        ActivityLogger::log(
+            'FILE',
+            'Viewed file ' . $file->file_name
+        );
 
         return response()->file($fullPath);
     }
@@ -491,6 +501,7 @@ private function ensureContractAccess(Contract $contract): void
             'file' => [
                 'nullable',
                 'file',
+                'mimes:pdf,doc,docx',
                 'max:10240'
             ],
 
@@ -678,19 +689,12 @@ private function ensureContractAccess(Contract $contract): void
             
 
             $contract->updateStatus();
-
-            foreach ($validated['services'] as $serviceId) {
-
-                ContractService::create([
-
-                    'contract_id'
-                        => $contract->id,
-
-                    'service_id'
-                        => $serviceId,
-                ]);
-            }
         });
+
+    ActivityLogger::log(
+    'CONTRACT',
+    'Created contract ' . $contract->contract_number
+    );
 
     return redirect()
         ->route(
@@ -720,18 +724,6 @@ private function ensureContractAccess(Contract $contract): void
         'contracts.detail-contract',
         compact('contract')
     );
-    }
-
-    public function destroy(Contract $contract)
-    {
-    $contract->delete();
-
-    return redirect()
-        ->route('contracts.index')
-        ->with(
-            'success',
-            'Contract deleted successfully.'
-        );
     }
 
     public function edit(Contract $contract)
@@ -793,6 +785,10 @@ private function ensureContractAccess(Contract $contract): void
             $contract->refresh();
             $contract->updateStatus();
 
+            ActivityLogger::log(
+            'CONTRACT',
+            'Updated contract date/status ' . $contract->contract_number
+);
             return redirect()
                 ->route('contracts.show', $contract->id)
                 ->with('success', 'Start date dan end date kontrak berhasil diperbarui.');
@@ -1048,6 +1044,11 @@ private function ensureContractAccess(Contract $contract): void
             ]);
         }
     }
+
+        ActivityLogger::log(
+        'CONTRACT',
+        'Updated contract ' . $contract->contract_number
+        );
 
         return redirect()
             ->route(

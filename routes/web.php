@@ -7,6 +7,8 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BasoFileController;
+use App\Http\Controllers\ContractFileController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLogin']);
@@ -15,6 +17,7 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1')
         ->name('login.post');
 });
 
@@ -52,11 +55,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/contracts/{contract}', [ContractController::class, 'show'])
             ->name('contracts.show');
 
-        Route::get('/contract-files/{file}/download', [ContractController::class, 'downloadFile'])
+        Route::get('/contract-files/{file}/download', [ContractFileController::class, 'download'])
             ->name('contract-files.download');
 
         Route::get('/contract-files/{file}/view', [ContractController::class, 'viewFile'])
             ->name('contracts.view');
+
+        Route::get('/baso/{baso}/download',[BasoFileController::class, 'download']
+            )->name('baso.download');
 
         Route::get('/billing', function () {
             return view('billing.outstanding');
