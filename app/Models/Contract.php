@@ -104,32 +104,18 @@ class Contract extends Model
         );
     }
 
-    public function getCalculatedStatusAttribute()
+    public function calculateStatus(): string
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Prioritaskan status manual dari database
-        |--------------------------------------------------------------------------
-        */
-
         if ($this->status === 'terminated') {
             return 'terminated';
         }
 
-        if ($this->status === 'expired') {
-            return 'expired';
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Hitung berdasarkan end date
-        |--------------------------------------------------------------------------
-        */
-
-        $daysRemaining = now()->diffInDays(
-            $this->end_date,
-            false
-        );
+        $daysRemaining = now()
+            ->startOfDay()
+            ->diffInDays(
+                $this->end_date,
+                false
+            );
 
         if ($daysRemaining < 0) {
             return 'expired';
@@ -144,34 +130,24 @@ class Contract extends Model
         }
 
         return 'active';
-    }   
+    }
 
-    public function updateStatus()
+    public function getCalculatedStatusAttribute()
     {
-        $daysRemaining = now()
-            ->startOfDay()
-            ->diffInDays(
-                $this->end_date,
-                false
-            );
+        return $this->calculateStatus();
+    }
 
-        if ($daysRemaining < 0) {
+    public function updateStatus(): bool
+    {
+        $newStatus = $this->calculateStatus();
 
-            $this->status = 'expired';
-
-        } elseif ($daysRemaining <= 7) {
-
-            $this->status = 'followup';
-
-        } elseif ($daysRemaining <= 30) {
-
-            $this->status = 'expiring';
-
-        } else {
-
-            $this->status = 'active';
+        if ($this->status === $newStatus) {
+            return false;
         }
 
+        $this->status = $newStatus;
         $this->save();
+
+        return true;
     }
 }

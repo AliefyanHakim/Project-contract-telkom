@@ -332,34 +332,6 @@ private function ensureContractAccess(Contract $contract): void
         return response()->file($fullPath);
     }
 
-    public function updateStatus()
-    {
-        $daysRemaining = now()
-            ->startOfDay()
-            ->diffInDays(
-                $this->end_date,
-                false
-            );
-
-        if ($daysRemaining < 0) {
-
-            $this->status = 'expired';
-
-        } elseif ($daysRemaining <= 7) {
-
-            $this->status = 'followup';
-
-        } elseif ($daysRemaining <= 30) {
-
-            $this->status = 'expiring';
-
-        } else {
-
-            $this->status = 'active';
-        }
-
-        $this->save();
-    }
     /**
      * Show form create contract.
      */

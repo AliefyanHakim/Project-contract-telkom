@@ -338,4 +338,26 @@
         align-items: flex-start;
         flex-direction: column;
     }
+
+    .form-error-box {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    }
+
+    .email-error {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .email-help {
+        display: block;
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 12px;
+    }
 }

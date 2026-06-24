@@ -165,11 +165,16 @@ Route::middleware('role:manager')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:manager,support_inputter,support_paycall')->group(function () {
-        Route::get('/email-notifications', [NotificationSettingController::class, 'index'])
-            ->name('email.notifications');
 
-        Route::post('/email-notifications', [NotificationSettingController::class, 'update'])
-            ->name('settings.email-notifications.update');
+        Route::get(
+            '/email-notifications',
+            [NotificationSettingController::class, 'index']
+        )->name('email.notifications');
+
+        Route::post(
+            '/email-notifications',
+            [NotificationSettingController::class, 'update']
+        )->name('settings.email-notifications.update');
     });
 
     /*

@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class NotificationSetting extends Model
 {
     protected $fillable = [
-        'user_id',
-        'notification_email',
+        'manager_email',
+        'daily_schedule',
+        'weekly_schedule',
     ];
 
-    public function user()
+    public static function settings()
     {
-        return $this->belongsTo(User::class);
+        return self::first();
     }
 }

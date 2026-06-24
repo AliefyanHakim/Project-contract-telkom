@@ -15,7 +15,18 @@
         <p>Configure automatic email alerts and delivery schedules for important contract notifications.</p>
     </div>
 
-    <form action="#" method="POST" class="email-form">
+    @if ($errors->any())
+        <div class="form-error-box">
+            <strong>Unable to save settings.</strong>
+            Please check the required fields below.
+        </div>
+    @endif
+    
+        <form
+            action="{{ route('settings.email-notifications.update') }}"
+            method="POST"
+            class="email-form"
+        >
         @csrf
 
         <section class="email-card">
@@ -35,17 +46,38 @@
 
                     <div class="email-input">
                         <span>✉</span>
-                        <input type="email" name="manager_email" value="manager@perusahaan.com">
+                        <input
+                            type="email"
+                            name="manager_email"
+                            value="{{ old('manager_email', $settings->manager_email) }}"
+                            required
+                        >
                     </div>
+
+                    <small class="email-help">
+                        Manager email is required. Notification settings cannot be saved if this field is empty.
+                    </small>
+
+                    @error('manager_email')
+                        <div class="email-error">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
 
                 <div class="email-field">
-                    <label>Admin / Support Email</label>
-                    <p>Recipient of overdue billing alerts</p>
+                <label>Support Recipients</label>
+                <p>
+                All Support Inputter and Support Paycall users
+                will automatically receive notifications.</p>
 
-                    <div class="email-input">
+                    <div class="email-input readonly">
                         <span>✉</span>
-                        <input type="email" name="admin_email" value="admin@perusahaan.com">
+                        <input
+                            type="text"
+                            value="Automatic from user database"
+                            readonly
+                        >
                     </div>
                 </div>
             </div>
@@ -77,9 +109,28 @@
                         <span class="schedule-badge urgent">Daily</span>
 
                         <select name="daily_schedule">
-                            <option selected>08:00 WIB</option>
-                            <option>09:00 WIB</option>
-                            <option>10:00 WIB</option>
+
+                            <option
+                                value="08:00"
+                                {{ $settings->daily_schedule == '08:00' ? 'selected' : '' }}
+                            >
+                                08:00 WIB
+                            </option>
+
+                            <option
+                                value="09:00"
+                                {{ $settings->daily_schedule == '09:00' ? 'selected' : '' }}
+                            >
+                                09:00 WIB
+                            </option>
+
+                            <option
+                                value="10:00"
+                                {{ $settings->daily_schedule == '10:00' ? 'selected' : '' }}
+                            >
+                                10:00 WIB
+                            </option>
+
                         </select>
                     </div>
                 </div>
@@ -98,9 +149,28 @@
                         <span class="schedule-badge expiring">Weekly</span>
 
                         <select name="weekly_schedule">
-                            <option selected>Monday morning</option>
-                            <option>Monday afternoon</option>
-                            <option>Friday morning</option>
+
+                            <option
+                                value="monday_morning"
+                                {{ $settings->weekly_schedule == 'monday_morning' ? 'selected' : '' }}
+                            >
+                                Monday morning
+                            </option>
+
+                            <option
+                                value="monday_afternoon"
+                                {{ $settings->weekly_schedule == 'monday_afternoon' ? 'selected' : '' }}
+                            >
+                                Monday afternoon
+                            </option>
+
+                            <option
+                                value="friday_morning"
+                                {{ $settings->weekly_schedule == 'friday_morning' ? 'selected' : '' }}
+                            >
+                                Friday morning
+                            </option>
+
                         </select>
                     </div>
                 </div>

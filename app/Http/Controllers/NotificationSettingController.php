@@ -2,46 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\NotificationSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\NotificationSetting;
 
 class NotificationSettingController extends Controller
 {
     public function index()
     {
-        $setting = Auth::user()
-            ->notificationSetting;
+        $settings = NotificationSetting::first();
+
+        if (!$settings) {
+
+            $settings = NotificationSetting::create([
+                'manager_email' => '',
+                'daily_schedule' => '08:00',
+                'weekly_schedule' => 'monday_morning',
+            ]);
+        }
 
         return view(
             'settings.email-notifications',
-            compact('setting')
+            compact('settings')
         );
     }
 
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'notification_email' => [
+            'manager_email' => [
                 'required',
-                'email',
-                'max:255',
+                'email'
+            ],
+
+            'daily_schedule' => [
+                'required',
+                'in:08:00,09:00,10:00'
+            ],
+
+            'weekly_schedule' => [
+                'required',
+                'in:monday_morning,monday_afternoon,friday_morning'
             ],
         ]);
 
-        NotificationSetting::updateOrCreate(
-            [
-                'user_id' => Auth::id(),
-            ],
-            [
-                'notification_email'
-                    => $validated['notification_email'],
-            ]
-        );
+        $settings = NotificationSetting::first();
+
+        $settings->update([
+            'manager_email' => $validated['manager_email'],
+            'daily_schedule' => $validated['daily_schedule'],
+            'weekly_schedule' => $validated['weekly_schedule'],
+        ]);
 
         return back()->with(
             'success',
-            'Email notification settings updated successfully.'
+            'Notification settings updated successfully.'
         );
     }
 }
