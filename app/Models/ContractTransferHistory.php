@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContractTransferHistory extends Model
 {
+    protected $table = 'contract_transfer_history';
+
     protected $fillable = [
         'contract_id',
         'from_am_id',

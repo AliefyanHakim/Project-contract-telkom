@@ -9,6 +9,7 @@ use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BasoFileController;
 use App\Http\Controllers\ContractFileController;
+use App\Http\Controllers\TransferController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLogin']);
@@ -123,37 +124,37 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-   /*
+ /*
 |--------------------------------------------------------------------------
 | Transfer
 |--------------------------------------------------------------------------
-| Transfer Contract: Manager + Account Manager
-| Transfer Request: Manager + Account Manager + Support Inputter
-| Direct Transfer: Manager + Account Manager + Support Inputter
-| Paycall tidak bisa akses transfer
+| Manager, AM, dan Support Inputter boleh melihat halaman transfer.
+| Paycall tidak boleh akses transfer.
+| Inputter hanya view-only karena POST hanya untuk Manager dan AM.
 */
 
-Route::middleware('role:manager,account_manager')->group(function () {
-    Route::get('/transfer-contract', function () {
-        return view('transfer.transfer-contract');
-    });
+Route::middleware('role:manager,account_manager,support_inputter')->group(function () {
+    Route::get('/transfer-request', [TransferController::class, 'requests'])
+        ->name('transfer.requests');
+
+    Route::get('/direct-transfer', [TransferController::class, 'directHistory'])
+        ->name('transfer.direct-history');
+
+    Route::get('/transfer-contract', [TransferController::class, 'create'])
+        ->name('transfer.create');
 });
 
-Route::middleware('role:manager,account_manager,support_inputter')->group(function () {
-    Route::get('/transfer-request', function () {
-        return view('transfer.transfer-request');
-    });
-
-    Route::get('/direct-transfer', function () {
-        return view('transfer.direct-transfer');
-    });
+Route::middleware('role:manager,account_manager')->group(function () {
+    Route::post('/transfer-contract', [TransferController::class, 'store'])
+        ->name('transfer.store');
 });
 
 /*
 |--------------------------------------------------------------------------
 | Transfer Approval
 |--------------------------------------------------------------------------
-| Accept dan Reject tetap khusus Manager.
+| Accept dan Reject khusus Manager.
+| Logic database-nya kita buat di step berikutnya.
 */
 
 Route::middleware('role:manager')->group(function () {

@@ -9,37 +9,11 @@
 @section('content')
 
 @php
-    $directRows = collect([
-        (object) [
-            'client_name' => 'PT Maju Bersama',
-            'contract_number' => '1234567890',
-            'from_am' => 'Account Manager 1',
-            'to_am' => 'Account Manager 2',
-            'package' => 'Enterprise',
-            'transfer_date' => '2026-05-29',
-            'status' => 'transferred',
-        ],
-        (object) [
-            'client_name' => 'PT Maju Bersama',
-            'contract_number' => '1234567890',
-            'from_am' => 'Account Manager 1',
-            'to_am' => 'Account Manager 2',
-            'package' => 'Enterprise',
-            'transfer_date' => '2026-05-29',
-            'status' => 'transferred',
-        ],
-        (object) [
-            'client_name' => 'PT Maju Bersama',
-            'contract_number' => '1234567890',
-            'from_am' => 'Account Manager 1',
-            'to_am' => 'Account Manager 2',
-            'package' => 'Enterprise',
-            'transfer_date' => '2026-05-29',
-            'status' => 'transferred',
-        ],
-    ]);
+    $directRows = $directTransfers ?? collect();
 
-    $totalRows = $directRows->count();
+    $totalRows = method_exists($directRows, 'total')
+        ? $directRows->total()
+        : $directRows->count();
 @endphp
 
 <div class="transfer-page">
@@ -111,42 +85,53 @@
 
                     @forelse ($directRows as $row)
 
-                        <tr class="transfer-row approved">
-                            <td>
-                                <div class="transfer-client">
-                                    <span class="transfer-client-icon approved">⇄</span>
-                                    <span>{{ $row->client_name }}</span>
-                                </div>
-                            </td>
+                    @php
+                        $contract = data_get($row, 'contract');
 
-                            <td>{{ $row->contract_number }}</td>
+                        $clientName = data_get($contract, 'contract_name', '-');
+                        $contractNumber = data_get($contract, 'contract_number', '-');
+                        $fromAm = data_get($row, 'fromAM.name', '-');
+                        $toAm = data_get($row, 'toAM.name', '-');
+                        $packageName = data_get($contract, 'services.0.service.service_name', 'Enterprise');
+                        $transferDate = data_get($row, 'transfer_date');
+                    @endphp
 
-                            <td>{{ $row->from_am }}</td>
+                    <tr class="transfer-row approved">
+                        <td>
+                            <div class="transfer-client">
+                                <span class="transfer-client-icon approved">⇄</span>
+                                <span>{{ $clientName }}</span>
+                            </div>
+                        </td>
 
-                            <td>{{ $row->to_am }}</td>
+                        <td>{{ $contractNumber }}</td>
 
-                            <td>{{ $row->package }}</td>
+                        <td>{{ $fromAm }}</td>
 
-                            <td>
-                                {{ \Carbon\Carbon::parse($row->transfer_date)->format('d/m/Y') }}
-                            </td>
+                        <td>{{ $toAm }}</td>
 
-                            <td>
-                                <span class="transfer-status approved">
-                                    ✓ Transferred
-                                </span>
-                            </td>
-                        </tr>
+                        <td>{{ $packageName }}</td>
 
-                    @empty
+                        <td>
+                            {{ $transferDate ? \Carbon\Carbon::parse($transferDate)->format('d/m/Y') : '-' }}
+                        </td>
 
-                        <tr>
-                            <td colspan="7" class="transfer-empty">
-                                No direct transfer data available.
-                            </td>
-                        </tr>
+                        <td>
+                            <span class="transfer-status approved">
+                                ✓ Transferred
+                            </span>
+                        </td>
+                    </tr>
 
-                    @endforelse
+                @empty
+
+                    <tr>
+                        <td colspan="7" class="transfer-empty">
+                            No direct transfer data available.
+                        </td>
+                    </tr>
+
+                @endforelse
 
                 </tbody>
 
@@ -154,17 +139,39 @@
 
         </div>
 
-        <div class="transfer-table-footer">
-            <p>
-                Showing 1 to {{ $totalRows }} of {{ $totalRows }} entries
-            </p>
+        @if(method_exists($directRows, 'total') && $directRows->total() > 0)
+    <div class="transfer-table-footer">
+        <p>
+            Showing {{ $directRows->firstItem() }}
+            to {{ $directRows->lastItem() }}
+            of {{ $directRows->total() }} entries
+        </p>
 
-            <div class="transfer-simple-pagination">
-                <button type="button">‹</button>
-                <button type="button" class="active">1</button>
-                <button type="button">›</button>
+        @if($directRows->hasPages())
+            <div class="transfer-pagination">
+                @if($directRows->onFirstPage())
+                    <span class="disabled">‹</span>
+                @else
+                    <a href="{{ $directRows->previousPageUrl() }}">‹</a>
+                @endif
+
+                @foreach($directRows->getUrlRange(1, $directRows->lastPage()) as $page => $url)
+                    @if($page == $directRows->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($directRows->hasMorePages())
+                    <a href="{{ $directRows->nextPageUrl() }}">›</a>
+                @else
+                    <span class="disabled">›</span>
+                @endif
             </div>
-        </div>
+        @endif
+    </div>
+@endif
 
     </section>
 

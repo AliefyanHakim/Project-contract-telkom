@@ -9,46 +9,14 @@
 @section('content')
 
 @php
-    $transferRows = isset($transferRequests)
-        ? $transferRequests
-        : (isset($transfers)
-            ? $transfers
-            : collect([
-                (object) [
-                    'client_name' => 'PT Maju Bersama',
-                    'contract_name' => 'PT Maju Bersama',
-                    'contract_number' => '1234567890',
-                    'am_name' => 'XXXXXXX',
-                    'package' => 'Enterprise',
-                    'start_date' => '2026-04-11',
-                    'end_date' => '2026-05-29',
-                    'status' => 'approval_pending',
-                ],
-                (object) [
-                    'client_name' => 'PT Maju Bersama',
-                    'contract_name' => 'PT Maju Bersama',
-                    'contract_number' => '1234567890',
-                    'am_name' => 'XXXXXXX',
-                    'package' => 'Enterprise',
-                    'start_date' => '2026-04-11',
-                    'end_date' => '2026-05-29',
-                    'status' => 'approved',
-                ],
-                (object) [
-                    'client_name' => 'PT Maju Bersama',
-                    'contract_name' => 'PT Maju Bersama',
-                    'contract_number' => '1234567890',
-                    'am_name' => 'XXXXXXX',
-                    'package' => 'Enterprise',
-                    'start_date' => '2026-04-11',
-                    'end_date' => '2026-05-29',
-                    'status' => 'rejected',
-                ],
-            ]));
+    $transferRows = $transferRequests ?? collect();
 
     $totalRows = method_exists($transferRows, 'total')
         ? $transferRows->total()
         : $transferRows->count();
+
+    $canAddTransferContract = auth()->user()->isManager()
+        || auth()->user()->isAccountManager();
 @endphp
 
 <div class="transfer-page">
@@ -133,9 +101,9 @@
 
                     @forelse ($transferRows as $row)
 
-                        @php
+                        @php                            
                             $rawStatus = strtolower(
-                                str_replace(' ', '_', data_get($row, 'status', 'approval_pending'))
+                                str_replace(' ', '_', data_get($row, 'status', 'pending'))
                             );
 
                             if (in_array($rawStatus, ['approved', 'approve'])) {
@@ -149,22 +117,23 @@
                                 $statusLabel = 'Approval Pending';
                             }
 
-                            $clientName = data_get($row, 'client_name')
-                                ?? data_get($row, 'contract_name')
-                                ?? 'PT Maju Bersama';
+                            $contract = data_get($row, 'contract');
 
-                            $contractNumber = data_get($row, 'contract_number', '1234567890');
+                            $clientName = data_get($contract, 'contract_name', '-');
 
-                            $amName = data_get($row, 'am_name')
-                                ?? data_get($row, 'owner.name')
-                                ?? 'XXXXXXX';
+                            $contractNumber = data_get($contract, 'contract_number', '-');
 
-                            $packageName = data_get($row, 'package')
-                                ?? data_get($row, 'service_name')
-                                ?? 'Enterprise';
+                            $currentAmName = data_get($row, 'currentAM.name', '-');
 
-                            $startDate = data_get($row, 'start_date');
-                            $endDate = data_get($row, 'end_date');
+                            $targetAmName = data_get($row, 'targetAM.name', '-');
+
+                            $amName = $currentAmName . ' → ' . $targetAmName;
+
+                            $packageName = data_get($contract, 'services.0.service.service_name', 'Enterprise');
+
+                            $startDate = data_get($contract, 'start_date');
+
+                            $endDate = data_get($contract, 'end_date');
                         @endphp
 
                         <tr class="transfer-row {{ $rowClass }}">
@@ -220,23 +189,39 @@
 
         </div>
 
-        <div class="transfer-table-footer">
-            <p>
-                Showing 1 to {{ $totalRows }} of {{ $totalRows }} entries
-            </p>
+        @if(method_exists($transferRows, 'total') && $transferRows->total() > 0)
+    <div class="transfer-table-footer">
+        <p>
+            Showing {{ $transferRows->firstItem() }}
+            to {{ $transferRows->lastItem() }}
+            of {{ $transferRows->total() }} entries
+        </p>
 
-            @if (method_exists($transferRows, 'links'))
-                <div class="transfer-pagination">
-                    {{ $transferRows->links() }}
-                </div>
-            @else
-                <div class="transfer-simple-pagination">
-                    <button type="button">‹</button>
-                    <button type="button" class="active">1</button>
-                    <button type="button">›</button>
-                </div>
-            @endif
-        </div>
+        @if($transferRows->hasPages())
+            <div class="transfer-pagination">
+                @if($transferRows->onFirstPage())
+                    <span class="disabled">‹</span>
+                @else
+                    <a href="{{ $transferRows->previousPageUrl() }}">‹</a>
+                @endif
+
+                @foreach($transferRows->getUrlRange(1, $transferRows->lastPage()) as $page => $url)
+                    @if($page == $transferRows->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($transferRows->hasMorePages())
+                    <a href="{{ $transferRows->nextPageUrl() }}">›</a>
+                @else
+                    <span class="disabled">›</span>
+                @endif
+            </div>
+        @endif
+    </div>
+@endif
 
     </section>
 
