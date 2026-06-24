@@ -13,9 +13,10 @@ class ContractTransferHistory extends Model
         'from_am_id',
         'to_am_id',
         'transferred_by',
+        'transfer_type',
         'notes',
         'transfer_date',
-    ];
+        ];
 
     protected function casts(): array
     {

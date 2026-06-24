@@ -26,15 +26,17 @@ class TransferController extends Controller
         if ($request->filled('search')) {
             $search = trim($request->search);
 
-            $query->whereHas('contract', function ($q) use ($search) {
-                $q->where('contract_name', 'like', "%{$search}%")
-                    ->orWhere('contract_number', 'like', "%{$search}%");
-            })
-            ->orWhereHas('currentAM', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('targetAM', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('contract', function ($contractQuery) use ($search) {
+                    $contractQuery->where('contract_name', 'like', "%{$search}%")
+                        ->orWhere('contract_number', 'like', "%{$search}%");
+                })
+                ->orWhereHas('currentAM', function ($amQuery) use ($search) {
+                    $amQuery->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('targetAM', function ($amQuery) use ($search) {
+                    $amQuery->where('name', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -48,6 +50,8 @@ class TransferController extends Controller
 
     public function directHistory(Request $request)
     {
+        $user = Auth::user();
+
         $query = ContractTransferHistory::with([
             'contract.services.service',
             'fromAM',
@@ -55,18 +59,32 @@ class TransferController extends Controller
             'transferredBy',
         ]);
 
+        if ($user->isManager()) {
+            $query->where('transfer_type', 'direct');
+        }
+
+        if ($user->isAccountManager()) {
+            $query->where('transfer_type', 'approved_request')
+                ->where(function ($q) use ($user) {
+                    $q->where('from_am_id', $user->id)
+                        ->orWhere('to_am_id', $user->id);
+                });
+        }
+
         if ($request->filled('search')) {
             $search = trim($request->search);
 
-            $query->whereHas('contract', function ($q) use ($search) {
-                $q->where('contract_name', 'like', "%{$search}%")
-                    ->orWhere('contract_number', 'like', "%{$search}%");
-            })
-            ->orWhereHas('fromAM', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('toAM', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('contract', function ($contractQuery) use ($search) {
+                    $contractQuery->where('contract_name', 'like', "%{$search}%")
+                        ->orWhere('contract_number', 'like', "%{$search}%");
+                })
+                ->orWhereHas('fromAM', function ($amQuery) use ($search) {
+                    $amQuery->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('toAM', function ($amQuery) use ($search) {
+                    $amQuery->where('name', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -75,7 +93,20 @@ class TransferController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('transfer.direct-transfer', compact('directTransfers'));
+        $contracts = Contract::with('owner')
+            ->orderBy('contract_name')
+            ->get();
+
+        $accountManagers = User::where('role_id', User::ROLE_ACCOUNT_MANAGER)
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        return view('transfer.direct-transfer', compact(
+            'directTransfers',
+            'contracts',
+            'accountManagers'
+        ));
     }
 
     public function create(Request $request)
@@ -116,12 +147,10 @@ class TransferController extends Controller
                 'required',
                 'exists:contracts,id',
             ],
-
             'target_am_id' => [
                 'required',
                 'exists:users,id',
             ],
-
             'reason' => [
                 'nullable',
                 'string',
@@ -158,8 +187,8 @@ class TransferController extends Controller
             ->with('success', 'Request transfer kontrak berhasil dibuat.');
     }
 
-        public function approve(ContractTransferRequest $transferRequest)
-        {
+    public function approve(ContractTransferRequest $transferRequest)
+    {
         if (!Auth::user()->isManager()) {
             abort(403, 'Hanya Manager yang boleh menyetujui transfer.');
         }
@@ -191,6 +220,7 @@ class TransferController extends Controller
                 'from_am_id' => $oldAmId,
                 'to_am_id' => $newAmId,
                 'transferred_by' => Auth::id(),
+                'transfer_type' => 'approved_request',
                 'notes' => $transferRequest->reason ?? 'Transfer request approved by Manager.',
                 'transfer_date' => now(),
             ]);
@@ -205,8 +235,8 @@ class TransferController extends Controller
             ->with('success', 'Transfer request berhasil disetujui.');
     }
 
-        public function reject(ContractTransferRequest $transferRequest)
-        {
+    public function reject(ContractTransferRequest $transferRequest)
+    {
         if (!Auth::user()->isManager()) {
             abort(403, 'Hanya Manager yang boleh menolak transfer.');
         }
@@ -231,6 +261,61 @@ class TransferController extends Controller
         return redirect('/transfer-request')
             ->with('success', 'Transfer request berhasil ditolak.');
     }
-}
 
-        
+    public function directStore(Request $request)
+    {
+        if (!Auth::user()->isManager()) {
+            abort(403, 'Hanya Manager yang boleh melakukan direct transfer.');
+        }
+
+        $validated = $request->validate([
+            'contract_id' => [
+                'required',
+                'exists:contracts,id',
+            ],
+            'target_am_id' => [
+                'required',
+                'exists:users,id',
+            ],
+            'notes' => [
+                'nullable',
+                'string',
+            ],
+        ]);
+
+        $contract = Contract::findOrFail($validated['contract_id']);
+
+        $oldAmId = $contract->owner_am_id;
+        $newAmId = $validated['target_am_id'];
+
+        if ((int) $oldAmId === (int) $newAmId) {
+            return back()
+                ->withInput()
+                ->with('error', 'Target Account Manager tidak boleh sama dengan AM saat ini.');
+        }
+
+        DB::transaction(function () use ($contract, $oldAmId, $newAmId, $validated) {
+            $contract->update([
+                'owner_am_id' => $newAmId,
+            ]);
+
+            ContractTransferHistory::create([
+                'contract_id' => $contract->id,
+                'from_am_id' => $oldAmId,
+                'to_am_id' => $newAmId,
+                'transferred_by' => Auth::id(),
+                'transfer_type' => 'direct',
+                'notes' => $validated['notes'] ?? 'Direct transfer by Manager.',
+                'transfer_date' => now(),
+            ]);
+
+            ActivityLogger::log(
+                'Direct Transfer',
+                'Manager melakukan direct transfer kontrak ' . $contract->contract_number
+            );
+        });
+
+        return redirect('/direct-transfer')
+            ->with('success', 'Direct transfer kontrak berhasil dilakukan.');
+    }
+}

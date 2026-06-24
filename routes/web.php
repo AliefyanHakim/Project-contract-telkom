@@ -124,7 +124,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
- /*
+/*
 |--------------------------------------------------------------------------
 | Transfer
 |--------------------------------------------------------------------------
@@ -153,7 +153,7 @@ Route::middleware('role:manager,account_manager')->group(function () {
 |--------------------------------------------------------------------------
 | Transfer Approval
 |--------------------------------------------------------------------------
-| Accept dan Reject khusus Manager.
+| Accept, Reject, dan Direct Transfer action khusus Manager.
 */
 
 Route::middleware('role:manager')->group(function () {
@@ -162,6 +162,9 @@ Route::middleware('role:manager')->group(function () {
 
     Route::post('/transfer-requests/{transferRequest}/reject', [TransferController::class, 'reject'])
         ->name('transfer.reject');
+
+    Route::post('/direct-transfer', [TransferController::class, 'directStore'])
+        ->name('transfer.direct-store');
 
     Route::get('/acceptreject-transfer', function () {
         return view('transfer.acceptreject-transfer');
