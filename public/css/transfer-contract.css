@@ -158,3 +158,51 @@ td{
     cursor: pointer;
     margin-top: 10px;
 }
+
+.search-box {
+    text-decoration: none;
+}
+
+.search-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #555;
+}
+
+.transfer-alert {
+    margin: 12px 0 18px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.transfer-alert.success {
+    background: #eafaf0;
+    color: #16833a;
+    border: 1px solid #bce8ca;
+}
+
+.transfer-alert.error {
+    background: #fff1f1;
+    color: #ef2b2b;
+    border: 1px solid #ffd0d0;
+}
+
+.readonly-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #f3f6fb;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.view-only-text {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+}

@@ -90,6 +90,7 @@
     align-items: center;
 }
 
+
 .contract-toolbar select,
 .contract-search-box {
     height: 52px;
@@ -277,5 +278,85 @@
 
     .contract-tabs {
         margin-left: 0;
+    }
+}
+
+/* ===== FIX CONTRACT TOOLBAR LAYOUT ===== */
+
+.contract-toolbar-card {
+    overflow: hidden;
+}
+
+.contract-toolbar {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 180px 180px 180px minmax(220px, 1fr) 200px;
+    gap: 14px;
+    align-items: center;
+}
+
+/* Account Manager: tidak ada All Account Managers */
+.contract-toolbar.am-toolbar {
+    grid-template-columns: 190px 190px minmax(260px, 1fr) 210px;
+}
+
+/* Role tanpa tombol Add Contract */
+.contract-toolbar.no-add {
+    grid-template-columns: 180px 180px 180px minmax(300px, 1fr);
+}
+
+/* AM tanpa tombol Add Contract */
+.contract-toolbar.am-toolbar.no-add {
+    grid-template-columns: 190px 190px minmax(320px, 1fr);
+}
+
+.contract-toolbar select,
+.contract-search-box,
+.contract-add-btn {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.contract-search-box input {
+    width: 100%;
+    min-width: 0;
+}
+
+.contract-add-btn {
+    min-width: 0;
+    white-space: nowrap;
+    padding: 0 18px;
+}
+
+/* Saat layar mulai sempit, toolbar turun ke 2 baris */
+@media (max-width: 1200px) {
+    .contract-toolbar,
+    .contract-toolbar.am-toolbar,
+    .contract-toolbar.no-add,
+    .contract-toolbar.am-toolbar.no-add {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .contract-search-box {
+        grid-column: span 2;
+    }
+
+    .contract-add-btn {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 800px) {
+    .contract-toolbar,
+    .contract-toolbar.am-toolbar,
+    .contract-toolbar.no-add,
+    .contract-toolbar.am-toolbar.no-add {
+        grid-template-columns: 1fr;
+    }
+
+    .contract-search-box,
+    .contract-add-btn {
+        grid-column: auto;
     }
 }

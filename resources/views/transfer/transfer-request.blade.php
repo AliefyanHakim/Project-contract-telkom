@@ -100,118 +100,102 @@
 
                 <tbody>
 
-                    @forelse ($transferRows as $row)
+    @forelse ($transferRows as $row)
 
-                        @php                            
-                            $rawStatus = strtolower(
-                                str_replace(' ', '_', data_get($row, 'status', 'pending'))
-                            );
+        @php
+            $rawStatus = strtolower(
+                str_replace(' ', '_', data_get($row, 'status', 'pending'))
+            );
 
-                            if (in_array($rawStatus, ['approved', 'approve'])) {
-                                $rowClass = 'approved';
-                                $statusLabel = 'Approved';
-                            } elseif (in_array($rawStatus, ['rejected', 'reject'])) {
-                                $rowClass = 'rejected';
-                                $statusLabel = 'Rejected';
-                            } else {
-                                $rowClass = 'pending';
-                                $statusLabel = 'Approval Pending';
-                            }
+            if (in_array($rawStatus, ['approved', 'approve'])) {
+                $rowClass = 'approved';
+                $statusLabel = 'Approved';
+            } elseif (in_array($rawStatus, ['rejected', 'reject'])) {
+                $rowClass = 'rejected';
+                $statusLabel = 'Rejected';
+            } else {
+                $rowClass = 'pending';
+                $statusLabel = 'Approval Pending';
+            }
 
-                            $contract = data_get($row, 'contract');
+            $contract = data_get($row, 'contract');
 
-                            $clientName = data_get($contract, 'contract_name', '-');
+            $clientName = data_get($contract, 'contract_name', '-');
+            $contractNumber = data_get($contract, 'contract_number', '-');
+            $currentAmName = data_get($row, 'currentAM.name', '-');
+            $targetAmName = data_get($row, 'targetAM.name', '-');
+            $amName = $currentAmName . ' → ' . $targetAmName;
 
-                            $contractNumber = data_get($contract, 'contract_number', '-');
+            $packageName = data_get($contract, 'services.0.service.service_name', 'Enterprise');
 
-                            $currentAmName = data_get($row, 'currentAM.name', '-');
+            $startDate = data_get($contract, 'start_date');
+            $endDate = data_get($contract, 'end_date');
+        @endphp
 
-                            $targetAmName = data_get($row, 'targetAM.name', '-');
+        <tr class="transfer-row {{ $rowClass }}">
+            <td>
+                <div class="transfer-client">
+                    <span class="transfer-client-icon {{ $rowClass }}">▦</span>
+                    <span>{{ $clientName }}</span>
+                </div>
+            </td>
 
-                            $amName = $currentAmName . ' → ' . $targetAmName;
+            <td>{{ $contractNumber }}</td>
 
-                            $packageName = data_get($contract, 'services.0.service.service_name', 'Enterprise');
+            <td>{{ $amName }}</td>
 
-                            $startDate = data_get($contract, 'start_date');
+            <td>{{ $packageName }}</td>
 
-                            $endDate = data_get($contract, 'end_date');
-                        @endphp
+            <td>
+                {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : '-' }}
+            </td>
 
-                        <tr class="transfer-row {{ $rowClass }}">
-                            <td>
-                                <div class="transfer-client">
-                                    <span class="transfer-client-icon {{ $rowClass }}">▥</span>
-                                    <span>{{ $clientName }}</span>
-                                </div>
-                            </td>
+            <td>
+                {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : '-' }}
+            </td>
 
-                            <td>{{ $contractNumber }}</td>
+            <td>
+                <span class="transfer-status {{ $rowClass }}">
+                    @if ($rowClass === 'approved')
+                        ✓
+                    @elseif ($rowClass === 'rejected')
+                        ×
+                    @else
+                        ⏱
+                    @endif
 
-                            <td>{{ $amName }}</td>
+                    {{ $statusLabel }}
+                </span>
+            </td>
 
-                            <td>{{ $packageName }}</td>
+            <td class="transfer-action-cell">
+                @if(auth()->user()->isManager() && $rowClass === 'pending')
+                    <a href="{{ url('/acceptreject-transfer/' . $row->id) }}" class="transfer-action-review">
+                        Review
+                    </a>
+                @elseif(auth()->user()->isManager())
+                    <span class="transfer-readonly-badge">
+                        Done
+                    </span>
+                @else
+                    <span class="transfer-readonly-badge">
+                        View Only
+                    </span>
+                @endif
+            </td>
+        </tr>
 
-                            <td>
-                                {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : '-' }}
-                            </td>
+    @empty
 
-                            <td>
-                                {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : '-' }}
-                            </td>
+        <tr>
+            <td colspan="8" class="transfer-empty">
+                No transfer request data available.
+            </td>
+        </tr>
 
-                            <td>
-                                <span class="transfer-status {{ $rowClass }}">
-                                    @if ($rowClass === 'approved')
-                                        ✓
-                                    @elseif ($rowClass === 'rejected')
-                                        ×
-                                    @else
-                                        ⏱
-                                    @endif
+    @endforelse
 
-                                    {{ $statusLabel }}
-                                </span>
-                            </td>
-                        </tr>
-                <td>
-    @if(auth()->user()->isManager() && $rowClass === 'pending')
-        <div class="transfer-action-group">
-            <form method="POST" action="{{ url('/transfer-requests/' . $row->id . '/approve') }}">
-                @csrf
-                <button type="submit" class="transfer-action-accept">
-                    Accept
-                </button>
-            </form>
-
-            <form method="POST" action="{{ url('/transfer-requests/' . $row->id . '/reject') }}">
-                @csrf
-                <button type="submit" class="transfer-action-reject">
-                    Reject
-                </button>
-            </form>
-        </div>
-    @elseif(auth()->user()->isManager())
-        <span class="transfer-readonly-badge">
-            Done
-        </span>
-    @else
-        <span class="transfer-readonly-badge">
-            View Only
-        </span>
-    @endif
-</td>
-
-                    @empty
-
-                        <tr>
-                            <td colspan="8" class="transfer-empty">
-                                No transfer request data available.
-                            </td>
-                        </tr>
-
-                    @endforelse
-
-                </tbody>
+</tbody>
 
             </table>
 

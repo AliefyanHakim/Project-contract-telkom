@@ -8,6 +8,26 @@
 
 @section('content')
 
+@php
+    $user = auth()->user();
+
+    $isAccountManager = $user->isAccountManager();
+
+    $canAddContract = $user->isAccountManager()
+        || $user->isSupportInputter()
+        || $user->isSupportPaycall();
+
+    $toolbarClass = 'contract-toolbar';
+
+    if ($isAccountManager) {
+        $toolbarClass .= ' am-toolbar';
+    }
+
+    if (!$canAddContract) {
+        $toolbarClass .= ' no-add';
+    }
+@endphp
+
 <div class="contract-page">
 
     <div class="contract-header">
@@ -20,50 +40,56 @@
     </div>
 
     <div class="contract-tabs">
-    <a href="{{ url('/contract-list') }}" class="contract-tab">
-        Current Contracts
-    </a>
+        <a href="{{ url('/contract-list') }}" class="contract-tab">
+            Current Contracts
+        </a>
 
-    <a href="{{ url('/closed-contract') }}" class="contract-tab active">
-        Closed Contracts
-    </a>
-</div>
+        <a href="{{ url('/closed-contract') }}" class="contract-tab active">
+            Closed Contracts
+        </a>
+    </div>
 
     <section class="contract-toolbar-card">
-    <form method="GET"
-        action="{{ route('contract.closed') }}"
-        class="contract-toolbar">
+        <form method="GET" action="{{ url('/closed-contract') }}" class="{{ $toolbarClass }}">
 
-            <select 
-            name="account_manager"
-            onchange="this.form.submit()">
+            @unless($isAccountManager)
+                <select 
+                    name="account_manager"
+                    onchange="this.form.submit()">
 
-                <option value="">
-                    All Account Managers
-                </option>
-
-                @foreach($accountManagers as $am)
-
-                    <option
-                        value="{{ $am->id }}"
-                        @selected(
-                            request('account_manager') == $am->id
-                        )>
-
-                        {{ $am->name }}
-
+                    <option value="">
+                        All Account Managers
                     </option>
 
-                @endforeach
+                    @foreach($accountManagers as $am)
+                        <option
+                            value="{{ $am->id }}"
+                            @selected(request('account_manager') == $am->id)>
 
-            </select>
+                            {{ $am->name }}
+
+                        </option>
+                    @endforeach
+
+                </select>
+            @endunless
 
             <select 
                 name="status"
                 onchange="this.form.submit()">
-                <option value="">All Statuses</option>
-                <option value="expired">Expired</option>
-                <option value="terminated">Terminated</option>
+
+                <option value="">
+                    All Statuses
+                </option>
+
+                <option value="expired" @selected(request('status') === 'expired')>
+                    Expired
+                </option>
+
+                <option value="terminated" @selected(request('status') === 'terminated')>
+                    Terminated
+                </option>
+
             </select>
 
             <select 
@@ -75,17 +101,13 @@
                 </option>
 
                 @foreach($services as $service)
-
                     <option
                         value="{{ $service->id }}"
-                        @selected(
-                            request('service') == $service->id
-                        )>
+                        @selected(request('service') == $service->id)>
 
                         {{ $service->service_name }}
 
                     </option>
-
                 @endforeach
 
             </select>
@@ -103,10 +125,12 @@
                 </button>
             </div>
 
-            <a href="{{ url('/add-contract') }}" class="contract-add-btn">
-                <span>＋</span>
-                Add Contract
-            </a>
+            @if($canAddContract)
+                <a href="{{ url('/add-contract') }}" class="contract-add-btn">
+                    <span>＋</span>
+                    Add Contract
+                </a>
+            @endif
 
         </form>
     </section>
@@ -131,71 +155,63 @@
 
                 <tbody>
 
-                @forelse($contracts as $contract)
+                    @forelse($contracts as $contract)
 
-                <tr
-                    onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
-                    style="cursor:pointer;">
+                        <tr
+                            onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
+                            style="cursor:pointer;">
 
-                    <td>
-                        {{ $contract->contract_name }}
-                    </td>
+                            <td>
+                                {{ $contract->contract_name }}
+                            </td>
 
-                    <td>
-                        {{ $contract->owner?->name }}
-                    </td>
+                            <td>
+                                {{ $contract->owner?->name ?? '-' }}
+                            </td>
 
-                    <td>
-                        {{ $contract->contract_number }}
-                    </td>
+                            <td>
+                                {{ $contract->contract_number }}
+                            </td>
 
-                    <td>
+                            <td>
+                                @forelse($contract->services as $contractService)
 
-                        @foreach($contract->services as $contractService)
+                                    {{ $contractService->service?->service_name }}
 
-                            {{ $contractService->service?->service_name }}
+                                    @if(!$loop->last)
+                                        ,
+                                    @endif
 
-                            @if(!$loop->last)
-                                ,
-                            @endif
+                                @empty
+                                    -
+                                @endforelse
+                            </td>
 
-                        @endforeach
+                            <td>
+                                {{ $contract->start_date ? \Carbon\Carbon::parse($contract->start_date)->format('d/m/Y') : '-' }}
+                            </td>
 
-                    </td>
+                            <td>
+                                {{ $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') : '-' }}
+                            </td>
 
-                    <td>
-                        {{ $contract->start_date?->format('d/m/Y') }}
-                    </td>
+                            <td>
+                                <span class="contract-status expired">
+                                    Expired
+                                </span>
+                            </td>
 
-                    <td>
-                        {{ $contract->end_date?->format('d/m/Y') }}
-                    </td>
+                        </tr>
 
-                    <td>
+                    @empty
 
-                        <span class="contract-status expired">
+                        <tr>
+                            <td colspan="7" class="contract-empty">
+                                No closed contracts found.
+                            </td>
+                        </tr>
 
-                            Expired
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-                @empty
-
-                <tr>
-
-                    <td colspan="7" class="contract-empty">
-
-                        No closed contracts found.
-
-                    </td>
-
-                </tr>
-
-                @endforelse
+                    @endforelse
 
                 </tbody>
 

@@ -1,207 +1,146 @@
 @extends('layouts.app')
 
-@section('title', 'Accept Reject Transfer | VasTrack')
+@section('title', 'Transfer Approval | VasTrack')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/transfer2.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/transfer-request.css') }}?v={{ time() }}">
 @endsection
 
 @section('content')
 
-<div class="contract-page">
+@php
+    $requestData = $transferRequest ?? null;
+    $contract = $requestData ? $requestData->contract : null;
 
-    <div class="contract-container">
-        <div class="table-wrapper">
+    $clientName = data_get($contract, 'contract_name', '-');
+    $contractNumber = data_get($contract, 'contract_number', '-');
+    $currentAm = data_get($requestData, 'currentAM.name', '-');
+    $targetAm = data_get($requestData, 'targetAM.name', '-');
+    $requester = data_get($requestData, 'requester.name', '-');
+    $packageName = data_get($contract, 'services.0.service.service_name', 'Enterprise');
+    $startDate = data_get($contract, 'start_date');
+    $endDate = data_get($contract, 'end_date');
+    $reason = data_get($requestData, 'reason', '-');
+    $status = data_get($requestData, 'status', 'pending');
+@endphp
 
-            <div class="contract-title">
-            ✉ Detail Contract
-            </div>
+<div class="transfer-page">
 
-            <hr>
+    <div class="transfer-header">
+        <a href="{{ url('/transfer-request') }}" class="transfer-back-btn">
+            ‹
+        </a>
 
-            <form>
-            <!-- baris 1 -->
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Customer ID Number</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group half">
-                    <label>ID Contract</label>
-                    <input type="text">
-                </div>
-
-            </div>
-
-            <br><hr><br>
-
-            <a> 1. PERUSAHAAN PERSEROAN (PERSERO) PT TELEKOMUNIKASI INDONESIA Tbk (TELKOM)<br>
-            DIwakili secara sah oleh:<a>
-
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text">
-            </div>
-
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Position</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group half">
-                    <label>Unit</label>
-                    <input type="text">
-                </div>
-
-            </div>
-
-            <br><hr><br>
-
-            <a>2. PELANGGAN<br>
-                Identitas Perusahaan/Institusi</a>
-
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text">
-            </div>
-
-            <div class="form-group">
-                <label>Address</label>
-                <input type="text">
-            </div>
-
-            <div class="form-group">
-                <label>NPWP</label>
-                <input type="text">
-            </div>
-
-            <br>
-            <a>Diwakili secara sah oleh:</a>
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Name</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group half">
-                    <label>Position</label>
-                    <input type="text">
-                </div>
-
-            </div>
-
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Phone Number</label>
-                    <input type="text">
-                </div>
-
-                <div class="form-group half">
-                    <label>Email Address</label>
-                    <input type="text">
-                </div>
-
-            </div>
-
-            <br><hr>
-
-            <div class="form-group">
-                <label>Service Type</label>
-                <input type="text">
-            </div>
-
-            <br><hr>
-            <!-- Contract Value -->
-            <div class="form-group">
-                <label>Contract Value</label>
-                <input type="text">
-            </div>
-
-            <br><hr>
-
-            <!-- tanggal -->
-            <div class="form-row">
-
-                <div class="form-group half">
-                    <label>Start Date</label>
-                    <input type="date">
-                </div>
-
-                <div class="form-group half">
-                    <label>End Date</label>
-                    <input type="date">
-                </div>
-
-            </div>
-
-            <br><hr>
-
-
-            <!-- Assigned AM -->
-            <div class="form-group">
-                <label>Assigned AM</label>
-                <input type="text">
-            </div>
-
-
-            <!-- Upload -->
-            <div class="form-group">
-
-                <label>Contract File</label>
-
-                <div class="file-row">
-
-                    <div class="file-name">
-                        document123.pdf
-                    </div>
-
-                    <button class="view-btn">
-                        View Document
-                    </button>
-
-                    <button class="download-btn">
-                        Download
-                    </button>
-
-                </div>
-
-            </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-    <div class="recipient-card">
-        <label>Account Manager</label>
-
-        <div class="fixed-box small-box">
-            Account manager 3
-        </div>
-
-        <label>Reason</label>
-
-        <div class="fixed-box reason-box">
-            Alasan blablabla
-        </div>
-
-        <div class="save-area">
-            <button class="reject-btn">
-                Reject
-            </button>
-
-            <button class="accept-btn">
-                Accept
-            </button>
+        <div>
+            <h1>Transfer Approval Detail</h1>
+            <p>Review contract transfer request before approving or rejecting it.</p>
         </div>
     </div>
+
+    @if(session('success'))
+        <div class="transfer-alert success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="transfer-alert error">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if(!$requestData)
+        <section class="transfer-table-card">
+            <div class="transfer-empty">
+                No transfer request data available.
+            </div>
+        </section>
+    @else
+
+        <section class="transfer-form-card">
+            <h2>Request Information</h2>
+            <p>This request was submitted by {{ $requester }}.</p>
+
+            <div class="approval-detail-grid">
+
+                <div class="approval-detail-item">
+                    <span>Client Name</span>
+                    <strong>{{ $clientName }}</strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>ID Contract</span>
+                    <strong>{{ $contractNumber }}</strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>Current AM</span>
+                    <strong>{{ $currentAm }}</strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>Target AM</span>
+                    <strong>{{ $targetAm }}</strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>Package</span>
+                    <strong>{{ $packageName }}</strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>Status</span>
+                    <strong>{{ ucfirst($status) }}</strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>Start Date</span>
+                    <strong>
+                        {{ $startDate ? \Carbon\Carbon::parse($startDate)->format('d/m/Y') : '-' }}
+                    </strong>
+                </div>
+
+                <div class="approval-detail-item">
+                    <span>End Date</span>
+                    <strong>
+                        {{ $endDate ? \Carbon\Carbon::parse($endDate)->format('d/m/Y') : '-' }}
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="approval-reason-box">
+                <span>Transfer Reason</span>
+                <p>{{ $reason ?: '-' }}</p>
+            </div>
+
+            @if($status === 'pending')
+                <div class="approval-action-group">
+
+                    <form method="POST" action="{{ url('/transfer-requests/' . $requestData->id . '/reject') }}">
+                        @csrf
+                        <button type="submit" class="approval-reject-btn">
+                            Reject
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ url('/transfer-requests/' . $requestData->id . '/approve') }}">
+                        @csrf
+                        <button type="submit" class="approval-accept-btn">
+                            Accept
+                        </button>
+                    </form>
+
+                </div>
+            @else
+                <div class="approval-done-box">
+                    This transfer request has already been processed.
+                </div>
+            @endif
+
+        </section>
+
+    @endif
 
 </div>
 

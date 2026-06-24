@@ -14,6 +14,10 @@
     $totalRows = method_exists($directRows, 'total')
         ? $directRows->total()
         : $directRows->count();
+
+    $isManager = auth()->user()->isManager();
+    $isAccountManager = auth()->user()->isAccountManager();
+    $isSupportInputter = auth()->user()->isSupportInputter();
 @endphp
 
 <div class="transfer-page">
@@ -94,6 +98,12 @@
                         $toAm = data_get($row, 'toAM.name', '-');
                         $packageName = data_get($contract, 'services.0.service.service_name', 'Enterprise');
                         $transferDate = data_get($row, 'transfer_date');
+
+                        $transferType = data_get($row, 'transfer_type', 'approved_request');
+
+                        $statusLabel = $transferType === 'direct'
+                            ? 'Direct Transfer'
+                            : 'Approved Transfer';
                     @endphp
 
                     <tr class="transfer-row approved">
@@ -118,7 +128,7 @@
 
                         <td>
                             <span class="transfer-status approved">
-                                ✓ Transferred
+                                ✓ {{ $statusLabel }}
                             </span>
                         </td>
                     </tr>

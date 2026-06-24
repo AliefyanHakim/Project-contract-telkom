@@ -8,6 +8,26 @@
 
 @section('content')
 
+@php
+    $user = auth()->user();
+
+    $isAccountManager = $user->isAccountManager();
+
+    $canAddContract = $user->isAccountManager()
+        || $user->isSupportInputter()
+        || $user->isSupportPaycall();
+
+    $toolbarClass = 'contract-toolbar';
+
+    if ($isAccountManager) {
+        $toolbarClass .= ' am-toolbar';
+    }
+
+    if (!$canAddContract) {
+        $toolbarClass .= ' no-add';
+    }
+@endphp
+
 <div class="contract-page">
 
     <div class="contract-header">
@@ -20,91 +40,71 @@
     </div>
 
     <div class="contract-tabs">
-    <a href="{{ url('/contract-list') }}" class="contract-tab active">
-        Current Contracts
-    </a>
+        <a href="{{ url('/contract-list') }}" class="contract-tab active">
+            Current Contracts
+        </a>
 
-    <a href="{{ url('/closed-contract') }}" class="contract-tab">
-        Closed Contracts
-    </a>
-</div>
+        <a href="{{ url('/closed-contract') }}" class="contract-tab">
+            Closed Contracts
+        </a>
+    </div>
 
     <section class="contract-toolbar-card">
-    <form
-        method="GET"
-        action="{{ route('contract.list') }}"
-        class="contract-toolbar">
+        <form method="GET" action="{{ url('/contract-list') }}" class="{{ $toolbarClass }}">
 
-        @if(!auth()->user()->isAccountManager())
+            @unless($isAccountManager)
+                <select 
+                    name="account_manager"
+                    onchange="this.form.submit()">
 
-        <select 
-        name="account_manager"
-        onchange="this.form.submit()">
+                    <option value="">
+                        All Account Managers
+                    </option>
 
-            <option value="">
-                All Account Managers
-            </option>
+                    @foreach($accountManagers as $am)
+                        <option
+                            value="{{ $am->id }}"
+                            @selected(request('account_manager') == $am->id)>
 
-            @foreach($accountManagers as $am)
+                            {{ $am->name }}
 
-                <option
-                    value="{{ $am->id }}"
-                    @selected(request('account_manager') == $am->id)>
+                        </option>
+                    @endforeach
 
-                    {{ $am->name }}
+                </select>
+            @endunless
 
+            <select 
+                name="status"
+                onchange="this.form.submit()">
+
+                <option value="">
+                    All Statuses
                 </option>
 
-            @endforeach
+                <option value="active" @selected(request('status') == 'active')>
+                    Active
+                </option>
 
-        </select>
+                <option value="expiring" @selected(request('status') == 'expiring')>
+                    Expiring Soon
+                </option>
 
-        @endif
+                <option value="followup" @selected(request('status') == 'followup')>
+                    Follow-up Pending
+                </option>
 
-        <select 
-        name="status"
-        onchange="this.form.submit()">
+            </select>
 
-            <option value="">
-                All Statuses
-            </option>
-
-            <option
-                value="active"
-                @selected(request('status') == 'active')>
-
-                Active
-
-            </option>
-
-            <option
-                value="expiring"
-                @selected(request('status') == 'expiring')>
-
-                Expiring Soon
-
-            </option>
-
-            <option
-                value="followup"
-                @selected(request('status') == 'followup')>
-
-                Follow-up Pending
-
-            </option>
-
-        </select>
-
-        <select 
-        name="service"
-        onchange="this.form.submit()">
+            <select 
+                name="service"
+                onchange="this.form.submit()">
 
                 <option value="">
                     All Packages
                 </option>
 
                 @foreach($services as $service)
-
                     <option
                         value="{{ $service->id }}"
                         @selected(request('service') == $service->id)>
@@ -112,11 +112,9 @@
                         {{ $service->service_name }}
 
                     </option>
-
                 @endforeach
 
             </select>
-
 
             <div class="contract-search-box">
                 <input
@@ -131,10 +129,12 @@
                 </button>
             </div>
 
-            <a href="{{ url('/add-contract') }}" class="contract-add-btn">
-                <span>＋</span>
-                Add Contract
-            </a>
+            @if($canAddContract)
+                <a href="{{ url('/add-contract') }}" class="contract-add-btn">
+                    <span>＋</span>
+                    Add Contract
+                </a>
+            @endif
 
         </form>
     </section>
@@ -159,92 +159,86 @@
 
                 <tbody>
 
-                @forelse($contracts as $contract)
+                    @forelse($contracts as $contract)
 
-                <tr
-                    class="contract-row {{ $contract->calculated_status }}"
-                    onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
-                    style="cursor:pointer;">
+                        <tr
+                            class="contract-row {{ $contract->calculated_status }}"
+                            onclick="window.location='{{ route('contracts.show', $contract->id) }}'"
+                            style="cursor:pointer;">
 
-                    <td>
-                        {{ $contract->contract_name }}
-                    </td>
+                            <td>
+                                {{ $contract->contract_name }}
+                            </td>
 
-                    <td>
-                        {{ $contract->owner?->name }}
-                    </td>
+                            <td>
+                                {{ $contract->owner?->name ?? '-' }}
+                            </td>
 
-                    <td>
-                        {{ $contract->contract_number }}
-                    </td>
+                            <td>
+                                {{ $contract->contract_number }}
+                            </td>
 
-                    <td>
+                            <td>
+                                @forelse($contract->services as $contractService)
 
-                        @foreach($contract->services as $contractService)
+                                    {{ $contractService->service?->service_name }}
 
-                            {{ $contractService->service->service_name }}
+                                    @if(!$loop->last)
+                                        ,
+                                    @endif
 
-                            @if(!$loop->last)
-                                ,
-                            @endif
+                                @empty
+                                    -
+                                @endforelse
+                            </td>
 
-                        @endforeach
+                            <td>
+                                {{ $contract->start_date ? \Carbon\Carbon::parse($contract->start_date)->format('d/m/Y') : '-' }}
+                            </td>
 
-                    </td>
+                            <td>
+                                {{ $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') : '-' }}
+                            </td>
 
-                    <td>
-                        {{ $contract->start_date?->format('d/m/Y') }}
-                    </td>
+                            <td>
+                                @if($contract->calculated_status === 'active')
 
-                    <td>
-                        {{ $contract->end_date?->format('d/m/Y') }}
-                    </td>
+                                    <span class="contract-status active">
+                                        Active
+                                    </span>
 
-                    <td>
+                                @elseif($contract->calculated_status === 'expiring')
 
-                        @if($contract->calculated_status === 'active')
+                                    <span class="contract-status expiring">
+                                        Expiring Soon
+                                    </span>
 
-                            <span class="contract-status active">
+                                @elseif($contract->calculated_status === 'followup')
 
-                                Active
+                                    <span class="contract-status followup">
+                                        Follow-up Pending
+                                    </span>
 
-                            </span>
+                                @else
 
-                        @elseif($contract->calculated_status === 'expiring')
+                                    <span class="contract-status followup">
+                                        {{ ucfirst($contract->calculated_status ?? 'Unknown') }}
+                                    </span>
 
-                            <span class="contract-status expiring">
+                                @endif
+                            </td>
 
-                                Expiring Soon
+                        </tr>
 
-                            </span>
+                    @empty
 
-                        @elseif($contract->calculated_status === 'followup')
+                        <tr>
+                            <td colspan="7" class="contract-empty">
+                                No contracts found.
+                            </td>
+                        </tr>
 
-                            <span class="contract-status followup">
-
-                                Follow-up Pending
-
-                            </span>
-
-                        @endif
-
-                    </td>
-
-                </tr>
-
-                @empty
-
-                <tr>
-
-                    <td colspan="7" class="contract-empty">
-
-                        No contracts found.
-
-                    </td>
-
-                </tr>
-
-                @endforelse
+                    @endforelse
 
                 </tbody>
 
@@ -254,11 +248,11 @@
 
     </section>
 
-    <div style="margin-top:20px;">
-
-    {{ $contracts->links() }}
-
-    </div>
+    @if(method_exists($contracts, 'links'))
+        <div style="margin-top:20px;">
+            {{ $contracts->links() }}
+        </div>
+    @endif
 
 </div>
 

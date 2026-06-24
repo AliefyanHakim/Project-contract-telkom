@@ -440,3 +440,116 @@
     font-size: 12px;
     font-weight: 900;
 }
+
+.transfer-action-review {
+    height: 36px;
+    border-radius: 10px;
+    padding: 0 16px;
+    background: var(--red);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.approval-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 22px;
+}
+
+.approval-detail-item {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    background: #fbfdff;
+}
+
+.approval-detail-item span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.approval-detail-item strong {
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.approval-reason-box {
+    margin-top: 18px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    background: #ffffff;
+}
+
+.approval-reason-box span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.approval-reason-box p {
+    margin: 0;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.approval-action-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.approval-action-group form {
+    margin: 0;
+}
+
+.approval-accept-btn,
+.approval-reject-btn {
+    height: 48px;
+    border: none;
+    border-radius: 14px;
+    padding: 0 28px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.approval-accept-btn {
+    background: var(--green);
+}
+
+.approval-reject-btn {
+    background: var(--red);
+}
+
+.approval-done-box {
+    margin-top: 24px;
+    border-radius: 14px;
+    padding: 14px 16px;
+    background: #f3f6fb;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+@media (max-width: 800px) {
+    .approval-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

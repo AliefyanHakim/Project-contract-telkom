@@ -157,6 +157,9 @@ Route::middleware('role:manager,account_manager')->group(function () {
 */
 
 Route::middleware('role:manager')->group(function () {
+    Route::get('/acceptreject-transfer/{transferRequest}', [TransferController::class, 'showApproval'])
+        ->name('transfer.show-approval');
+
     Route::post('/transfer-requests/{transferRequest}/approve', [TransferController::class, 'approve'])
         ->name('transfer.approve');
 
@@ -170,13 +173,11 @@ Route::middleware('role:manager')->group(function () {
         return view('transfer.acceptreject-transfer');
     });
 
-    Route::get('/accepted-transfer', function () {
-        return view('transfer.accepted-transfer');
-    });
+    Route::get('/accepted-transfer', [TransferController::class, 'acceptedRequests'])
+        ->name('transfer.accepted');
 
-    Route::get('/rejected-transfer', function () {
-        return view('transfer.rejected-transfer');
-    });
+    Route::get('/rejected-transfer', [TransferController::class, 'rejectedRequests'])
+        ->name('transfer.rejected');
 });
 
     /*
