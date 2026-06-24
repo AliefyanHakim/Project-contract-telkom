@@ -75,12 +75,14 @@
             <b>›</b>
         </a>
 
-        <a href="{{ url('/transfer-request') }}"
-        class="vt-menu-item {{ request()->is('transfer-request') || request()->is('acceptreject-transfer') || request()->is('accepted-transfer') || request()->is('rejected-transfer') || request()->is('direct-transfer') ? 'active' : '' }}">
-            <span class="vt-menu-icon">⇄</span>
-            <span>Transfer Request</span>
-            <b>›</b>
-        </a>
+        @if(auth()->user()->isManager() || auth()->user()->isAccountManager() || auth()->user()->isSupportInputter())
+    <a href="{{ url('/transfer-request') }}"
+       class="vt-menu-item {{ request()->is('transfer-request') || request()->is('acceptreject-transfer') || request()->is('accepted-transfer') || request()->is('rejected-transfer') || request()->is('direct-transfer') ? 'active' : '' }}">
+        <span class="vt-menu-icon">⇄</span>
+        <span>Transfer Request</span>
+        <b>›</b>
+    </a>
+@endif
 
         <p class="vt-menu-title">Settings</p>
 
