@@ -154,10 +154,15 @@ Route::middleware('role:manager,account_manager')->group(function () {
 | Transfer Approval
 |--------------------------------------------------------------------------
 | Accept dan Reject khusus Manager.
-| Logic database-nya kita buat di step berikutnya.
 */
 
 Route::middleware('role:manager')->group(function () {
+    Route::post('/transfer-requests/{transferRequest}/approve', [TransferController::class, 'approve'])
+        ->name('transfer.approve');
+
+    Route::post('/transfer-requests/{transferRequest}/reject', [TransferController::class, 'reject'])
+        ->name('transfer.reject');
+
     Route::get('/acceptreject-transfer', function () {
         return view('transfer.acceptreject-transfer');
     });

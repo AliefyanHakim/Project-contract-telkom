@@ -397,3 +397,46 @@
         flex-direction: column;
     }
 }
+
+.transfer-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.transfer-action-group form {
+    margin: 0;
+}
+
+.transfer-action-accept,
+.transfer-action-reject {
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    padding: 0 14px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.transfer-action-accept {
+    background: var(--green);
+}
+
+.transfer-action-reject {
+    background: var(--red);
+}
+
+.transfer-readonly-badge {
+    min-width: 78px;
+    height: 34px;
+    border-radius: 999px;
+    background: #f3f6fb;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+}

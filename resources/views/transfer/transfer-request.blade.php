@@ -94,6 +94,7 @@
                         <th>Start</th>
                         <th>End</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
@@ -172,11 +173,38 @@
                                 </span>
                             </td>
                         </tr>
+                <td>
+    @if(auth()->user()->isManager() && $rowClass === 'pending')
+        <div class="transfer-action-group">
+            <form method="POST" action="{{ url('/transfer-requests/' . $row->id . '/approve') }}">
+                @csrf
+                <button type="submit" class="transfer-action-accept">
+                    Accept
+                </button>
+            </form>
+
+            <form method="POST" action="{{ url('/transfer-requests/' . $row->id . '/reject') }}">
+                @csrf
+                <button type="submit" class="transfer-action-reject">
+                    Reject
+                </button>
+            </form>
+        </div>
+    @elseif(auth()->user()->isManager())
+        <span class="transfer-readonly-badge">
+            Done
+        </span>
+    @else
+        <span class="transfer-readonly-badge">
+            View Only
+        </span>
+    @endif
+</td>
 
                     @empty
 
                         <tr>
-                            <td colspan="7" class="transfer-empty">
+                            <td colspan="8" class="transfer-empty">
                                 No transfer request data available.
                             </td>
                         </tr>
