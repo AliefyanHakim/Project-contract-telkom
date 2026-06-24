@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 23, 2026 at 08:08 AM
+-- Generation Time: Jun 24, 2026 at 09:25 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -36,6 +36,15 @@ CREATE TABLE `activity_logs` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `activity_logs`
+--
+
+INSERT INTO `activity_logs` (`id`, `user_id`, `module`, `activity`, `created_at`, `updated_at`) VALUES
+(1, 9, 'CONTRACT', 'Created contract 432', '2026-06-23 21:06:45', '2026-06-23 21:06:45'),
+(2, 9, 'CONTRACT', 'Created contract 4', '2026-06-23 21:24:27', '2026-06-23 21:24:27'),
+(3, 8, 'AUTH', 'Login', '2026-06-23 23:49:59', '2026-06-23 23:49:59');
+
 -- --------------------------------------------------------
 
 --
@@ -52,6 +61,13 @@ CREATE TABLE `baso_files` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `baso_files`
+--
+
+INSERT INTO `baso_files` (`id`, `contract_id`, `file_name`, `file_path`, `baso_date`, `uploaded_by`, `created_at`, `updated_at`) VALUES
+(1, 20, 'CONTRACT-15.docx', 'baso/glcx9eKIqHscOt5Le7gHERJSSrq9hbAZEtglxJOV.docx', '2026-06-24', 9, '2026-06-23 21:24:27', '2026-06-23 21:24:27');
 
 -- --------------------------------------------------------
 
@@ -71,6 +87,30 @@ CREATE TABLE `billings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache`
+--
+
+CREATE TABLE `cache` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache_locks`
+--
+
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -100,7 +140,6 @@ CREATE TABLE `contracts` (
   `customer_pic_position` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `customer_phone` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `customer_email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `generated_file` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `signing_date` date DEFAULT NULL,
   `signing_location` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -109,14 +148,15 @@ CREATE TABLE `contracts` (
 -- Dumping data for table `contracts`
 --
 
-INSERT INTO `contracts` (`id`, `contract_number`, `contract_name`, `owner_am_id`, `start_date`, `end_date`, `status`, `created_by`, `created_at`, `updated_at`, `account_number`, `sid`, `telkom_name`, `telkom_position`, `telkom_unit`, `customer_address`, `customer_npwp`, `customer_pic_name`, `customer_pic_position`, `customer_phone`, `customer_email`, `generated_file`, `signing_date`, `signing_location`) VALUES
-(5, '1', 'a', 9, '2026-06-20', '2026-06-27', 'expired', 8, '2026-06-20 01:21:56', '2026-06-20 03:09:41', 'a', NULL, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', NULL, '2026-06-20', 'a'),
-(6, '12', 'a', 9, '2026-06-20', '2026-06-27', 'followup', 8, '2026-06-20 01:23:29', '2026-06-22 19:07:53', 'a', NULL, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', NULL, '2026-06-20', 'a'),
-(7, '2', 'b', 9, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-21 19:06:39', '2026-06-22 19:46:37', '1', NULL, 'b', 'b', 'b', 'b', 'b', 'b', 'b', '1', 'b@gmail.com', NULL, '2026-06-23', 'b'),
-(8, '67', 'p', 10, '2026-06-19', '2026-06-21', 'expired', 8, '2026-06-21 21:08:07', '2026-06-21 21:08:07', '17', NULL, 'p', 'p', 'p', 'p', 'p', 'p', 'p', '8', 'p@gmail.com', NULL, '2026-06-20', 'p'),
-(16, '567', 'cccc', 11, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-22 02:08:08', '2026-06-22 02:08:08', '1234', NULL, 'k', 'kk', 'kkk', 'p0', '7777', 'n', 'nnn', '000', 'aaaa@gmail.com', NULL, '2026-06-22', 'sana'),
-(17, '1234', 'r', 11, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-22 02:25:54', '2026-06-22 02:25:54', '123', NULL, 'q', 'w', 'e', 't', 'y', 'u', 'i', '0', 'o@gmail.com', NULL, '2026-06-22', 'd'),
-(18, '123', 'def', 9, '2026-06-23', '2026-06-27', 'followup', 8, '2026-06-22 18:44:54', '2026-06-22 18:45:37', 'a', NULL, 'PT Telkom', 'b', 'A', 'a', '123', 's', 'b', '0987', 'silvia@gmail.com', NULL, '2026-06-23', 'a');
+INSERT INTO `contracts` (`id`, `contract_number`, `contract_name`, `owner_am_id`, `start_date`, `end_date`, `status`, `created_by`, `created_at`, `updated_at`, `account_number`, `sid`, `telkom_name`, `telkom_position`, `telkom_unit`, `customer_address`, `customer_npwp`, `customer_pic_name`, `customer_pic_position`, `customer_phone`, `customer_email`, `signing_date`, `signing_location`) VALUES
+(5, '1', 'a', 9, '2026-06-20', '2026-06-27', 'expired', 8, '2026-06-20 01:21:56', '2026-06-20 03:09:41', 'a', NULL, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', '2026-06-20', 'a'),
+(6, '12', 'a', 9, '2026-06-20', '2026-06-27', 'followup', 8, '2026-06-20 01:23:29', '2026-06-22 19:07:53', 'a', NULL, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', '2026-06-20', 'a'),
+(7, '2', 'b', 9, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-21 19:06:39', '2026-06-22 19:46:37', '1', NULL, 'b', 'b', 'b', 'b', 'b', 'b', 'b', '1', 'b@gmail.com', '2026-06-23', 'b'),
+(8, '67', 'p', 10, '2026-06-19', '2026-06-21', 'expired', 8, '2026-06-21 21:08:07', '2026-06-21 21:08:07', '17', NULL, 'p', 'p', 'p', 'p', 'p', 'p', 'p', '8', 'p@gmail.com', '2026-06-20', 'p'),
+(16, '567', 'cccc', 11, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-22 02:08:08', '2026-06-22 02:08:08', '1234', NULL, 'k', 'kk', 'kkk', 'p0', '7777', 'n', 'nnn', '000', 'aaaa@gmail.com', '2026-06-22', 'sana'),
+(17, '1234', 'r', 11, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-22 02:25:54', '2026-06-22 02:25:54', '123', NULL, 'q', 'w', 'e', 't', 'y', 'u', 'i', '0', 'o@gmail.com', '2026-06-22', 'd'),
+(18, '123', 'def', 9, '2026-06-23', '2026-06-27', 'followup', 8, '2026-06-22 18:44:54', '2026-06-22 18:45:37', 'a', NULL, 'PT Telkom', 'b', 'A', 'a', '123', 's', 'b', '0987', 'silvia@gmail.com', '2026-06-23', 'a'),
+(20, '4', 'q', 9, '2026-06-24', '2026-12-24', 'active', 9, '2026-06-23 21:24:26', '2026-06-23 21:24:26', NULL, NULL, 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q@gmail.com', '2026-06-24', 'q');
 
 -- --------------------------------------------------------
 
@@ -158,7 +198,8 @@ CREATE TABLE `contract_files` (
 INSERT INTO `contract_files` (`id`, `contract_id`, `file_name`, `file_path`, `uploaded_by`, `created_at`, `updated_at`) VALUES
 (4, 16, 'CONTRACT-16.docx', 'contracts/CONTRACT-16.docx', 8, '2026-06-22 02:08:08', '2026-06-22 02:08:08'),
 (5, 17, 'CONTRACT-17.docx', 'contracts/CONTRACT-17.docx', 8, '2026-06-22 02:25:54', '2026-06-22 02:25:54'),
-(6, 18, 'CONTRACT-18.docx', 'contracts/CONTRACT-18.docx', 8, '2026-06-22 18:44:55', '2026-06-22 18:44:55');
+(6, 18, 'CONTRACT-18.docx', 'contracts/CONTRACT-18.docx', 8, '2026-06-22 18:44:55', '2026-06-22 18:44:55'),
+(7, 20, 'KFS_PT_IFORTE_SOLUSI_INFOTEK.docx', 'contracts/J8GY4L9QXAbwU52NA1ArcU9RCXb2xNUBaObGxkno.docx', 9, '2026-06-23 21:24:27', '2026-06-23 21:24:27');
 
 -- --------------------------------------------------------
 
@@ -198,7 +239,11 @@ INSERT INTO `contract_services` (`id`, `contract_id`, `service_id`, `created_at`
 (31, 18, 6, '2026-06-22 18:45:37', '2026-06-22 18:45:37', 0.00, 0.00),
 (32, 18, 5, '2026-06-22 18:45:37', '2026-06-22 18:45:37', 0.00, 0.00),
 (33, 6, 3, '2026-06-22 19:07:53', '2026-06-22 19:07:53', 0.00, 0.00),
-(34, 7, 3, '2026-06-22 19:46:37', '2026-06-22 19:46:37', 0.00, 0.00);
+(34, 7, 3, '2026-06-22 19:46:37', '2026-06-22 19:46:37', 0.00, 0.00),
+(35, 19, 2, '2026-06-23 21:06:45', '2026-06-23 21:06:45', 0.00, 0.00),
+(36, 19, 2, '2026-06-23 21:06:45', '2026-06-23 21:06:45', 0.00, 0.00),
+(37, 20, 4, '2026-06-23 21:24:26', '2026-06-23 21:24:26', 0.00, 0.00),
+(38, 20, 8, '2026-06-23 21:24:26', '2026-06-23 21:24:26', 0.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -289,18 +334,19 @@ CREATE TABLE `notifications` (
 
 CREATE TABLE `notification_settings` (
   `id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
-  `notification_email` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `manager_email` varchar(255) DEFAULT NULL,
+  `daily_schedule` varchar(20) DEFAULT '08:00',
+  `weekly_schedule` varchar(50) DEFAULT 'monday_morning',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `notification_settings`
 --
 
-INSERT INTO `notification_settings` (`id`, `user_id`, `notification_email`, `created_at`, `updated_at`) VALUES
-(1, 8, 'manager@perusahaan.com', '2026-06-18 00:09:09', '2026-06-18 00:09:09');
+INSERT INTO `notification_settings` (`id`, `manager_email`, `daily_schedule`, `weekly_schedule`, `created_at`, `updated_at`) VALUES
+(1, 'manager@perusahaan.com', '10:00', 'friday_morning', '2026-06-24 00:14:22', '2026-06-24 01:04:48');
 
 -- --------------------------------------------------------
 
@@ -375,7 +421,10 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('2MbRnqo1yUAW5SHXeA6az132kFeFf2Ul4BorUjly', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJoS1N1eWloQzNXalk1cUpEWHVnelV1VVdzS215bDU1bWd5NjVsdVNtIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL3Byb2ZpbGUiLCJyb3V0ZSI6InByb2ZpbGUifSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjh9', 1782201911);
+('5rywhZRgIUBb4qxiOyQpqU8GpyLdmwH3Mmrb8K9g', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJqZDcxNFhCdjB3TTB3ZGY0TkM1SUpmVEI2MzlZZm9UekdnUlNHVGJxIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2Rhc2hib2FyZCIsInJvdXRlIjoiZGFzaGJvYXJkIn0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjo4fQ==', 1782274714),
+('Hvjg4P3Na1gJDUPFafUPI07gLAYNP0CfD2kDNrRX', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJqZHBFRmF2SFpXMVpFY09HMzh0SlNvR29UNENFRVBvZWpKS2VtS1MyIiwidXJsIjpbXSwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9lbWFpbC1ub3RpZmljYXRpb25zIiwicm91dGUiOiJlbWFpbC5ub3RpZmljYXRpb25zIn0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjh9', 1782288529),
+('kFunsmrJdxxKhbezEoa5p3Toj9SKotkCBkS5YGfi', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJFT1hGNUJXcXdGb0VPTWs2bTh2SjRNejVXU3lnSlYwUjI5b2NiRFhyIiwidXJsIjp7ImludGVuZGVkIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2VtYWlsLW5vdGlmaWNhdGlvbnMifSwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1782283785),
+('z98HMCQ7S1ubLEtXUauFae1V4spqlj2f3acDnJtD', 9, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJ4bzdYWmdzc3pTUHZkUlNuaWM2eEJJS1BWWHkxQUI4SHNtQWo0ckxmIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9iYXNvXC8xXC9kb3dubG9hZCIsInJvdXRlIjoiYmFzby5kb3dubG9hZCJ9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjo5fQ==', 1782275593);
 
 -- --------------------------------------------------------
 
@@ -433,6 +482,18 @@ ALTER TABLE `billings`
   ADD PRIMARY KEY (`id`),
   ADD KEY `contract_id` (`contract_id`),
   ADD KEY `updated_by` (`updated_by`);
+
+--
+-- Indexes for table `cache`
+--
+ALTER TABLE `cache`
+  ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `cache_locks`
+--
+ALTER TABLE `cache_locks`
+  ADD PRIMARY KEY (`key`);
 
 --
 -- Indexes for table `contracts`
@@ -511,8 +572,7 @@ ALTER TABLE `notifications`
 -- Indexes for table `notification_settings`
 --
 ALTER TABLE `notification_settings`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_id` (`user_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `roles`
@@ -549,13 +609,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `baso_files`
 --
 ALTER TABLE `baso_files`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `billings`
@@ -567,7 +627,7 @@ ALTER TABLE `billings`
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `contract_extensions`
@@ -579,13 +639,13 @@ ALTER TABLE `contract_extensions`
 -- AUTO_INCREMENT for table `contract_files`
 --
 ALTER TABLE `contract_files`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `contract_services`
 --
 ALTER TABLE `contract_services`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `contract_transfer_history`
@@ -717,12 +777,6 @@ ALTER TABLE `notes`
 --
 ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `notification_settings`
---
-ALTER TABLE `notification_settings`
-  ADD CONSTRAINT `fk_notification_settings_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `users`
