@@ -11,11 +11,19 @@
 
 <div class="wrapper">
 
-    <div class="logo">
-        <img src="{{ asset('images/telkom-logo.png') }}" alt="">
-    </div>
-
     <div class="login-card">
+
+        <img
+            src="{{ asset('images/logo-vastrack2.png') }}"
+            class="logo">
+
+        <div class="brand">
+            Vas<span>Track</span>
+        </div>
+
+        <div class="tagline">
+            Track • Manage • Secure
+        </div>
 
         <form
             action="{{ route('login.post') }}"
