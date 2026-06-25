@@ -309,26 +309,25 @@ public function closedContracts(Request $request)
     }
 
     public function viewFile(ContractFile $file)
-    {
-        $this->ensureContractAccess(
-        $file->contract
-        );
+{
+    $this->ensureContractAccess($file->contract);
 
-        $fullPath = storage_path(
-            'app/' . $file->file_path
-        );
-
-        if (!File::exists($fullPath)) {
-            abort(404);
-        }
-
-        ActivityLogger::log(
-            'FILE',
-            'Viewed file ' . $file->file_name
-        );
-
-        return response()->file($fullPath);
+    if (!Storage::exists($file->file_path)) {
+        abort(404, 'File not found');
     }
+
+    ActivityLogger::log(
+        'FILE',
+        'Viewed file ' . $file->file_name
+    );
+
+    return response()->file(
+        Storage::path($file->file_path),
+        [
+            'Content-Disposition' => 'inline; filename="' . $file->file_name . '"',
+        ]
+    );
+}
 
     /**
      * Show form create contract.
@@ -640,10 +639,11 @@ public function store(Request $request)
     $this->ensureContractAccess($contract);
 
     $contract->load([
-        'owner',
-        'services.service',
-        'files'
-    ]);
+    'owner',
+    'services.service',
+    'files',
+    'basoFiles',
+]);
 
     return view(
         'contracts.detail-contract',
@@ -653,11 +653,14 @@ public function store(Request $request)
 
     public function edit(Contract $contract)
     {
-        $this->ensureContractAccess($contract);
+    $this->ensureContractAccess($contract);
 
     $contract->load([
-        'services'
-    ]);
+    'owner',
+    'services.service',
+    'files',
+    'basoFiles',
+]);
 
     $accountManagers = User::where(
         'role_id',
@@ -701,6 +704,8 @@ public function store(Request $request)
             ],
         ]);
 
+        
+
         $contract->update([
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
@@ -720,6 +725,20 @@ public function store(Request $request)
     }
 
     $validated = $request->validate([
+        'file' => [
+            'nullable',
+            'file',
+            'mimes:pdf,doc,docx',
+            'max:10240',
+        ],
+
+        'contract_file' => [
+            'nullable',
+            'file',
+            'mimes:pdf,doc,docx',
+            'max:10240',
+        ],
+
         'contract_name' => [
             'required',
             'max:255',

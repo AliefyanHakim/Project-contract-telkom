@@ -71,6 +71,16 @@
 
         @else
 
+        @php
+            $serviceRows = collect(old('services', $contract->services->pluck('service_id')->toArray()));
+
+            if ($serviceRows->isEmpty()) {
+                $serviceRows = collect(['']);
+            }
+
+            $oldCustomServices = old('custom_services', []);
+        @endphp
+
         <form
             method="POST"
             action="{{ route('contracts.update', $contract->id) }}"
@@ -235,73 +245,41 @@
             </div>
             <br><hr><br>
 
-            <div class="form-section-title">
-        Services
-    </div>
+        
+    <div class="form-section-title">Services</div>
     <div class="form-section-desc">Manage selected service packages for this contract.</div>
 
-            <div id="services-container">
-
-            @foreach($contract->services as $index => $contractService)
-
-            <div class="service-item">
-
+    <div id="services-container">
+        @foreach($serviceRows as $index => $selectedServiceId)
+            <div class="service-row">
                 <div class="form-row">
-
                     <div class="form-group half">
-
                         <label>Service</label>
-
-                        <select
-                            name="services[]">
+                        <select name="services[]" required>
+                            <option value="" @selected(empty($selectedServiceId))>-- Select Service --</option>
 
                             @foreach($services as $service)
-
                                 <option
                                     value="{{ $service->id }}"
-                                    @selected(
-                                        $contractService->service_id == $service->id
-                                    )>
-
+                                    @selected((string) $selectedServiceId === (string) $service->id)>
                                     {{ $service->service_name }}
-
                                 </option>
-
                             @endforeach
-
                         </select>
-
                     </div>
 
                     <div class="form-group half">
-
-                        <button
-                            type="button"
-                            class="remove-service upload-btn">
-
-                            Remove
-
-                        </button>
-
+                        <label>&nbsp;</label>
+                        <button type="button" class="remove-service upload-btn">Remove</button>
                     </div>
-
                 </div>
-
             </div>
+        @endforeach
+    
+    <button type="button" id="add-service" class="upload-btn">+ Add Service</button>
+</div>
 
-            @endforeach
-
-            </div>
-
-            <button
-                type="button"
-                id="add-service"
-                class="upload-btn">
-
-                + Add Service
-            
-            </button>
-            <br><br>
+<br>
 
             <div class="form-section-title">
         Custom Services
@@ -363,48 +341,45 @@
             readonly>
     </div>
 </div>
-                        <!-- Upload -->
-            <div class="form-section">
+
+    <!-- Upload -->
+ <div class="form-section">
     <div class="form-section-title">Contract File</div>
-    <div class="form-section-desc">
-        View existing contract files or upload a replacement file.
-    </div>
+    <div class="form-section-desc">Open existing contract files or upload a new file.</div>
 
-    @if($contract->files && $contract->files->count() > 0)
-
-        <div class="contract-file-existing-list">
-
-            @foreach($contract->files as $file)
-
-                <div class="contract-file-existing-card">
-
-                    <div class="contract-file-existing-info">
-                        <strong>{{ $file->file_name }}</strong>
-
-                        <span>
-                            Uploaded:
-                            {{ $file->created_at ? $file->created_at->format('d/m/Y') : '-' }}
-                        </span>
-                    </div>
-
-                    <div class="contract-file-actions">
-                        <a
-                            href="{{ route('contracts.file.view', $file->id) }}"
-                            class="contract-file-view-btn">
-                            View
-                        </a>
-                    </div>
-
+    <div class="contract-file-existing-list">
+        @forelse($contract->files as $file)
+            <div class="contract-file-existing-card">
+                <div class="contract-file-existing-info">
+                    <strong>{{ $file->file_name }}</strong>
+                    <span>
+                        Uploaded:
+                        {{ $file->created_at ? $file->created_at->format('d/m/Y') : '-' }}
+                    </span>
                 </div>
 
-            @endforeach
+                <div class="contract-file-actions">
+                    <a
+                        href="{{ route('contracts.view', $file->id) }}"
+                        class="contract-file-view-btn"
+                        target="_blank"
+                        rel="noopener">
+                        View
+                    </a>
 
-        </div>
-
-    @endif
+                    <a
+                        href="{{ route('contract-files.download', $file->id) }}"
+                        class="contract-file-download-btn">
+                        Download
+                    </a>
+                </div>
+            </div>
+        @empty
+            <div class="empty-file-state">No contract file has been uploaded yet.</div>
+        @endforelse
+    </div>
 
     <div class="contract-file-clean-row">
-
         <div class="contract-file-clean-field">
             <label>Upload Contract File</label>
 
@@ -415,24 +390,17 @@
                     accept=".pdf,.doc,.docx"
                     class="contract-file-input">
 
-                <span class="contract-file-icon">
-                    DOC
-                </span>
-
-                <span class="contract-file-text">
-                    Choose contract file
-                </span>
+                <span class="contract-file-icon">DOC</span>
+                <span class="contract-file-text">Choose contract file</span>
             </label>
 
-            <small class="form-hint">
-                Accepted formats: PDF, DOC, DOCX.
-            </small>
+            <small class="form-hint">Accepted formats: PDF, DOC, DOCX. Maximum size: 10 MB.</small>
         </div>
-
     </div>
 </div>
 
 <script>
+
 document.addEventListener('DOMContentLoaded', function () {
     const contractFileInput = document.querySelector('.contract-file-input');
 
@@ -453,40 +421,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <div class="form-section">
     <div class="form-section-title">BASO Files</div>
-    <div class="form-section-desc">
-        Upload supporting BASO documents and their dates.
-    </div>
+    <div class="form-section-desc">Open existing BASO files or upload supporting BASO documents and their dates.</div>
 
-    @if($contract->basoFiles && $contract->basoFiles->count() > 0)
-        <div class="baso-existing-list">
+    <div class="baso-existing-list">
+        @forelse($contract->basoFiles as $baso)
+            <div class="baso-existing-card">
+                <div class="baso-existing-info">
+                    <strong>{{ $baso->file_name }}</strong>
+                    <span>
+                        BASO Date:
+                        {{ $baso->baso_date ? \Carbon\Carbon::parse($baso->baso_date)->format('d/m/Y') : '-' }}
+                    </span>
+                </div>
 
-            @foreach($contract->basoFiles as $baso)
-                <div class="baso-existing-card">
-
-                    <div class="baso-existing-info">
-                        <strong>{{ $baso->file_name }}</strong>
-
-                        <span>
-                            BASO Date:
-                            {{ $baso->baso_date ? \Carbon\Carbon::parse($baso->baso_date)->format('d/m/Y') : '-' }}
-                        </span>
-                    </div>
-
-                    <a href="{{ route('baso.download', $baso->id) }}"
-                       class="baso-view-btn">
+                <div class="baso-file-actions">
+                    <a
+                        href="{{ route('baso.view', $baso->id) }}"
+                        class="baso-view-btn"
+                        target="_blank"
+                        rel="noopener">
                         View
                     </a>
 
+                    <a
+                        href="{{ route('baso.download', $baso->id) }}"
+                        class="baso-download-btn">
+                        Download
+                    </a>
                 </div>
-            @endforeach
-
-        </div>
-    @endif
+            </div>
+        @empty
+            <div class="empty-file-state">No BASO file has been uploaded yet.</div>
+        @endforelse
+    </div>
 
     <div id="baso-container" class="baso-clean-list">
-
         <div class="baso-clean-row">
-
             <div class="baso-clean-field">
                 <label>BASO File</label>
 
@@ -498,33 +468,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         class="baso-file-input">
 
                     <span class="baso-file-icon">PDF</span>
-
-                    <span class="baso-file-text">
-                        Choose BASO file
-                    </span>
+                    <span class="baso-file-text">Choose BASO file</span>
                 </label>
             </div>
 
             <div class="baso-clean-field">
                 <label>BASO Date</label>
-
                 <input
                     type="date"
                     name="baso_dates[]"
                     class="baso-date-input">
             </div>
 
-            <button type="button" class="remove-baso-clean">
-                Remove
-            </button>
-
+            <button type="button" class="remove-baso-clean">Remove</button>
         </div>
-
     </div>
 
-    <button type="button" id="add-baso" class="baso-add-btn">
-        + Add BASO
-    </button>
+    <button type="button" id="add-baso" class="baso-add-btn">+ Add BASO</button>
 </div>
     
             <!-- Save button -->
@@ -552,36 +512,33 @@ document.addEventListener('DOMContentLoaded', function () {
 @section('scripts')
 
 @if(!auth()->user()->isSupportPaycall())
-
-<script> document.addEventListener('DOMContentLoaded', function ()) {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
     const serviceContainer = document.getElementById('services-container');
     const addServiceButton = document.getElementById('add-service');
+    const customContainer = document.getElementById('custom-services-container');
+    const addCustomButton = document.getElementById('add-custom-service');
+    const basoContainer = document.getElementById('baso-container');
+    const addBasoButton = document.getElementById('add-baso');
 
     if (serviceContainer && addServiceButton) {
         addServiceButton.addEventListener('click', function () {
             const html = `
                 <div class="service-row">
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group half">
                             <label>Service</label>
-
                             <select name="services[]" required>
                                 <option value="">-- Select Service --</option>
-
                                 @foreach($services as $service)
-                                    <option value="{{ $service->id }}">
-                                        {{ $service->service_name }}
-                                    </option>
+                                    <option value="{{ $service->id }}">{{ $service->service_name }}</option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group half">
                             <label>&nbsp;</label>
-
-                            <button type="button" class="remove-service">
-                                Remove
-                            </button>
+                            <button type="button" class="remove-service upload-btn">Remove</button>
                         </div>
                     </div>
                 </div>
@@ -591,31 +548,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         serviceContainer.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-service')) {
-                const rows = serviceContainer.querySelectorAll('.service-row');
+            if (!e.target.classList.contains('remove-service')) {
+                return;
+            }
 
-                if (rows.length > 1) {
-                    e.target.closest('.service-row').remove();
-                }
+            const rows = serviceContainer.querySelectorAll('.service-row');
+            const currentRow = e.target.closest('.service-row');
+
+            if (rows.length > 1 && currentRow) {
+                currentRow.remove();
+                return;
+            }
+
+            const select = currentRow ? currentRow.querySelector('select') : null;
+            if (select) {
+                select.value = '';
             }
         });
     }
-}
-
-    const customContainer = document.getElementById('custom-services-container');
-    const addCustomButton = document.getElementById('add-custom-service');
 
     if (customContainer && addCustomButton) {
-        let customIndex = 0;
+        let customIndex = customContainer.querySelectorAll('.custom-service-row').length;
 
         addCustomButton.addEventListener('click', function () {
             const row = document.createElement('div');
-
             row.classList.add('custom-service-row');
-
             row.innerHTML = `
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group half">
                         <label>Service Name</label>
                         <input
                             type="text"
@@ -623,16 +583,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             placeholder="Example: Dedicated Internet">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group half">
                         <label>&nbsp;</label>
-                        <button type="button" class="remove-custom-service">
-                            Remove
-                        </button>
+                        <button type="button" class="remove-custom-service upload-btn">Remove</button>
                     </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group half">
                         <label>Installation Fee</label>
                         <input
                             type="number"
@@ -640,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             placeholder="0">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group half">
                         <label>Monthly Fee</label>
                         <input
                             type="number"
@@ -656,48 +614,63 @@ document.addEventListener('DOMContentLoaded', function () {
 
         customContainer.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-custom-service')) {
-                e.target.closest('.custom-service-row').remove();
+                const row = e.target.closest('.custom-service-row');
+                if (row) {
+                    row.remove();
+                }
             }
         });
     }
 
-    <script> document.addEventListener('DOMContentLoaded', function () {
-    const basoContainer = document.getElementById('baso-container');
-    const addBasoButton = document.getElementById('add-baso');
+    function setFilePickerText(input, emptyText) {
+        const picker = input.closest('label');
+        const text = picker ? picker.querySelector('.contract-file-text, .baso-file-text') : null;
 
-    function updateFileName(input) {
-        const row = input.closest('.baso-clean-row');
-        const text = row.querySelector('.baso-file-text');
-
-        if (input.files && input.files.length > 0) {
-            text.textContent = input.files[0].name;
-        } else {
-            text.textContent = 'Choose BASO file';
+        if (!text) {
+            return;
         }
+
+        text.textContent = input.files && input.files.length > 0
+            ? input.files[0].name
+            : emptyText;
     }
+
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('contract-file-input')) {
+            setFilePickerText(e.target, 'Choose contract file');
+        }
+
+        if (e.target.classList.contains('baso-file-input')) {
+            setFilePickerText(e.target, 'Choose BASO file');
+        }
+    });
 
     if (basoContainer && addBasoButton) {
         addBasoButton.addEventListener('click', function () {
             const html = `
-                <div class="baso-row">
-                    <div class="form-group">
+                <div class="baso-clean-row">
+                    <div class="baso-clean-field">
                         <label>BASO File</label>
-                        <input
-                            type="file"
-                            name="baso_files[]"
-                            accept=".pdf,.doc,.docx">
+                        <label class="baso-file-picker">
+                            <input
+                                type="file"
+                                name="baso_files[]"
+                                accept=".pdf,.doc,.docx"
+                                class="baso-file-input">
+                            <span class="baso-file-icon">PDF</span>
+                            <span class="baso-file-text">Choose BASO file</span>
+                        </label>
                     </div>
 
-                    <div class="form-group">
+                    <div class="baso-clean-field">
                         <label>BASO Date</label>
                         <input
                             type="date"
-                            name="baso_dates[]">
+                            name="baso_dates[]"
+                            class="baso-date-input">
                     </div>
 
-                    <button type="button" class="remove-baso">
-                        Remove
-                    </button>
+                    <button type="button" class="remove-baso-clean">Remove</button>
                 </div>
             `;
 
@@ -705,23 +678,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         basoContainer.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-baso')) {
-                const rows = basoContainer.querySelectorAll('.baso-row');
+            if (!e.target.classList.contains('remove-baso-clean')) {
+                return;
+            }
 
-                if (rows.length > 1) {
-                    e.target.closest('.baso-row').remove();
-                } else {
-                    const row = e.target.closest('.baso-row');
+            const rows = basoContainer.querySelectorAll('.baso-clean-row');
+            const currentRow = e.target.closest('.baso-clean-row');
 
-                    row.querySelector('input[type="file"]').value = '';
-                    row.querySelector('input[type="date"]').value = '';
+            if (rows.length > 1 && currentRow) {
+                currentRow.remove();
+                return;
+            }
+
+            if (currentRow) {
+                const fileInput = currentRow.querySelector('.baso-file-input');
+                const dateInput = currentRow.querySelector('.baso-date-input');
+                const fileText = currentRow.querySelector('.baso-file-text');
+
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+
+                if (dateInput) {
+                    dateInput.value = '';
+                }
+
+                if (fileText) {
+                    fileText.textContent = 'Choose BASO file';
                 }
             }
         });
     }
 });
 </script>
-
 @endif
 
 @endsection

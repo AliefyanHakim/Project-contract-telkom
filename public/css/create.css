@@ -1,10 +1,3 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
-}
-
 :root {
     --navy: #071b52;
     --muted: #64748b;
@@ -724,6 +717,205 @@ body {
 
 @media (max-width: 900px) {
     .contract-file-existing-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== EDIT CONTRACT FILE ACTIONS ===== */
+.contract-file-actions,
+.baso-file-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.contract-file-download-btn,
+.baso-download-btn {
+    height: 40px;
+    border-radius: 12px;
+    background: #e8f9ee;
+    color: #15803d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 900;
+    padding: 0 12px;
+}
+
+.contract-file-download-btn:hover,
+.baso-download-btn:hover,
+.contract-file-view-btn:hover,
+.baso-view-btn:hover {
+    filter: brightness(0.98);
+    transform: translateY(-1px);
+}
+
+.empty-file-state {
+    padding: 14px 16px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* ===== CONTRACT DETAIL CLEAN UI ===== */
+
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.detail-subtitle {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.detail-status-badge {
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    background: #eef2ff;
+    color: #071b52;
+    border: 1px solid #dbe3ff;
+}
+
+.detail-status-badge.active {
+    background: #ecfdf3;
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+
+.detail-status-badge.expiring {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+.detail-status-badge.followup {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.detail-status-badge.expired,
+.detail-status-badge.terminated {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+.detail-mini-title {
+    margin-top: 22px;
+    margin-bottom: 4px;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.detail-service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-service-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+    gap: 16px;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+.detail-service-main {
+    min-width: 0;
+}
+
+.detail-service-main strong {
+    display: block;
+    color: var(--navy);
+    font-size: 15px;
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detail-service-main span {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.detail-service-fees {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.detail-service-fees div {
+    padding: 12px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+}
+
+.detail-service-fees small {
+    display: block;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 900;
+    margin-bottom: 5px;
+}
+
+.detail-service-fees strong {
+    display: block;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.detail-action-area {
+    padding-top: 4px;
+}
+
+@media (max-width: 900px) {
+    .detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .detail-service-card {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-service-fees {
         grid-template-columns: 1fr;
     }
 }

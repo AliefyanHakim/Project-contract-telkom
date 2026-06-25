@@ -79,8 +79,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/contract-files/{file}/view', [ContractController::class, 'viewFile'])
             ->name('contracts.view');
 
-        Route::get('/baso/{baso}/download',[BasoFileController::class, 'download']
-            )->name('baso.download');
+        Route::get('/baso/{baso}/view', [BasoFileController::class, 'view'])
+            ->name('baso.view');
+
+        Route::get('/baso/{baso}/download', [BasoFileController::class, 'download'])
+            ->name('baso.download');
 
         Route::get('/billing',
             [BillingController::class,'outstanding']);

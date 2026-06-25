@@ -242,6 +242,14 @@ a {
 
 .vt-notification-btn {
     color: var(--red);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.vt-notification-btn.is-empty {
+    color: #94a3b8;
 }
 
 .vt-notification-btn small {
