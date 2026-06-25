@@ -4,60 +4,60 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/contract-list.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/contract-alerts.css') }}?v={{ time() }}">
 @endsection
 
 @section('content')
 
-<div class="contract-page">
+<div class="contract-page alerts-page-v2">
 
     <div class="contract-header">
         <a href="{{ url('/dashboard') }}" class="contract-back-btn">‹</a>
 
         <div>
             <h1>Contract Alerts</h1>
-            <p>Monitor contracts that need attention based on expiry and follow-up status.</p>
+
+            @if(auth()->user()->isAccountManager())
+                <p>Monitor contract alerts for your owned contracts.</p>
+            @else
+                <p>Monitor contract alerts across all Account Managers.</p>
+            @endif
         </div>
     </div>
 
     <section class="contract-alert-summary nice-alert-summary">
 
-    <a href="{{ url('/contract-list?status=active') }}" class="nice-alert-card active">
-        <div class="nice-alert-icon">
-            ✓
-        </div>
+        <a href="{{ url('/contract-list?status=active') }}" class="nice-alert-card active">
+            <div class="nice-alert-icon">✓</div>
 
-        <div class="nice-alert-content">
-            <h3>Active</h3>
-            <strong>{{ $summary['active'] ?? 0 }}</strong>
-            <p>Contracts in healthy status</p>
-        </div>
-    </a>
+            <div class="nice-alert-content">
+                <h3>Active</h3>
+                <strong>{{ $summary['active'] ?? 0 }}</strong>
+                <p>Contracts in healthy status</p>
+            </div>
+        </a>
 
-    <a href="{{ url('/contract-alerts?status=followup') }}" class="nice-alert-card critical">
-        <div class="nice-alert-icon">
-            !
-        </div>
+        <a href="{{ url('/contract-alerts?status=followup') }}" class="nice-alert-card critical">
+            <div class="nice-alert-icon">!</div>
 
-        <div class="nice-alert-content">
-            <h3>Critical</h3>
-            <strong>{{ $summary['critical'] ?? 0 }}</strong>
-            <p>Need immediate follow-up</p>
-        </div>
-    </a>
+            <div class="nice-alert-content">
+                <h3>Critical</h3>
+                <strong>{{ $summary['critical'] ?? 0 }}</strong>
+                <p>Need immediate follow-up</p>
+            </div>
+        </a>
 
-    <a href="{{ url('/contract-alerts?status=expiring') }}" class="nice-alert-card expiring">
-        <div class="nice-alert-icon">
-            ⏱
-        </div>
+        <a href="{{ url('/contract-alerts?status=expiring') }}" class="nice-alert-card expiring">
+            <div class="nice-alert-icon">⏱</div>
 
-        <div class="nice-alert-content">
-            <h3>Expiring Soon</h3>
-            <strong>{{ $summary['expiring'] ?? 0 }}</strong>
-            <p>Will expire within 30 days</p>
-        </div>
-    </a>
+            <div class="nice-alert-content">
+                <h3>Expiring Soon</h3>
+                <strong>{{ $summary['expiring'] ?? 0 }}</strong>
+                <p>Will expire within 30 days</p>
+            </div>
+        </a>
 
-</section>
+    </section>
 
     <section class="contract-toolbar-card">
         <form method="GET" action="{{ url('/contract-alerts') }}" class="contract-toolbar alert-toolbar">
@@ -72,7 +72,7 @@
                 </option>
 
                 <option value="followup" @selected(request('status') === 'followup')>
-                    Follow-up Pending
+                    Critical Follow-up
                 </option>
 
                 <option value="expired" @selected(request('status') === 'expired')>
@@ -94,10 +94,10 @@
             </div>
 
             <a href="{{ route('contract.alerts.report') . '?' . http_build_query(request()->query()) }}"
-            class="contract-alert-report-btn">
+               class="contract-alert-report-btn">
                 Download Report
             </a>
-            
+
         </form>
     </section>
 
@@ -135,7 +135,7 @@
 
                             $statusLabel = match($status) {
                                 'expiring' => 'Expiring Soon',
-                                'followup' => 'Follow-up Pending',
+                                'followup' => 'Critical Follow-up',
                                 'expired' => 'Expired',
                                 default => ucfirst($status),
                             };
@@ -204,9 +204,33 @@
 
     </section>
 
-    @if(method_exists($contracts, 'links'))
-        <div style="margin-top:20px;">
-            {{ $contracts->links() }}
+    @if($contracts->hasPages())
+        <div class="contract-pagination">
+
+            @if($contracts->onFirstPage())
+                <span class="contract-page-btn disabled">
+                    ‹ Previous
+                </span>
+            @else
+                <a href="{{ $contracts->previousPageUrl() }}" class="contract-page-btn">
+                    ‹ Previous
+                </a>
+            @endif
+
+            <span class="contract-page-info">
+                Showing {{ $contracts->firstItem() }} to {{ $contracts->lastItem() }} of {{ $contracts->total() }} results
+            </span>
+
+            @if($contracts->hasMorePages())
+                <a href="{{ $contracts->nextPageUrl() }}" class="contract-page-btn">
+                    Next ›
+                </a>
+            @else
+                <span class="contract-page-btn disabled">
+                    Next ›
+                </span>
+            @endif
+
         </div>
     @endif
 

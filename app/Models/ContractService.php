@@ -9,6 +9,8 @@ class ContractService extends Model
     protected $fillable = [
         'contract_id',
         'service_id',
+        'installation_fee',
+        'monthly_fee',
     ];
 
     public function contract()

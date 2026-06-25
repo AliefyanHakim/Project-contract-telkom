@@ -8,6 +8,15 @@
     $cards = $cards ?? [];
     $contracts = $contracts ?? [];
     $summaries = $summaries ?? [];
+    $billingRows = $billingRows ?? collect();
+
+    $user = auth()->user();
+
+    $showBillingPanel = $user->isSupportInputter()
+        || $user->isSupportPaycall();
+
+    $canOpenContractAlerts = $user->isAccountManager()
+        || $user->isSupportInputter();
 @endphp
 
 @if($expiring30Days > 0)
@@ -20,7 +29,15 @@
         follow up or renew immediately.
     </p>
 
-    <a href="{{ url('/contract-alerts') }}">View All Alerts</a>
+    @if($canOpenContractAlerts)
+        <a href="{{ url('/contract-alerts') }}">
+            View Alerts
+        </a>
+    @else
+        <a href="{{ url('/contract-list') }}">
+            View Contracts
+        </a>
+    @endif
 </section>
 @endif
 
@@ -40,6 +57,7 @@
 </section>
 
 <section class="vt-content-grid">
+
     <div class="vt-panel">
         <div class="vt-panel-header">
             <div>
@@ -47,16 +65,25 @@
                 <p>Attention needed for renewal and follow up</p>
             </div>
 
-            <a href="{{ url('/contract-alerts') }}">View All</a>
+            @if($canOpenContractAlerts)
+                <a href="{{ url('/contract-alerts') }}">
+                    View Alerts
+                </a>
+            @else
+                <a href="{{ url('/contract-list') }}">
+                    View Contracts
+                </a>
+            @endif
         </div>
 
         <div class="vt-contract-list">
-            @foreach ($contracts as $contract)
+            @forelse ($contracts as $contract)
                 <div class="vt-contract-item">
                     <div class="vt-contract-logo">PT</div>
 
                     <div class="vt-contract-info">
                         <h4>{{ $contract['company'] }} — {{ $contract['package'] }}</h4>
+
                         <p>
                             AM: {{ $contract['am'] }}
                             <span>•</span>
@@ -71,57 +98,153 @@
                             {{ $contract['days_left'] }}
                         </span>
 
-                        <a href="{{ route('contracts.show', $contract['id']) }}">Detail ›</a>
+                        <a href="{{ route('contracts.show', $contract['id']) }}">
+                            Detail ›
+                        </a>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="vt-empty-state">
+                    No contracts near expiration.
+                </div>
+            @endforelse
         </div>
     </div>
 
-    <div class="vt-panel">
-        <div class="vt-panel-header">
-            <div>
-                <h3>Summary by Account Manager</h3>
-                <p>Contract performance overview</p>
+    @if($showBillingPanel)
+
+        <div class="vt-panel">
+            <div class="vt-panel-header">
+                <div>
+                    <h3>Billing Overview</h3>
+                    <p>Outstanding invoices and payment follow-up</p>
+                </div>
+
+                <a href="{{ url('/billing') }}">
+                    View Billing
+                </a>
             </div>
-        </div>
 
-        <div class="vt-table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Account Manager</th>
-                        <th>Clients</th>
-                        <th>Active</th>
-                        <th>Expiring</th>
-                        <th>Monthly Value</th>
-                    </tr>
-                </thead>
+            <div class="vt-billing-summary-grid">
+                <div class="vt-billing-mini-card">
+                    <span>Outstanding</span>
+                    <strong>{{ $billingSummary['outstanding_count'] ?? 0 }}</strong>
+                    <p>{{ $billingSummary['outstanding_amount'] ?? 'Rp 0' }}</p>
+                </div>
 
-                <tbody>
-                    @foreach ($summaries as $summary)
+                <div class="vt-billing-mini-card">
+                    <span>Pending</span>
+                    <strong>{{ $billingSummary['pending_count'] ?? 0 }}</strong>
+                    <p>Waiting for payment</p>
+                </div>
+
+                <div class="vt-billing-mini-card danger">
+                    <span>Overdue</span>
+                    <strong>{{ $billingSummary['overdue_count'] ?? 0 }}</strong>
+                    <p>Need follow-up</p>
+                </div>
+            </div>
+
+            <div class="vt-table-wrapper">
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ $summary['name'] }}</td>
-                            <td>{{ $summary['clients'] }}</td>
-                            <td>{{ $summary['active'] }}</td>
-                            <td>{{ $summary['expiring'] }}</td>
-                            <td>{{ $summary['value'] }}</td>
+                            <th>Client</th>
+                            <th>AM</th>
+                            <th>Period</th>
+                            <th>Amount</th>
+                            <th>Status</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        @forelse($billingRows as $row)
+                            <tr>
+                                <td>{{ $row['client'] }}</td>
+                                <td>{{ $row['am'] }}</td>
+                                <td>{{ $row['period'] }}</td>
+                                <td>{{ $row['amount'] }}</td>
+                                <td>
+                                    <span class="vt-billing-status {{ $row['status'] }}">
+                                        {{ ucfirst($row['status']) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    No outstanding billing found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <a href="{{ url('/billing') }}" class="vt-summary-link">
+                View Billing Detail
+            </a>
         </div>
 
-        @if(auth()->user()->isAccountManager())
-            <a href="{{ url('/contract-list') }}" class="vt-summary-link">
-                View My Contracts
-            </a>
-        @else
-            <a href="{{ url('/detailam') }}" class="vt-summary-link">
-                View Full Summary
-            </a>
-        @endif
-    </div>
+    @else
+
+        <div class="vt-panel">
+            <div class="vt-panel-header">
+                <div>
+                    <h3>Summary by Account Manager</h3>
+                    <p>Contract performance overview</p>
+                </div>
+            </div>
+
+            <div class="vt-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account Manager</th>
+                            <th>Clients</th>
+                            <th>Active</th>
+                            <th>Expiring</th>
+                            <th>Monthly Value</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($summaries as $summary)
+                            <tr>
+                                <td>{{ $summary['name'] }}</td>
+                                <td>{{ $summary['clients'] }}</td>
+                                <td>{{ $summary['active'] }}</td>
+                                <td>{{ $summary['expiring'] }}</td>
+                                <td>{{ $summary['value'] }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5">
+                                    No Account Manager summary found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if($user->isAccountManager())
+                <a href="{{ url('/contract-list') }}" class="vt-summary-link">
+                    View My Contracts
+                </a>
+            @elseif($user->isManager())
+                <a href="{{ url('/detailam') }}" class="vt-summary-link">
+                    View Full Summary
+                </a>
+            @else
+                <a href="{{ url('/contract-list') }}" class="vt-summary-link">
+                    View Contracts
+                </a>
+            @endif
+        </div>
+
+    @endif
+
 </section>
 
 @endsection

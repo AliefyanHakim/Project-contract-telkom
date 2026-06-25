@@ -14,6 +14,15 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Contract KPI
+        |--------------------------------------------------------------------------
+        | AM       → kontraknya sendiri.
+        | Manager  → global.
+        | Inputter → global.
+        | Paycall  → global.
+        */
         $baseContracts = Contract::query();
         $this->applyContractScope($baseContracts, $user);
 
@@ -25,13 +34,6 @@ class DashboardController extends Controller
             ->where('status', 'followup')
             ->count();
 
-        $expiring7Days = (clone $baseContracts)
-            ->whereBetween('end_date', [
-                now()->toDateString(),
-                now()->copy()->addDays(7)->toDateString(),
-            ])
-            ->count();
-
         $expiring30Days = (clone $baseContracts)
             ->whereBetween('end_date', [
                 now()->toDateString(),
@@ -39,7 +41,14 @@ class DashboardController extends Controller
             ])
             ->count();
 
-        $billingQuery = Billing::query()
+        /*
+        |--------------------------------------------------------------------------
+        | Billing KPI
+        |--------------------------------------------------------------------------
+        */
+        $billingQuery = Billing::with([
+                'contract.owner',
+            ])
             ->whereIn('payment_status', [
                 'pending',
                 'overdue',
@@ -49,6 +58,8 @@ class DashboardController extends Controller
 
         $outstandingAmount = (clone $billingQuery)->sum('amount');
         $outstandingCount = (clone $billingQuery)->count();
+        $pendingCount = (clone $billingQuery)->where('payment_status', 'pending')->count();
+        $overdueCount = (clone $billingQuery)->where('payment_status', 'overdue')->count();
 
         $cards = [
             [
@@ -85,6 +96,15 @@ class DashboardController extends Controller
             ],
         ];
 
+        /*
+        |--------------------------------------------------------------------------
+        | Contracts Near Expiration
+        |--------------------------------------------------------------------------
+        | AM       → kontraknya sendiri.
+        | Inputter → semua kontrak seluruh AM.
+        | Paycall  → semua kontrak seluruh AM.
+        | Manager  → semua kontrak.
+        */
         $nearExpirationQuery = Contract::with([
                 'owner',
                 'services.service',
@@ -127,6 +147,13 @@ class DashboardController extends Controller
                 ];
             });
 
+        /*
+        |--------------------------------------------------------------------------
+        | Summary by Account Manager
+        |--------------------------------------------------------------------------
+        | Dipakai untuk Manager dan AM.
+        | Inputter dan Paycall di Blade akan pakai Billing Overview.
+        */
         $summaryUsersQuery = User::where('role_id', User::ROLE_ACCOUNT_MANAGER)
             ->where('status', 'active');
 
@@ -137,15 +164,10 @@ class DashboardController extends Controller
         $summaries = $summaryUsersQuery
             ->orderBy('name')
             ->get()
-            ->map(function ($am) use ($user) {
-                $contractsQuery = $am->ownedContracts()
-                    ->with('services.service');
-
-                if ($user->isSupportInputter()) {
-                    $contractsQuery->where('created_by', $user->id);
-                }
-
-                $contracts = $contractsQuery->get();
+            ->map(function ($am) {
+                $contracts = $am->ownedContracts()
+                    ->with('services.service')
+                    ->get();
 
                 $monthlyValue = $contracts->sum(function ($contract) {
                     return $contract->services->sum(function ($contractService) {
@@ -160,20 +182,59 @@ class DashboardController extends Controller
                 return [
                     'name' => $am->name,
                     'clients' => $contracts->count(),
-                    'active' => $contracts
-                        ->where('status', 'active')
-                        ->count(),
-                    'expiring' => $contracts
-                        ->whereIn('status', ['expiring', 'followup'])
-                        ->count(),
+                    'active' => $contracts->where('status', 'active')->count(),
+                    'expiring' => $contracts->whereIn('status', ['expiring', 'followup'])->count(),
                     'value' => 'Rp ' . number_format($monthlyValue, 0, ',', '.'),
                 ];
             });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Billing Overview Panel
+        |--------------------------------------------------------------------------
+        | Dipakai untuk Inputter dan Paycall.
+        */
+        $billingRowsQuery = Billing::with([
+                'contract.owner',
+            ])
+            ->whereIn('payment_status', [
+                'pending',
+                'overdue',
+            ]);
+
+        $this->applyBillingScope($billingRowsQuery, $user);
+
+        $billingRows = $billingRowsQuery
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(function ($billing) {
+                return [
+                    'client' => $billing->contract?->contract_name ?? '-',
+                    'contract_number' => $billing->contract?->contract_number ?? '-',
+                    'am' => $billing->contract?->owner?->name ?? '-',
+                    'period' => $billing->billing_period ?? '-',
+                    'amount' => 'Rp ' . number_format($billing->amount ?? 0, 0, ',', '.'),
+                    'status' => $billing->payment_status ?? '-',
+                    'due_date' => $billing->due_date
+                        ? \Carbon\Carbon::parse($billing->due_date)->format('d/m/Y')
+                        : '-',
+                ];
+            });
+
+        $billingSummary = [
+            'outstanding_amount' => 'Rp ' . number_format($outstandingAmount, 0, ',', '.'),
+            'outstanding_count' => $outstandingCount,
+            'pending_count' => $pendingCount,
+            'overdue_count' => $overdueCount,
+        ];
 
         return view('dashboard.index', compact(
             'cards',
             'contracts',
             'summaries',
+            'billingRows',
+            'billingSummary',
             'expiring30Days'
         ));
     }
@@ -184,9 +245,12 @@ class DashboardController extends Controller
             $query->where('owner_am_id', $user->id);
         }
 
-        if ($user->isSupportInputter()) {
-            $query->where('created_by', $user->id);
-        }
+        /*
+        |--------------------------------------------------------------------------
+        | Inputter dan Paycall tidak difilter.
+        |--------------------------------------------------------------------------
+        | Dashboard mereka global seperti Manager.
+        */
     }
 
     private function applyBillingScope(Builder $query, User $user): void
@@ -197,10 +261,11 @@ class DashboardController extends Controller
             });
         }
 
-        if ($user->isSupportInputter()) {
-            $query->whereHas('contract', function ($contractQuery) use ($user) {
-                $contractQuery->where('created_by', $user->id);
-            });
-        }
+        /*
+        |--------------------------------------------------------------------------
+        | Inputter dan Paycall tidak difilter.
+        |--------------------------------------------------------------------------
+        | Billing dashboard mereka global.
+        */
     }
 }

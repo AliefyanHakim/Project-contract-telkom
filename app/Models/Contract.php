@@ -11,7 +11,8 @@ class Contract extends Model
     protected $fillable = [
         'contract_number',
         'contract_name',
-
+        'account_number',
+        'sid',
         'customer_id_number',
 
         'telkom_name',

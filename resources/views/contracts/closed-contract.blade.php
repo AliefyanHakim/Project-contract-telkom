@@ -14,8 +14,7 @@
     $isAccountManager = $user->isAccountManager();
 
     $canAddContract = $user->isAccountManager()
-        || $user->isSupportInputter()
-        || $user->isSupportPaycall();
+    || $user->isSupportInputter();
 
     $toolbarClass = 'contract-toolbar';
 

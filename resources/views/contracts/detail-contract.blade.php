@@ -440,11 +440,13 @@ href="{{ asset('css/create.css') }}">
                         Back
                     </a>
 
-                    <a href="{{ route('contracts.edit', $contract->id) }}">
-                        <button type="button" class="edit-btn">
-                            Edit
-                        </button>
-                    </a>
+                    @if(auth()->user()->isAccountManager() || auth()->user()->isSupportInputter() || auth()->user()->isSupportPaycall())
+    <a href="{{ route('contracts.edit', $contract->id) }}">
+        <button type="button" class="edit-btn">
+            Edit
+        </button>
+    </a>
+@endif
 
             </div>
 

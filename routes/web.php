@@ -89,13 +89,15 @@ Route::middleware('auth')->group(function () {
             [BillingController::class,'paymentHistory']);   
     });
 
-    /*
+ /*
 |--------------------------------------------------------------------------
 | Contract Alerts
 |--------------------------------------------------------------------------
-| Hanya Account Manager yang bisa melihat alert kontraknya sendiri.
+| Account Manager melihat alert kontraknya sendiri.
+| Support Inputter melihat semua alert kontrak seluruh AM.
+| Manager dan Paycall tidak bisa akses.
 */
-Route::middleware('role:account_manager')->group(function () {
+Route::middleware('role:account_manager,support_inputter')->group(function () {
 
     Route::get('/contract-alerts', [AlertController::class, 'index'])
         ->name('contract.alerts');

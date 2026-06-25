@@ -204,119 +204,79 @@ private function generateBillingsForContract(Contract $contract): void
         );
     }
 
-    public function closedContracts(Request $request)
-    {
-        $query = Contract::with([
-            'owner',
-            'creator',
-            'services.service'
-        ])
-        ->where('status', 'expired');
+public function closedContracts(Request $request)
+{
+    $query = Contract::with([
+        'owner',
+        'creator',
+        'services.service',
+    ])
+    ->whereIn('status', [
+        'expired',
+        'terminated',
+    ]);
 
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
 
-        if ($user->isAccountManager()) {
+    if ($user->isAccountManager()) {
+        $query->where('owner_am_id', $user->id);
+    }
 
-            $query->where(
-                'owner_am_id',
-                $user->id
-            );
-        }
+    if ($request->filled('search')) {
+        $search = trim($request->search);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
+        $query->where(function ($q) use ($search) {
+            $q->where('contract_name', 'like', "%{$search}%")
+                ->orWhere('contract_number', 'like', "%{$search}%")
+                ->orWhere('account_number', 'like', "%{$search}%")
+                ->orWhere('sid', 'like', "%{$search}%")
+                ->orWhereHas('owner', function ($ownerQuery) use ($search) {
+                    $ownerQuery->where('name', 'like', "%{$search}%");
+                });
+        });
+    }
 
-        if ($request->filled('search')) {
+    if (
+        $request->filled('account_manager')
+        && !$user->isAccountManager()
+    ) {
+        $query->where('owner_am_id', $request->account_manager);
+    }
 
-            $search = trim($request->search);
+    if ($request->filled('service')) {
+        $query->whereHas('services', function ($q) use ($request) {
+            $q->where('service_id', $request->service);
+        });
+    }
 
-            $query->where(function ($q) use ($search) {
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
 
-                $q->where(
-                    'contract_name',
-                    'like',
-                    "%{$search}%"
-                )
-                ->orWhere(
-                    'contract_number',
-                    'like',
-                    "%{$search}%"
-                );
+    $contracts = $query
+        ->orderByDesc('end_date')
+        ->paginate(15)
+        ->withQueryString();
 
-            });
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Account Manager
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $request->filled('account_manager')
-            && !$user->isAccountManager()
-        ) {
-
-            $query->where(
-                'owner_am_id',
-                $request->account_manager
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Package
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->filled('service')) {
-
-            $query->whereHas(
-                'services',
-                function ($q) use ($request) {
-
-                    $q->where(
-                        'service_id',
-                        $request->service
-                    );
-
-                }
-            );
-        }
-
-        $contracts = $query
-            ->orderByDesc('end_date')
-            ->paginate(15)
-            ->withQueryString();
-
-        $accountManagers = User::where(
-            'role_id',
-            User::ROLE_ACCOUNT_MANAGER
-        )
+    $accountManagers = User::where('role_id', User::ROLE_ACCOUNT_MANAGER)
         ->where('status', 'active')
         ->orderBy('name')
         ->get();
 
-        $services = Service::where(
-            'status',
-            'active'
-        )
+    $services = Service::where('status', 'active')
         ->orderBy('service_name')
         ->get();
 
-        return view(
-            'contracts.closed-contract',
-            compact(
-                'contracts',
-                'accountManagers',
-                'services'
-            )
-        );
-    }
+    return view(
+        'contracts.closed-contract',
+        compact(
+            'contracts',
+            'accountManagers',
+            'services'
+        )
+    );
+}
 
     public function getCalculatedStatusAttribute()
     {

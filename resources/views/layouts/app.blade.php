@@ -7,7 +7,8 @@
 
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('css/transfer-request.css') }}?v={{ time() }}">
-
+    <link rel="stylesheet" href="{{ asset('css/vastrack-ui.css') }}?v={{ time() }}">
+    
 @yield('styles')
 </head>
 <body>

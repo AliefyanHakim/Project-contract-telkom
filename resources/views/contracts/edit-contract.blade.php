@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('styles')
-<link rel="stylesheet"
-href="{{ asset('css/create.css') }}">
+<link rel="stylesheet" href="{{ asset('css/create.css') }}">
 @endsection
 
 @section('content')
@@ -27,6 +26,52 @@ href="{{ asset('css/create.css') }}">
             </div>
             <br>
         @endif
+
+        @if(auth()->user()->isSupportPaycall())
+
+            {{-- FORM PENDEK PAYCALL --}}
+            <div class="form-container">
+                <form action="{{ route('contracts.update', $contract->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" value="{{ $contract->contract_name }}" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contract Number</label>
+                        <input type="text" value="{{ $contract->contract_number }}" readonly>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Start Date</label>
+                            <input
+                                type="date"
+                                name="start_date"
+                                value="{{ old('start_date', optional($contract->start_date)->format('Y-m-d')) }}"
+                                required>
+                        </div>
+
+                        <div class="form-group half">
+                            <label>End Date</label>
+                            <input
+                                type="date"
+                                name="end_date"
+                                value="{{ old('end_date', optional($contract->end_date)->format('Y-m-d')) }}"
+                                required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="save-btn">
+                        Save Date Changes
+                    </button>
+                </form>
+            </div>
+
+        @else
 
         <form
             method="POST"
@@ -296,40 +341,7 @@ href="{{ asset('css/create.css') }}">
                 value="{{ $contract->owner->name }}"
                 readonly
             >
-
-            @if(auth()->user()->isSupportPaycall())
-
-            <div class="form-group">
-
-                <label>Status</label>
-
-                <select name="status">
-
-                    <option
-                        value="active"
-                        @selected($contract->status == 'active')>
-                        Active
-                    </option>
-
-                    <option
-                        value="expired"
-                        @selected($contract->status == 'expired')>
-                        Expired
-                    </option>
-
-                    <option
-                        value="terminated"
-                        @selected($contract->status == 'terminated')>
-                        Terminated
-                    </option>
-
-                </select>
-
-            </div>
-
-            @endif
-
-            <!-- Upload -->
+                        <!-- Upload -->
             <h4>Contract File</h4>
 
             @foreach($contract->files as $file)
@@ -411,6 +423,8 @@ href="{{ asset('css/create.css') }}">
 
         </form>
 
+        @endif
+
     </div>
 
 </div>
@@ -419,298 +433,151 @@ href="{{ asset('css/create.css') }}">
 
 @section('scripts')
 
+@if(!auth()->user()->isSupportPaycall())
+
 <script>
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
+document.addEventListener('DOMContentLoaded', function () {
+    const serviceContainer = document.getElementById('services-container');
+    const addServiceButton = document.getElementById('add-service');
 
-        console.log('LOADED');
+    if (serviceContainer && addServiceButton) {
+        addServiceButton.addEventListener('click', function () {
+            const html = `
+                <div class="service-row" style="margin-bottom:15px;">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Service</label>
 
-        const container =
-            document.getElementById('services-container');
+                            <select name="services[]" required>
+                                <option value="">-- Select Service --</option>
 
-        const addButton =
-            document.getElementById('add-service');
-
-        console.log(container);
-        console.log(addButton);
-
-        addButton.addEventListener(
-            'click',
-            function () {
-
-                console.log('CLICKED');
-
-            }
-        );
-    }
-);
-
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
-        const container =
-            document.getElementById(
-                'services-container'
-            );
-
-        const addButton =
-            document.getElementById(
-                'add-service'
-            );
-
-        addButton.addEventListener(
-            'click',
-            function () {
-
-                const html = `
-                    <div class="service-row"
-                         style="margin-bottom:15px;">
-
-                        <div class="form-row">
-
-                            <div class="form-group half">
-
-                                <label>Service</label>
-
-                                <select
-                                    name="services[]"
-                                    required>
-
-                                    <option value="">
-                                        -- Select Service --
+                                @foreach($services as $service)
+                                    <option value="{{ $service->id }}">
+                                        {{ $service->service_name }}
                                     </option>
-
-                                    @foreach($services as $service)
-
-                                        <option
-                                            value="{{ $service->id }}">
-
-                                            {{ $service->service_name }}
-
-                                        </option>
-
-                                    @endforeach
-
-                                </select>
-
-                            </div>
-
-                            <div class="form-group half">
-
-                                <label>&nbsp;</label>
-
-                                <button
-                                    type="button"
-                                    class="remove-service upload-btn">
-
-                                    Remove
-
-                                </button>
-
-                            </div>
-
+                                @endforeach
+                            </select>
                         </div>
 
+                        <div class="form-group half">
+                            <label>&nbsp;</label>
+                            <button type="button" class="remove-service upload-btn">
+                                Remove
+                            </button>
+                        </div>
                     </div>
-                `;
+                </div>
+            `;
 
-                container.insertAdjacentHTML(
-                    'beforeend',
-                    html
-                );
-            }
-        );
+            serviceContainer.insertAdjacentHTML('beforeend', html);
+        });
 
-        container.addEventListener(
-            'click',
-            function (e) {
+        serviceContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-service')) {
+                const row = e.target.closest('.service-row') || e.target.closest('.service-item');
 
-                if (
-                    e.target.classList.contains(
-                        'remove-service'
-                    )
-                ) {
-
-                    e.target
-                        .closest('.service-row')
-                        .remove();
+                if (row) {
+                    row.remove();
                 }
             }
-        );
+        });
     }
-);
 
+    const customContainer = document.getElementById('custom-services-container');
+    const addCustomButton = document.getElementById('add-custom-service');
 
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
+    if (customContainer && addCustomButton) {
         let customIndex = 1;
 
-        const button =
-            document.getElementById(
-                'add-custom-service'
-            );
+        addCustomButton.addEventListener('click', function () {
+            const row = document.createElement('div');
 
-        const container =
-            document.getElementById(
-                'custom-services-container'
-            );
+            row.classList.add('custom-service-row');
+            row.style.marginTop = '15px';
 
-        console.log(button);
-        console.log(container);
-
-        if (!button || !container) {
-            return;
-        }
-
-        button.addEventListener(
-            'click',
-            function () {
-
-                const row =
-                    document.createElement('div');
-
-                row.classList.add(
-                    'custom-service-row'
-                );
-
-                row.style.marginTop = '15px';
-
-                row.innerHTML = `
-                    <div class="form-row">
-
-                        <div class="form-group half">
-
-                            <label>Service Name</label>
-
-                            <input
-                                type="text"
-                                name="custom_services[${customIndex}][service_name]">
-
-                        </div>
-
-                        <div class="form-group half">
-
-                            <label>&nbsp;</label>
-
-                            <button
-                                type="button"
-                                class="remove-custom-service upload-btn">
-
-                                Remove
-
-                            </button>
-
-                        </div>
-
+            row.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Service Name</label>
+                        <input
+                            type="text"
+                            name="custom_services[${customIndex}][service_name]">
                     </div>
 
-                    <div class="form-row">
-
-                        <div class="form-group half">
-
-                            <label>Installation Fee</label>
-
-                            <input
-                                type="number"
-                                name="custom_services[${customIndex}][installation_fee]">
-
-                        </div>
-
-                        <div class="form-group half">
-
-                            <label>Monthly Fee</label>
-
-                            <input
-                                type="number"
-                                name="custom_services[${customIndex}][monthly_fee]">
-
-                        </div>
-
+                    <div class="form-group half">
+                        <label>&nbsp;</label>
+                        <button type="button" class="remove-custom-service upload-btn">
+                            Remove
+                        </button>
                     </div>
-                `;
+                </div>
 
-                container.appendChild(row);
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Installation Fee</label>
+                        <input
+                            type="number"
+                            name="custom_services[${customIndex}][installation_fee]">
+                    </div>
 
-                customIndex++;
-            }
-        );
+                    <div class="form-group half">
+                        <label>Monthly Fee</label>
+                        <input
+                            type="number"
+                            name="custom_services[${customIndex}][monthly_fee]">
+                    </div>
+                </div>
+            `;
 
-        container.addEventListener(
-            'click',
-            function (e) {
+            customContainer.appendChild(row);
+            customIndex++;
+        });
 
-                if (
-                    e.target.classList.contains(
-                        'remove-custom-service'
-                    )
-                ) {
+        customContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-custom-service')) {
+                const row = e.target.closest('.custom-service-row');
 
-                    e.target
-                        .closest(
-                            '.custom-service-row'
-                        )
-                        .remove();
+                if (row) {
+                    row.remove();
                 }
             }
-        );
+        });
     }
-);
 
-document
-.getElementById('add-baso')
-.addEventListener('click', function () {
+    const basoContainer = document.getElementById('baso-container');
+    const addBasoButton = document.getElementById('add-baso');
 
-    const container =
-        document.getElementById(
-            'baso-container'
-        );
+    if (basoContainer && addBasoButton) {
+        addBasoButton.addEventListener('click', function () {
+            const row = document.createElement('div');
 
-    const row =
-        document.createElement('div');
+            row.classList.add('baso-row');
 
-    row.classList.add('baso-row');
+            row.innerHTML = `
+                <input type="file" name="baso_files[]">
+                <input type="date" name="baso_dates[]">
 
-    row.innerHTML = `
-        <input
-            type="file"
-            name="baso_files[]">
+                <button type="button" class="remove-baso upload-btn">
+                    Remove
+                </button>
+            `;
 
-        <input
-            type="date"
-            name="baso_dates[]">
+            basoContainer.appendChild(row);
+        });
 
-        <button
-            type="button"
-            class="remove-baso upload-btn">
+        basoContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-baso')) {
+                const row = e.target.closest('.baso-row');
 
-            Remove
-
-        </button>
-    `;
-
-    container.appendChild(row);
-});
-
-document.addEventListener(
-'click',
-function(e){
-
-    if(
-        e.target.classList.contains(
-            'remove-baso'
-        )
-    ){
-        e.target.closest(
-            '.baso-row'
-        ).remove();
+                if (row) {
+                    row.remove();
+                }
+            }
+        });
     }
 });
 </script>
 
-
+@endif
 
 @endsection

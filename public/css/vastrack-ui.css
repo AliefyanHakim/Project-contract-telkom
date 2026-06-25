@@ -1,0 +1,99 @@
+/* ===== VASTRACK GLOBAL UI FIX ===== */
+
+.pagination svg,
+nav[role="navigation"] svg {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+nav[role="navigation"] {
+    font-size: 14px;
+    color: var(--navy);
+}
+
+nav[role="navigation"] a,
+nav[role="navigation"] span {
+    text-decoration: none;
+}
+
+.vt-empty-state {
+    color: #94a3b8;
+    font-weight: 800;
+    padding: 18px 0;
+}
+
+/* ===== DASHBOARD BILLING PANEL ===== */
+
+.vt-billing-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.vt-billing-mini-card {
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    padding: 14px;
+}
+
+.vt-billing-mini-card span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 6px;
+}
+
+.vt-billing-mini-card strong {
+    display: block;
+    color: var(--navy);
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.vt-billing-mini-card p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.vt-billing-mini-card.danger {
+    background: #fff5f5;
+    border-color: #f4caca;
+}
+
+.vt-billing-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.vt-billing-status.pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.vt-billing-status.overdue {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.vt-billing-status.paid {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+@media (max-width: 900px) {
+    .vt-billing-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
