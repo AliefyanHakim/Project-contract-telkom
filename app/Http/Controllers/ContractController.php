@@ -498,14 +498,26 @@ public function store(Request $request)
             'max:255',
         ],
 
-        'custom_installation_fee' => [
+        'custom_services' => [
             'nullable',
-            'numeric',
+            'array',
         ],
 
-        'custom_monthly_fee' => [
+        'custom_services.*.service_name' => [
+            'nullable',
+            'max:255',
+        ],
+
+        'custom_services.*.installation_fee' => [
             'nullable',
             'numeric',
+            'min:0',
+        ],
+
+        'custom_services.*.monthly_fee' => [
+            'nullable',
+            'numeric',
+            'min:0',
         ],
     ]);
 
@@ -555,18 +567,7 @@ public function store(Request $request)
             'created_by' => Auth::id(),
         ]);
 
-        if ($request->filled('custom_service_name')) {
-            $newService = Service::create([
-                'service_name' => $request->custom_service_name,
-                'installation_fee' => $request->custom_installation_fee ?? 0,
-                'monthly_fee' => $request->custom_monthly_fee ?? 0,
-                'status' => 'active',
-            ]);
-
-            $validated['services'][] = $newService->id;
-        }
-
-        foreach ($validated['services'] as $serviceId) {
+            foreach ($validated['services'] as $serviceId) {
             $service = Service::findOrFail($serviceId);
 
             ContractService::create([
@@ -857,17 +858,6 @@ public function store(Request $request)
 
         ContractService::where('contract_id', $contract->id)->delete();
 
-        foreach ($validated['services'] as $serviceId) {
-            $service = Service::findOrFail($serviceId);
-
-            ContractService::create([
-                'contract_id' => $contract->id,
-                'service_id' => $service->id,
-                'installation_fee' => $service->installation_fee ?? 0,
-                'monthly_fee' => $service->monthly_fee ?? 0,
-            ]);
-        }
-
         $this->generateBillingsForContract($contract);
 
         foreach ($request->custom_services ?? [] as $customService) {
@@ -889,6 +879,26 @@ public function store(Request $request)
                 'monthly_fee' => $service->monthly_fee ?? 0,
             ]);
         }
+
+        foreach ($request->custom_services ?? [] as $customService) {
+    if (empty($customService['service_name'])) {
+        continue;
+    }
+
+    $service = Service::create([
+        'service_name' => $customService['service_name'],
+        'installation_fee' => $customService['installation_fee'] ?? 0,
+        'monthly_fee' => $customService['monthly_fee'] ?? 0,
+        'status' => 'active',
+    ]);
+
+    ContractService::create([
+        'contract_id' => $contract->id,
+        'service_id' => $service->id,
+        'installation_fee' => $service->installation_fee ?? 0,
+        'monthly_fee' => $service->monthly_fee ?? 0,
+    ]);
+}
 
         if ($request->hasFile('baso_files')) {
             foreach ($request->file('baso_files') as $index => $file) {

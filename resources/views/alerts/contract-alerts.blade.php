@@ -75,9 +75,6 @@
                     Critical Follow-up
                 </option>
 
-                <option value="expired" @selected(request('status') === 'expired')>
-                    Expired
-                </option>
             </select>
 
             <div class="contract-search-box">
@@ -129,14 +126,12 @@
                             $rowClass = match($status) {
                                 'expiring' => 'expiring',
                                 'followup' => 'followup',
-                                'expired' => 'expired',
                                 default => 'followup',
                             };
 
                             $statusLabel = match($status) {
                                 'expiring' => 'Expiring Soon',
                                 'followup' => 'Critical Follow-up',
-                                'expired' => 'Expired',
                                 default => ucfirst($status),
                             };
                         @endphp

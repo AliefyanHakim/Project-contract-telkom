@@ -24,7 +24,6 @@ class AlertController extends Controller
         ->whereIn('status', [
             'expiring',
             'followup',
-            'expired',
         ]);
 
         /*
@@ -100,7 +99,6 @@ class AlertController extends Controller
         ->whereIn('status', [
             'expiring',
             'followup',
-            'expired',
         ]);
 
         if ($user->isAccountManager()) {

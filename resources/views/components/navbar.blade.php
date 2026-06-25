@@ -13,7 +13,6 @@
         ->whereIn('status', [
             'expiring',
             'followup',
-            'expired',
         ]);
 
     if ($user->isAccountManager()) {

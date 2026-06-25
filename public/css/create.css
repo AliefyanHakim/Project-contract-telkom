@@ -919,3 +919,43 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ===== ADD CONTRACT CLEAN UI ===== */
+
+.detail-header,
+.add-contract-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.detail-subtitle {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.detail-mini-title {
+    margin-top: 22px;
+    margin-bottom: 4px;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.add-action-area {
+    padding-top: 4px;
+}
+
+@media (max-width: 900px) {
+    .detail-header,
+    .add-contract-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
