@@ -156,7 +156,7 @@ Route::middleware('role:account_manager,support_inputter,support_paycall')->grou
 |--------------------------------------------------------------------------
 | Hanya Manager dan Support Inputter yang bisa melihat ringkasan per AM.
 */
-Route::middleware('role:manager,support_inputter')->group(function () {
+Route::middleware('role:manager')->group(function () {
 
     Route::get('/detailam', function () {
         $firstAm = User::where('role_id', User::ROLE_ACCOUNT_MANAGER)
@@ -173,6 +173,9 @@ Route::middleware('role:manager,support_inputter')->group(function () {
 
     Route::get('/account-manager/{user}', [AmController::class, 'show'])
         ->name('account-managers.show');
+
+    Route::get('/account-manager/{user}/export', [AmController::class, 'export'])
+        ->name('account-managers.export');
 
 });
 

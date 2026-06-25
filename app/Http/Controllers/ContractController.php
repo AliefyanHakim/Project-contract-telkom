@@ -930,20 +930,16 @@ public function store(Request $request)
     }
 
     if ($type === 'closed') {
-        $query->whereIn('status', [
-            'expired',
-            'closed',
-        ]);
+    $query->whereIn('status', [
+        'expired',
+        'terminated',
+    ]);
     }
 
     if ($user->isAccountManager()) {
         $query->where('owner_am_id', $user->id);
     }
-
-    if ($user->isSupportInputter()) {
-        $query->where('created_by', $user->id);
-    }
-
+    
     if (request()->filled('status')) {
         $query->where('status', request('status'));
     }

@@ -34,11 +34,11 @@
             <b>›</b>
         </a>
 
-        @if(auth()->user()->isManager() || auth()->user()->isSupportInputter())
+        @if(auth()->user()->isManager())
             <a href="{{ url('/detailam') }}"
                class="vt-menu-item {{ request()->is('detailam') || request()->is('account-manager*') ? 'active' : '' }}">
                 <span class="vt-menu-icon">AM</span>
-                <span>By Account Manager</span>
+                <span>Account Manager</span>
                 <b>›</b>
             </a>
         @endif

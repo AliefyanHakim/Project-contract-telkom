@@ -194,11 +194,17 @@
                                 {{ $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') : '-' }}
                             </td>
 
-                            <td>
+                        <td>
+                            @if($contract->status === 'terminated')
+                                <span class="contract-status followup">
+                                    Terminated
+                                </span>
+                            @else
                                 <span class="contract-status expired">
                                     Expired
                                 </span>
-                            </td>
+                            @endif
+                        </td>
 
                         </tr>
 

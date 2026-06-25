@@ -35,7 +35,7 @@
 
                 <div>
                     <h2>Automatic Email Alert Settings</h2>
-                    <p>Set recipients for critical contract and billing notifications.</p>
+                    <p>Set your personal recipient email and reminder schedule.</p>
                 </div>
             </div>
 
@@ -66,24 +66,33 @@
                 </div>
 
                 <div class="email-field">
-                <label>Support Recipients</label>
-                <p>
-                Recipient of all critical alerts</p>
+    <label>Reminder Scope</label>
+    <p>Contract reminder coverage based on your role</p>
 
-                    <div class="email-input readonly">
-                        <span>✉</span>
-                        <input
-                            type="text"
-                            value="Automatic from user database"
-                            readonly
-                        >
-                    </div>
-                    <small class="email-help">
-                        All Support users will automatically receive notifications.
-                    </small>
-                </div>
+    <div class="email-input readonly">
+        <span>i</span>
+
+        @if(auth()->user()->isAccountManager())
+            <input
+                type="text"
+                value="Your owned contracts only"
+                readonly
+            >
+                @else
+                    <input
+                        type="text"
+                        value="Contracts created/inputted by your account"
+                        readonly
+                    >
+                @endif
             </div>
-        </section>
+
+            <small class="email-help">
+                Reminder settings are saved per user and do not affect other roles.
+            </small>
+            </div>
+        </div>
+    </section>
 
         <section class="email-card">
             <div class="email-card-title">

@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Mail\ContractStatusChangedMail;
-use App\Mail\CustomerContractReminderMail;
 use App\Models\Contract;
 use App\Models\NotificationSetting;
 use App\Models\User;
@@ -15,197 +14,109 @@ class SendContractNotifications extends Command
 {
     protected $signature = 'contracts:notify';
 
-    protected $description =
-        'Send contract expiration notifications';
+    protected $description = 'Send contract expiration reminder notifications';
 
     public function handle()
     {
-        $settings = NotificationSetting::settings();
+        $settings = NotificationSetting::with('user')
+            ->whereHas('user', function ($query) {
+                $query->whereIn('role_id', [
+                    User::ROLE_ACCOUNT_MANAGER,
+                    User::ROLE_SUPPORT_INPUTTER,
+                ]);
+            })
+            ->get();
 
-        $now = now();
+        $sentCount = 0;
 
-        /*
-        |--------------------------------------------------------------------------
-        | DAILY FOLLOWUP (<= 7 HARI)
-        |--------------------------------------------------------------------------
-        */
+        foreach ($settings as $setting) {
+            if (!$setting->user || !$setting->manager_email) {
+                continue;
+            }
 
-        if (
-            $now->format('H:i')
-            === $settings->daily_schedule
-        ) {
-            $this->sendFollowupNotifications();
+            $sentCount += $this->sendForSetting($setting);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | WEEKLY EXPIRING (8-30 HARI)
-        |--------------------------------------------------------------------------
-        */
+        $this->info('Contract reminders sent: ' . $sentCount);
 
-        if (
-            $this->shouldSendWeekly(
-                $settings->weekly_schedule
-            )
-        ) {
-            $this->sendExpiringNotifications();
-        }
-
-        return self::SUCCESS;
+        return Command::SUCCESS;
     }
 
-    private function shouldSendWeekly(
-        string $schedule
-    ): bool {
+    private function sendForSetting(NotificationSetting $setting): int
+    {
+        $user = $setting->user;
+        $now = now();
 
+        $shouldSendDaily = $now->format('H:i') === $setting->daily_schedule;
+        $shouldSendWeekly = $this->shouldSendWeekly($setting->weekly_schedule);
+
+        if (!$shouldSendDaily && !$shouldSendWeekly) {
+            return 0;
+        }
+
+        $query = Contract::with([
+            'owner',
+            'services.service',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Email reminder scope
+        |--------------------------------------------------------------------------
+        | AM       → kontrak miliknya sendiri.
+        | Inputter → kontrak yang dia input.
+        | Manager dan Paycall tidak ikut reminder.
+        */
+        if ($user->isAccountManager()) {
+            $query->where('owner_am_id', $user->id);
+        }
+
+        if ($user->isSupportInputter()) {
+            $query->where('created_by', $user->id);
+        }
+
+        $sent = 0;
+
+        foreach ($query->get() as $contract) {
+            $daysRemaining = now()
+                ->startOfDay()
+                ->diffInDays($contract->end_date, false);
+
+            if ($daysRemaining < 0 || $daysRemaining > 30) {
+                continue;
+            }
+
+            $newStatus = $daysRemaining <= 7
+                ? 'followup'
+                : 'expiring';
+
+            Mail::to($setting->manager_email)
+                ->send(new ContractStatusChangedMail(
+                    $contract,
+                    $contract->status,
+                    $newStatus
+                ));
+
+            ActivityLogger::log(
+                'EMAIL_NOTIFICATION',
+                'Sent reminder for contract ' . $contract->contract_number
+            );
+
+            $sent++;
+        }
+
+        return $sent;
+    }
+
+    private function shouldSendWeekly(string $schedule): bool
+    {
         $now = now();
 
         return match ($schedule) {
-
-            'monday_morning' =>
-                $now->isMonday()
-                && $now->format('H:i') === '08:00',
-
-            'monday_afternoon' =>
-                $now->isMonday()
-                && $now->format('H:i') === '13:00',
-
-            'friday_morning' =>
-                $now->isFriday()
-                && $now->format('H:i') === '08:00',
-
+            'monday_morning' => $now->isMonday() && $now->format('H:i') === '08:00',
+            'monday_afternoon' => $now->isMonday() && $now->format('H:i') === '13:00',
+            'friday_morning' => $now->isFriday() && $now->format('H:i') === '08:00',
             default => false,
         };
-    }
-
-    private function sendFollowupNotifications()
-    {
-        $contracts = Contract::with([
-            'owner',
-            'files'
-        ])->get();
-
-        foreach ($contracts as $contract) {
-
-            $daysRemaining =
-                now()->startOfDay()
-                ->diffInDays(
-                    $contract->end_date,
-                    false
-                );
-
-            if (
-                $daysRemaining < 0 ||
-                $daysRemaining > 7
-            ) {
-                continue;
-            }
-
-            $this->sendEmails(
-                $contract,
-                $daysRemaining
-            );
-        }
-    }
-
-    private function sendExpiringNotifications()
-    {
-        $contracts = Contract::with([
-            'owner',
-            'files'
-        ])->get();
-
-        foreach ($contracts as $contract) {
-
-            $daysRemaining =
-                now()->startOfDay()
-                ->diffInDays(
-                    $contract->end_date,
-                    false
-                );
-
-            if (
-                $daysRemaining < 8 ||
-                $daysRemaining > 30
-            ) {
-                continue;
-            }
-
-            $this->sendEmails(
-                $contract,
-                $daysRemaining
-            );
-        }
-    }
-
-    private function sendEmails(
-        Contract $contract,
-        int $daysRemaining
-    ) {
-
-        $supportInputters = User::where(
-            'role_id',
-            User::ROLE_SUPPORT_INPUTTER
-        )->pluck('email');
-
-        $supportPaycalls = User::where(
-            'role_id',
-            User::ROLE_SUPPORT_PAYCALL
-        )->pluck('email');
-
-        $setting =
-            NotificationSetting::settings();
-
-        $internalRecipients = collect([
-            $setting->manager_email,
-            $contract->owner?->email,
-        ])
-        ->merge($supportInputters)
-        ->merge($supportPaycalls)
-        ->filter()
-        ->unique();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Internal Email
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($internalRecipients as $email) {
-
-            Mail::to($email)->queue(
-                new ContractStatusChangedMail(
-                    $contract,
-                    'active',
-                    $daysRemaining <= 7
-                        ? 'followup'
-                        : 'expiring'
-                )
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Customer Email
-        |--------------------------------------------------------------------------
-        */
-
-        if ($contract->customer_email) {
-
-            Mail::to(
-                $contract->customer_email
-            )->queue(
-                new CustomerContractReminderMail(
-                    $contract,
-                    $daysRemaining
-                )
-            );
-        }
-
-        ActivityLogger::log(
-            'NOTIFICATION',
-            'Sent reminder for contract '
-            .$contract->contract_number
-        );
     }
 }
