@@ -11,10 +11,8 @@
     <div class="contract-container">
 
         <div class="contract-title">
-            ✏ Edit Contract
+            Edit Contract
         </div>
-
-        <hr>
 
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -116,8 +114,13 @@
 
             <br><hr><br>
 
-            <a> 1. PERUSAHAAN PERSEROAN (PERSERO) PT TELEKOMUNIKASI INDONESIA Tbk (TELKOM)<br>
-            DIwakili secara sah oleh:<a>
+                            <div class="form-section-title">
+        Telkom Representative
+    </div>
+
+    <div class="form-section-desc">
+        Authorized representative from PT Telekomunikasi Indonesia Tbk.
+    </div>
 
             <div class="form-group">
                 <label>Name</label>
@@ -151,9 +154,14 @@
             </div>
 
             <br><hr><br>
+                
+            <div class="form-section-title">
+        Customer Information
+    </div>
 
-            <a>2. PELANGGAN<br>
-                Identitas Perusahaan/Institusi</a>
+    <div class="form-section-desc">
+        Customer identity, address, and authorized representative.
+    </div>
 
             <div class="form-group">
                 <label>Company Name</label>
@@ -225,9 +233,12 @@
                 </div>
 
             </div>
-            <br><hr>
+            <br><hr><br>
 
-            <h4>Services</h4>
+            <div class="form-section-title">
+        Services
+    </div>
+    <div class="form-section-desc">Manage selected service packages for this contract.</div>
 
             <div id="services-container">
 
@@ -288,15 +299,18 @@
                 class="upload-btn">
 
                 + Add Service
-
+            
             </button>
+            <br><br>
 
-            <h4>Custom Services</h4>
+            <div class="form-section-title">
+        Custom Services
+    </div>
 
             <div id="custom-services-container">
 
             </div>
-
+            
             <button
                 type="button"
                 id="add-custom-service"
@@ -305,6 +319,7 @@
                 + Add Custom Service
 
             </button>
+        </div>
 
             <br><hr>
 
@@ -336,79 +351,182 @@
 
 
             <!-- Assigned AM -->
-            <input
-                type="text"
-                value="{{ $contract->owner->name }}"
-                readonly
-            >
+           <div class="form-section">
+    <div class="form-section-title">Account Manager</div>
+    <div class="form-section-desc">Assigned owner of this contract.</div>
+
+    <div class="form-group">
+        <label>Assigned AM</label>
+        <input
+            type="text"
+            value="{{ $contract->owner_am_id ? 'AM ' . $contract->owner_am_id : '-' }}"
+            readonly>
+    </div>
+</div>
                         <!-- Upload -->
-            <h4>Contract File</h4>
+            <div class="form-section">
+    <div class="form-section-title">Contract File</div>
+    <div class="form-section-desc">
+        View existing contract files or upload a replacement file.
+    </div>
+
+    @if($contract->files && $contract->files->count() > 0)
+
+        <div class="contract-file-existing-list">
 
             @foreach($contract->files as $file)
 
-            <div class="file-row">
+                <div class="contract-file-existing-card">
 
-                <span>
+                    <div class="contract-file-existing-info">
+                        <strong>{{ $file->file_name }}</strong>
 
-                    {{ $file->file_name }}
+                        <span>
+                            Uploaded:
+                            {{ $file->created_at ? $file->created_at->format('d/m/Y') : '-' }}
+                        </span>
+                    </div>
 
-                </span>
+                    <div class="contract-file-actions">
+                        <a
+                            href="{{ route('contracts.file.view', $file->id) }}"
+                            class="contract-file-view-btn">
+                            View
+                        </a>
+                    </div>
 
-            </div>
-
-            @endforeach
-
-            <input
-            type="file"
-            name="file">
-
-            <h4>BASO Files</h4>
-
-            @foreach($contract->basoFiles as $baso)
-
-            <div class="file-row">
-
-                <span>
-
-                    {{ $baso->file_name }}
-
-                </span>
-
-                <span>
-
-                    {{ $baso->baso_date }}
-
-                </span>
-
-            </div>
+                </div>
 
             @endforeach
-
-            <div id="baso-container">
-
-            <div class="baso-row">
-
-                <input
-                    type="file"
-                    name="baso_files[]">
-
-                <input
-                    type="date"
-                    name="baso_dates[]">
-
-            </div>
 
         </div>
 
-        <button
-            type="button"
-            id="add-baso"
-            class="upload-btn">
+    @endif
 
-            + Add BASO
+    <div class="contract-file-clean-row">
 
-        </button>
+        <div class="contract-file-clean-field">
+            <label>Upload Contract File</label>
 
+            <label class="contract-file-picker">
+                <input
+                    type="file"
+                    name="file"
+                    accept=".pdf,.doc,.docx"
+                    class="contract-file-input">
+
+                <span class="contract-file-icon">
+                    DOC
+                </span>
+
+                <span class="contract-file-text">
+                    Choose contract file
+                </span>
+            </label>
+
+            <small class="form-hint">
+                Accepted formats: PDF, DOC, DOCX.
+            </small>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const contractFileInput = document.querySelector('.contract-file-input');
+
+    if (contractFileInput) {
+        contractFileInput.addEventListener('change', function () {
+            const picker = this.closest('.contract-file-picker');
+            const text = picker.querySelector('.contract-file-text');
+
+            if (this.files && this.files.length > 0) {
+                text.textContent = this.files[0].name;
+            } else {
+                text.textContent = 'Choose contract file';
+            }
+        });
+    }
+});
+</script>
+
+    <div class="form-section">
+    <div class="form-section-title">BASO Files</div>
+    <div class="form-section-desc">
+        Upload supporting BASO documents and their dates.
+    </div>
+
+    @if($contract->basoFiles && $contract->basoFiles->count() > 0)
+        <div class="baso-existing-list">
+
+            @foreach($contract->basoFiles as $baso)
+                <div class="baso-existing-card">
+
+                    <div class="baso-existing-info">
+                        <strong>{{ $baso->file_name }}</strong>
+
+                        <span>
+                            BASO Date:
+                            {{ $baso->baso_date ? \Carbon\Carbon::parse($baso->baso_date)->format('d/m/Y') : '-' }}
+                        </span>
+                    </div>
+
+                    <a href="{{ route('baso.download', $baso->id) }}"
+                       class="baso-view-btn">
+                        View
+                    </a>
+
+                </div>
+            @endforeach
+
+        </div>
+    @endif
+
+    <div id="baso-container" class="baso-clean-list">
+
+        <div class="baso-clean-row">
+
+            <div class="baso-clean-field">
+                <label>BASO File</label>
+
+                <label class="baso-file-picker">
+                    <input
+                        type="file"
+                        name="baso_files[]"
+                        accept=".pdf,.doc,.docx"
+                        class="baso-file-input">
+
+                    <span class="baso-file-icon">PDF</span>
+
+                    <span class="baso-file-text">
+                        Choose BASO file
+                    </span>
+                </label>
+            </div>
+
+            <div class="baso-clean-field">
+                <label>BASO Date</label>
+
+                <input
+                    type="date"
+                    name="baso_dates[]"
+                    class="baso-date-input">
+            </div>
+
+            <button type="button" class="remove-baso-clean">
+                Remove
+            </button>
+
+        </div>
+
+    </div>
+
+    <button type="button" id="add-baso" class="baso-add-btn">
+        + Add BASO
+    </button>
+</div>
+    
             <!-- Save button -->
             <div class="save-area">
 
@@ -435,17 +553,16 @@
 
 @if(!auth()->user()->isSupportPaycall())
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+<script> document.addEventListener('DOMContentLoaded', function ()) {
     const serviceContainer = document.getElementById('services-container');
     const addServiceButton = document.getElementById('add-service');
 
     if (serviceContainer && addServiceButton) {
         addServiceButton.addEventListener('click', function () {
             const html = `
-                <div class="service-row" style="margin-bottom:15px;">
+                <div class="service-row">
                     <div class="form-row">
-                        <div class="form-group half">
+                        <div class="form-group">
                             <label>Service</label>
 
                             <select name="services[]" required>
@@ -459,9 +576,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             </select>
                         </div>
 
-                        <div class="form-group half">
+                        <div class="form-group">
                             <label>&nbsp;</label>
-                            <button type="button" class="remove-service upload-btn">
+
+                            <button type="button" class="remove-service">
                                 Remove
                             </button>
                         </div>
@@ -474,57 +592,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
         serviceContainer.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-service')) {
-                const row = e.target.closest('.service-row') || e.target.closest('.service-item');
+                const rows = serviceContainer.querySelectorAll('.service-row');
 
-                if (row) {
-                    row.remove();
+                if (rows.length > 1) {
+                    e.target.closest('.service-row').remove();
                 }
             }
         });
     }
+}
 
     const customContainer = document.getElementById('custom-services-container');
     const addCustomButton = document.getElementById('add-custom-service');
 
     if (customContainer && addCustomButton) {
-        let customIndex = 1;
+        let customIndex = 0;
 
         addCustomButton.addEventListener('click', function () {
             const row = document.createElement('div');
 
             row.classList.add('custom-service-row');
-            row.style.marginTop = '15px';
 
             row.innerHTML = `
                 <div class="form-row">
-                    <div class="form-group half">
+                    <div class="form-group">
                         <label>Service Name</label>
                         <input
                             type="text"
-                            name="custom_services[${customIndex}][service_name]">
+                            name="custom_services[${customIndex}][service_name]"
+                            placeholder="Example: Dedicated Internet">
                     </div>
 
-                    <div class="form-group half">
+                    <div class="form-group">
                         <label>&nbsp;</label>
-                        <button type="button" class="remove-custom-service upload-btn">
+                        <button type="button" class="remove-custom-service">
                             Remove
                         </button>
                     </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group half">
+                    <div class="form-group">
                         <label>Installation Fee</label>
                         <input
                             type="number"
-                            name="custom_services[${customIndex}][installation_fee]">
+                            name="custom_services[${customIndex}][installation_fee]"
+                            placeholder="0">
                     </div>
 
-                    <div class="form-group half">
+                    <div class="form-group">
                         <label>Monthly Fee</label>
                         <input
                             type="number"
-                            name="custom_services[${customIndex}][monthly_fee]">
+                            name="custom_services[${customIndex}][monthly_fee]"
+                            placeholder="0">
                     </div>
                 </div>
             `;
@@ -535,42 +656,65 @@ document.addEventListener('DOMContentLoaded', function () {
 
         customContainer.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-custom-service')) {
-                const row = e.target.closest('.custom-service-row');
-
-                if (row) {
-                    row.remove();
-                }
+                e.target.closest('.custom-service-row').remove();
             }
         });
     }
 
+    <script> document.addEventListener('DOMContentLoaded', function () {
     const basoContainer = document.getElementById('baso-container');
     const addBasoButton = document.getElementById('add-baso');
 
+    function updateFileName(input) {
+        const row = input.closest('.baso-clean-row');
+        const text = row.querySelector('.baso-file-text');
+
+        if (input.files && input.files.length > 0) {
+            text.textContent = input.files[0].name;
+        } else {
+            text.textContent = 'Choose BASO file';
+        }
+    }
+
     if (basoContainer && addBasoButton) {
         addBasoButton.addEventListener('click', function () {
-            const row = document.createElement('div');
+            const html = `
+                <div class="baso-row">
+                    <div class="form-group">
+                        <label>BASO File</label>
+                        <input
+                            type="file"
+                            name="baso_files[]"
+                            accept=".pdf,.doc,.docx">
+                    </div>
 
-            row.classList.add('baso-row');
+                    <div class="form-group">
+                        <label>BASO Date</label>
+                        <input
+                            type="date"
+                            name="baso_dates[]">
+                    </div>
 
-            row.innerHTML = `
-                <input type="file" name="baso_files[]">
-                <input type="date" name="baso_dates[]">
-
-                <button type="button" class="remove-baso upload-btn">
-                    Remove
-                </button>
+                    <button type="button" class="remove-baso">
+                        Remove
+                    </button>
+                </div>
             `;
 
-            basoContainer.appendChild(row);
+            basoContainer.insertAdjacentHTML('beforeend', html);
         });
 
         basoContainer.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-baso')) {
-                const row = e.target.closest('.baso-row');
+                const rows = basoContainer.querySelectorAll('.baso-row');
 
-                if (row) {
-                    row.remove();
+                if (rows.length > 1) {
+                    e.target.closest('.baso-row').remove();
+                } else {
+                    const row = e.target.closest('.baso-row');
+
+                    row.querySelector('input[type="file"]').value = '';
+                    row.querySelector('input[type="date"]').value = '';
                 }
             }
         });

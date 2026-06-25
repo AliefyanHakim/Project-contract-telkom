@@ -14,7 +14,7 @@ href="{{ asset('css/create.css') }}">
     <div class="contract-container">
 
         <div class="contract-title">
-            📄 Contract Detail
+            Contract Detail
         </div>
 
         <hr>
@@ -226,38 +226,26 @@ href="{{ asset('css/create.css') }}">
 
         {{-- SERVICES --}}
 
-        <h4>
-            Services
-        </h4>
+        <div class="form-section">
+    <div class="form-section-title">Services</div>
+    <div class="form-section-desc">Selected service packages for this contract.</div>
 
-        @forelse($contract->services as $contractService)
-
-            <div
-                style="
-                    border:1px solid #ddd;
-                    border-radius:8px;
-                    padding:12px;
-                    margin-bottom:10px;
-                    background:#fafafa;
-                ">
-
-                <strong>
-
-                    {{ $contractService->service->service_name }}
-
-                </strong>
-
+    @forelse($contract->services as $contractService)
+        <div class="service-card">
+            <div>
+                <strong>{{ $contractService->service?->service_name ?? '-' }}</strong>
+                <span>
+                    Monthly Fee:
+                    Rp {{ number_format($contractService->monthly_fee ?? $contractService->service?->monthly_fee ?? 0, 0, ',', '.') }}
+                </span>
             </div>
-
-        @empty
-
-            <p>
-                No service selected.
-            </p>
-
-        @endforelse
-
-        <br><hr><br>
+        </div>
+    @empty
+        <div class="service-card">
+            <strong>No service selected.</strong>
+        </div>
+    @endforelse
+</div>
 
         {{-- CONTRACT DATE --}}
 
@@ -432,22 +420,16 @@ href="{{ asset('css/create.css') }}">
         </div>
 
         <div class="save-area">
-
-            <div class="save-area">
-
-                    <a href="{{ route('contracts.index') }}"
-                    class="save-btn">
-                        Back
-                    </a>
-
-                    @if(auth()->user()->isAccountManager() || auth()->user()->isSupportInputter() || auth()->user()->isSupportPaycall())
-    <a href="{{ route('contracts.edit', $contract->id) }}">
-        <button type="button" class="edit-btn">
-            Edit
-        </button>
+    <a href="{{ route('contracts.index') }}" class="upload-btn">
+        Back
     </a>
-@endif
 
+    @if(auth()->user()->isAccountManager() || auth()->user()->isSupportInputter() || auth()->user()->isSupportPaycall())
+        <a href="{{ route('contracts.edit', $contract->id) }}" class="edit-btn">
+            Edit Contract
+        </a>
+    @endif
+</div>
             </div>
 
         </div>
