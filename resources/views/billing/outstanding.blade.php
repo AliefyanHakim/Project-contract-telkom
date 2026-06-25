@@ -98,17 +98,18 @@
             <table class="billing-table">
 
                 <thead>
-                    <tr>
-                        <th>Client Name</th>
-                        <th>ID Contract</th>
-                        <th>No. Invoice</th>
-                        <th>Period</th>
-                        <th>Price</th>
-                        <th>Due Date</th>
-                        <th>Billing State</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>AM</th>
+                    <th>ID Contract</th>
+                    <th>No. Invoice</th>
+                    <th>Period</th>
+                    <th>Price</th>
+                    <th>Due Date</th>
+                    <th>Billing State</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
                 <tbody>
 
@@ -130,6 +131,10 @@
 
                             <td>
                                 {{ $row->contract->contract_name ?? '-' }}
+                            </td>
+
+                            <td>
+                                {{ $row->contract?->owner_am_id ? 'AM ' . $row->contract->owner_am_id : '-' }}
                             </td>
 
                             <td>
@@ -210,7 +215,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="8" class="billing-empty">
+                            <td colspan="9" class="billing-empty">
                                 No billing data found.
                             </td>
                         </tr>

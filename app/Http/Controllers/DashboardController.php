@@ -137,7 +137,9 @@ class DashboardController extends Controller
                     'id' => $contract->id,
                     'company' => $contract->contract_name,
                     'package' => $contract->contract_number,
-                    'am' => $contract->owner?->name ?? '-',
+                    'am' => $contract->owner_am_id
+                    ? 'AM ' . $contract->owner_am_id
+                    : '-',
                     'end_date' => $contract->end_date
                         ? $contract->end_date->format('d/m/Y')
                         : '-',
@@ -212,7 +214,9 @@ class DashboardController extends Controller
                 return [
                     'client' => $billing->contract?->contract_name ?? '-',
                     'contract_number' => $billing->contract?->contract_number ?? '-',
-                    'am' => $billing->contract?->owner?->name ?? '-',
+                    'am' => $billing->contract?->owner_am_id
+                    ? 'AM ' . $billing->contract->owner_am_id
+                    : '-',
                     'period' => $billing->billing_period ?? '-',
                     'amount' => 'Rp ' . number_format($billing->amount ?? 0, 0, ',', '.'),
                     'status' => $billing->payment_status ?? '-',

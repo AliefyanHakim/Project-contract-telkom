@@ -91,6 +91,7 @@
                 <thead>
                     <tr>
                         <th>Client Name</th>
+                        <th>AM</th>
                         <th>ID Contract</th>
                         <th>No. Invoice</th>
                         <th>Period</th>
@@ -108,6 +109,10 @@
 
                             <td>
                                 {{ $row->contract->contract_name ?? '-' }}
+                            </td>
+
+                            <td>
+                                {{ $row->contract?->owner_am_id ? 'AM ' . $row->contract->owner_am_id : '-' }}
                             </td>
 
                             <td>
@@ -141,7 +146,7 @@
                     @empty
 
                         <tr>
-                            <td colspan="7" class="billing-empty">
+                            <td colspan="8" class="billing-empty">
                                 No payment history found.
                             </td>
                         </tr>

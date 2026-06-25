@@ -165,7 +165,7 @@
                             </td>
 
                             <td>
-                                {{ $contract->owner?->name ?? '-' }}
+                                {{ $contract->owner_am_id ? 'AM ' . $contract->owner_am_id : '-' }}
                             </td>
 
                             <td>
