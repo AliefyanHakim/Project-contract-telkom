@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 24, 2026 at 09:25 AM
+-- Generation Time: Jun 26, 2026 at 01:19 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.16
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `activity_logs` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint NOT NULL,
   `module` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `activity` text COLLATE utf8mb4_general_ci,
@@ -41,9 +41,7 @@ CREATE TABLE `activity_logs` (
 --
 
 INSERT INTO `activity_logs` (`id`, `user_id`, `module`, `activity`, `created_at`, `updated_at`) VALUES
-(1, 9, 'CONTRACT', 'Created contract 432', '2026-06-23 21:06:45', '2026-06-23 21:06:45'),
-(2, 9, 'CONTRACT', 'Created contract 4', '2026-06-23 21:24:27', '2026-06-23 21:24:27'),
-(3, 8, 'AUTH', 'Login', '2026-06-23 23:49:59', '2026-06-23 23:49:59');
+(1, 8, 'AUTH', 'Login', '2026-06-25 18:18:40', '2026-06-25 18:18:40');
 
 -- --------------------------------------------------------
 
@@ -52,22 +50,15 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `module`, `activity`, `created_at`
 --
 
 CREATE TABLE `baso_files` (
-  `id` bigint NOT NULL,
-  `contract_id` bigint NOT NULL,
-  `file_name` varchar(255) NOT NULL,
-  `file_path` varchar(255) NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `contract_id` bigint UNSIGNED NOT NULL,
+  `file_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `baso_date` date DEFAULT NULL,
-  `uploaded_by` bigint DEFAULT NULL,
+  `uploaded_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `baso_files`
---
-
-INSERT INTO `baso_files` (`id`, `contract_id`, `file_name`, `file_path`, `baso_date`, `uploaded_by`, `created_at`, `updated_at`) VALUES
-(1, 20, 'CONTRACT-15.docx', 'baso/glcx9eKIqHscOt5Le7gHERJSSrq9hbAZEtglxJOV.docx', '2026-06-24', 9, '2026-06-23 21:24:27', '2026-06-23 21:24:27');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -76,9 +67,10 @@ INSERT INTO `baso_files` (`id`, `contract_id`, `file_name`, `file_path`, `baso_d
 --
 
 CREATE TABLE `billings` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `billing_period` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `due_date` date DEFAULT NULL,
   `amount` decimal(15,2) NOT NULL,
   `payment_status` enum('pending','paid','overdue') COLLATE utf8mb4_general_ci DEFAULT 'pending',
   `payment_date` date DEFAULT NULL,
@@ -87,6 +79,42 @@ CREATE TABLE `billings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `billings`
+--
+
+INSERT INTO `billings` (`id`, `contract_id`, `billing_period`, `due_date`, `amount`, `payment_status`, `payment_date`, `proof_file`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 1, '2026-06', '2026-06-20', 2200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 06:58:48', '2026-06-25 06:58:48'),
+(2, 1, '2026-07', '2026-07-20', 2200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 06:58:48', '2026-06-25 06:58:48'),
+(3, 2, '2026-06', '2026-06-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 06:59:52', '2026-06-25 06:59:52'),
+(4, 2, '2026-07', '2026-07-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 06:59:52', '2026-06-25 06:59:52'),
+(5, 3, '2026-06', '2026-06-20', 2200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:01:40', '2026-06-25 07:01:40'),
+(6, 3, '2026-07', '2026-07-20', 2200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:01:40', '2026-06-25 07:01:40'),
+(7, 4, '2026-06', '2026-06-20', 3500000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:07:19', '2026-06-25 07:07:19'),
+(8, 4, '2026-07', '2026-07-20', 3500000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:07:19', '2026-06-25 07:07:19'),
+(9, 5, '2026-06', '2026-06-20', 2500000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:09:50', '2026-06-25 07:09:50'),
+(10, 5, '2026-07', '2026-07-20', 2500000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:09:50', '2026-06-25 07:09:50'),
+(11, 6, '2026-06', '2026-06-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:10:55', '2026-06-25 07:10:55'),
+(12, 6, '2026-07', '2026-07-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:10:55', '2026-06-25 07:10:55'),
+(13, 6, '2026-08', '2026-08-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:10:55', '2026-06-25 07:10:55'),
+(14, 7, '2026-06', '2026-06-20', 1200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:11:41', '2026-06-25 07:11:41'),
+(15, 7, '2026-07', '2026-07-20', 1200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:11:41', '2026-06-25 07:11:41'),
+(16, 8, '2026-06', '2026-06-20', 1500000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:13:12', '2026-06-25 07:13:12'),
+(17, 8, '2026-07', '2026-07-20', 1500000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:13:12', '2026-06-25 07:13:12'),
+(18, 9, '2026-06', '2026-06-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:14:35', '2026-06-25 07:14:35'),
+(19, 9, '2026-07', '2026-07-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:14:35', '2026-06-25 07:14:35'),
+(20, 9, '2026-08', '2026-08-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:14:35', '2026-06-25 07:14:35'),
+(21, 10, '2026-06', '2026-06-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:15:36', '2026-06-25 07:15:36'),
+(22, 10, '2026-07', '2026-07-20', 5000000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:15:36', '2026-06-25 07:15:36'),
+(23, 11, '2026-06', '2026-06-20', 1800000.00, 'paid', '2026-06-25', NULL, 13, '2026-06-25 07:17:11', '2026-06-25 07:24:09'),
+(24, 11, '2026-07', '2026-07-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 07:17:11', '2026-06-25 07:17:11'),
+(25, 12, '2026-06', '2026-06-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 10:31:27', '2026-06-25 10:31:27'),
+(26, 12, '2026-07', '2026-07-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 10:31:27', '2026-06-25 10:31:27'),
+(27, 13, '2026-06', '2026-06-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 10:46:30', '2026-06-25 10:46:30'),
+(28, 13, '2026-07', '2026-07-20', 1800000.00, 'pending', NULL, NULL, NULL, '2026-06-25 10:46:30', '2026-06-25 10:46:30'),
+(29, 14, '2026-05', '2026-05-20', 2200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 10:48:05', '2026-06-25 10:48:05'),
+(30, 14, '2026-06', '2026-06-20', 2200000.00, 'pending', NULL, NULL, NULL, '2026-06-25 10:48:05', '2026-06-25 10:48:05');
 
 -- --------------------------------------------------------
 
@@ -99,6 +127,14 @@ CREATE TABLE `cache` (
   `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1782436777;', 1782436777),
+('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1782436777);
 
 -- --------------------------------------------------------
 
@@ -119,18 +155,19 @@ CREATE TABLE `cache_locks` (
 --
 
 CREATE TABLE `contracts` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_number` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `contract_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `account_number` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `sid` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `owner_am_id` bigint NOT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
-  `status` enum('active','expiring','followup','expired','terminated') COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
   `created_by` bigint DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `account_number` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `sid` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `customer_id_number` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `telkom_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `telkom_position` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `telkom_unit` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -140,6 +177,7 @@ CREATE TABLE `contracts` (
   `customer_pic_position` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `customer_phone` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `customer_email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `generated_file` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `signing_date` date DEFAULT NULL,
   `signing_location` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -148,15 +186,21 @@ CREATE TABLE `contracts` (
 -- Dumping data for table `contracts`
 --
 
-INSERT INTO `contracts` (`id`, `contract_number`, `contract_name`, `owner_am_id`, `start_date`, `end_date`, `status`, `created_by`, `created_at`, `updated_at`, `account_number`, `sid`, `telkom_name`, `telkom_position`, `telkom_unit`, `customer_address`, `customer_npwp`, `customer_pic_name`, `customer_pic_position`, `customer_phone`, `customer_email`, `signing_date`, `signing_location`) VALUES
-(5, '1', 'a', 9, '2026-06-20', '2026-06-27', 'expired', 8, '2026-06-20 01:21:56', '2026-06-20 03:09:41', 'a', NULL, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', '2026-06-20', 'a'),
-(6, '12', 'a', 9, '2026-06-20', '2026-06-27', 'followup', 8, '2026-06-20 01:23:29', '2026-06-22 19:07:53', 'a', NULL, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a@gmail.com', '2026-06-20', 'a'),
-(7, '2', 'b', 9, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-21 19:06:39', '2026-06-22 19:46:37', '1', NULL, 'b', 'b', 'b', 'b', 'b', 'b', 'b', '1', 'b@gmail.com', '2026-06-23', 'b'),
-(8, '67', 'p', 10, '2026-06-19', '2026-06-21', 'expired', 8, '2026-06-21 21:08:07', '2026-06-21 21:08:07', '17', NULL, 'p', 'p', 'p', 'p', 'p', 'p', 'p', '8', 'p@gmail.com', '2026-06-20', 'p'),
-(16, '567', 'cccc', 11, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-22 02:08:08', '2026-06-22 02:08:08', '1234', NULL, 'k', 'kk', 'kkk', 'p0', '7777', 'n', 'nnn', '000', 'aaaa@gmail.com', '2026-06-22', 'sana'),
-(17, '1234', 'r', 11, '2026-06-22', '2026-07-22', 'expiring', 8, '2026-06-22 02:25:54', '2026-06-22 02:25:54', '123', NULL, 'q', 'w', 'e', 't', 'y', 'u', 'i', '0', 'o@gmail.com', '2026-06-22', 'd'),
-(18, '123', 'def', 9, '2026-06-23', '2026-06-27', 'followup', 8, '2026-06-22 18:44:54', '2026-06-22 18:45:37', 'a', NULL, 'PT Telkom', 'b', 'A', 'a', '123', 's', 'b', '0987', 'silvia@gmail.com', '2026-06-23', 'a'),
-(20, '4', 'q', 9, '2026-06-24', '2026-12-24', 'active', 9, '2026-06-23 21:24:26', '2026-06-23 21:24:26', NULL, NULL, 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q@gmail.com', '2026-06-24', 'q');
+INSERT INTO `contracts` (`id`, `contract_number`, `contract_name`, `account_number`, `sid`, `owner_am_id`, `start_date`, `end_date`, `status`, `created_by`, `created_at`, `updated_at`, `customer_id_number`, `telkom_name`, `telkom_position`, `telkom_unit`, `customer_address`, `customer_npwp`, `customer_pic_name`, `customer_pic_position`, `customer_phone`, `customer_email`, `generated_file`, `signing_date`, `signing_location`) VALUES
+(1, '17251634', 'PT Pelindo', '8136173', '72364275', 1, '2026-06-26', '2026-07-28', 'active', 1, '2026-06-25 06:58:48', '2026-06-25 06:58:48', NULL, 'Silvia', 'AM', 'BS', 'Plaju', '84584', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, '756763', 'Bank Indonesia', '26347254', '3657336', 1, '2026-06-15', '2026-07-15', 'expiring', 1, '2026-06-25 06:59:52', '2026-06-25 07:00:19', NULL, 'Vindira', 'AM', 'BS', 'Sudirman', '8475846', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, '08349374', 'Gramedia', '7247254', '7237252', 1, '2026-06-10', '2026-07-10', 'expiring', 1, '2026-06-25 07:01:40', '2026-06-25 07:01:40', NULL, 'Alifyan', 'AM', 'BS', 'KM 7', '83748364', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, '8457853', 'PT Pertamina', '47548753', '612416246', 1, '2026-06-01', '2026-07-01', 'followup', 1, '2026-06-25 07:07:19', '2026-06-25 07:07:19', NULL, 'Piyayo', 'AM', 'BS', 'Plaju', '9374583', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(5, '8236234', 'Bank Sumsel', '92738264', '28425472', 3, '2026-06-25', '2026-07-25', 'expiring', 2, '2026-06-25 07:09:50', '2026-06-25 07:19:04', NULL, 'Vindi', 'AM', 'BS', 'Jakabaring', '92748346', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(6, '9357364', 'Palembang Icon Mall', '97433648', '7121635', 2, '2026-06-16', '2026-08-16', 'active', 2, '2026-06-25 07:10:55', '2026-06-25 07:10:55', NULL, 'Nabila', 'AM', 'BS', 'Simpang 5', '8346386', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, '824627345', 'PT PLN', '834637484', '72327532', 2, '2026-06-02', '2026-07-02', 'followup', 2, '2026-06-25 07:11:41', '2026-06-25 07:11:41', NULL, 'Alifyan', 'AM', 'BS', 'Kertapati', '824286', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(8, '7235273', 'PT Angkasa Pura', '927328632', '83463745', 3, '2026-06-17', '2026-07-17', 'expiring', 3, '2026-06-25 07:13:12', '2026-06-25 07:13:12', NULL, 'Silvia', 'AM', 'BS', 'Bandara', '827463', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(9, '354342', 'Richeese Factory', '03859375', '8262376', 3, '2026-06-27', '2026-08-27', 'active', 3, '2026-06-25 07:14:35', '2026-06-25 07:14:35', NULL, 'Septi', 'Inputter', 'BS', 'Sudirman', '93538638', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(10, '83436', 'PT Sinarmas', '834637453', '63526362', 3, '2026-06-01', '2026-07-01', 'followup', 3, '2026-06-25 07:15:36', '2026-06-25 07:15:36', NULL, 'Avryns', 'AM', 'BS', 'Bukit Besar', '83538645', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(11, '746374', 'Lion Air', '83473743', '7352632', 2, '2026-06-18', '2026-07-18', 'expiring', 2, '2026-06-25 07:17:11', '2026-06-25 07:17:11', NULL, 'Alifyan', 'AM', 'BS', 'Bandara', '834636', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, '862727', 'Transmart', '72TW6256', '723625', 2, '2026-06-29', '2026-07-29', 'active', 2, '2026-06-25 10:31:27', '2026-06-25 10:36:25', NULL, 'Silvia', 'AM', 'BS', 'Pakjo', '827637253', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, '8347386', 'Hypermart', '95949347', '346376', 2, '2026-06-17', '2026-07-17', 'expiring', 2, '2026-06-25 10:46:30', '2026-06-25 10:46:30', NULL, 'Vindi', 'AM', 'BS', 'PS', '8347837', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(14, '47587', 'Citilink', '8748465', '23472346', 2, '2026-05-05', '2026-06-05', 'expired', 2, '2026-06-25 10:48:05', '2026-06-25 10:48:05', NULL, 'Alifyan', 'AM', 'BS', 'Bandara', '8347387', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -165,7 +209,7 @@ INSERT INTO `contracts` (`id`, `contract_number`, `contract_name`, `owner_am_id`
 --
 
 CREATE TABLE `contract_extensions` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `old_end_date` date NOT NULL,
   `new_end_date` date NOT NULL,
@@ -182,7 +226,7 @@ CREATE TABLE `contract_extensions` (
 --
 
 CREATE TABLE `contract_files` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `file_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `file_path` text COLLATE utf8mb4_general_ci NOT NULL,
@@ -191,16 +235,6 @@ CREATE TABLE `contract_files` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `contract_files`
---
-
-INSERT INTO `contract_files` (`id`, `contract_id`, `file_name`, `file_path`, `uploaded_by`, `created_at`, `updated_at`) VALUES
-(4, 16, 'CONTRACT-16.docx', 'contracts/CONTRACT-16.docx', 8, '2026-06-22 02:08:08', '2026-06-22 02:08:08'),
-(5, 17, 'CONTRACT-17.docx', 'contracts/CONTRACT-17.docx', 8, '2026-06-22 02:25:54', '2026-06-22 02:25:54'),
-(6, 18, 'CONTRACT-18.docx', 'contracts/CONTRACT-18.docx', 8, '2026-06-22 18:44:55', '2026-06-22 18:44:55'),
-(7, 20, 'KFS_PT_IFORTE_SOLUSI_INFOTEK.docx', 'contracts/J8GY4L9QXAbwU52NA1ArcU9RCXb2xNUBaObGxkno.docx', 9, '2026-06-23 21:24:27', '2026-06-23 21:24:27');
-
 -- --------------------------------------------------------
 
 --
@@ -208,42 +242,34 @@ INSERT INTO `contract_files` (`id`, `contract_id`, `file_name`, `file_path`, `up
 --
 
 CREATE TABLE `contract_services` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `service_id` bigint NOT NULL,
+  `installation_fee` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `monthly_fee` decimal(15,2) NOT NULL DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `installation_fee` decimal(15,2) DEFAULT '0.00',
-  `monthly_fee` decimal(15,2) DEFAULT '0.00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `contract_services`
 --
 
-INSERT INTO `contract_services` (`id`, `contract_id`, `service_id`, `created_at`, `updated_at`, `installation_fee`, `monthly_fee`) VALUES
-(1, 1, 3, '2026-06-20 01:12:36', '2026-06-20 01:12:36', 0.00, 0.00),
-(2, 2, 3, '2026-06-20 01:17:56', '2026-06-20 01:17:56', 0.00, 0.00),
-(3, 3, 3, '2026-06-20 01:20:13', '2026-06-20 01:20:13', 0.00, 0.00),
-(4, 4, 3, '2026-06-20 01:21:45', '2026-06-20 01:21:45', 0.00, 0.00),
-(15, 5, 3, '2026-06-20 03:09:41', '2026-06-20 03:09:41', 0.00, 0.00),
-(16, 5, 1, '2026-06-20 03:09:41', '2026-06-20 03:09:41', 0.00, 0.00),
-(21, 8, 2, '2026-06-21 21:08:07', '2026-06-21 21:08:07', 0.00, 0.00),
-(22, 14, 8, '2026-06-22 01:44:09', '2026-06-22 01:44:09', 0.00, 0.00),
-(23, 14, 1, '2026-06-22 01:44:09', '2026-06-22 01:44:09', 0.00, 0.00),
-(24, 15, 7, '2026-06-22 01:48:43', '2026-06-22 01:48:43', 0.00, 0.00),
-(25, 15, 2, '2026-06-22 01:48:43', '2026-06-22 01:48:43', 0.00, 0.00),
-(26, 16, 7, '2026-06-22 02:08:08', '2026-06-22 02:08:08', 0.00, 0.00),
-(27, 17, 2, '2026-06-22 02:25:54', '2026-06-22 02:25:54', 0.00, 0.00),
-(28, 17, 6, '2026-06-22 02:25:54', '2026-06-22 02:25:54', 0.00, 0.00),
-(31, 18, 6, '2026-06-22 18:45:37', '2026-06-22 18:45:37', 0.00, 0.00),
-(32, 18, 5, '2026-06-22 18:45:37', '2026-06-22 18:45:37', 0.00, 0.00),
-(33, 6, 3, '2026-06-22 19:07:53', '2026-06-22 19:07:53', 0.00, 0.00),
-(34, 7, 3, '2026-06-22 19:46:37', '2026-06-22 19:46:37', 0.00, 0.00),
-(35, 19, 2, '2026-06-23 21:06:45', '2026-06-23 21:06:45', 0.00, 0.00),
-(36, 19, 2, '2026-06-23 21:06:45', '2026-06-23 21:06:45', 0.00, 0.00),
-(37, 20, 4, '2026-06-23 21:24:26', '2026-06-23 21:24:26', 0.00, 0.00),
-(38, 20, 8, '2026-06-23 21:24:26', '2026-06-23 21:24:26', 0.00, 0.00);
+INSERT INTO `contract_services` (`id`, `contract_id`, `service_id`, `installation_fee`, `monthly_fee`, `created_at`, `updated_at`) VALUES
+(1, 1, 6, 4500000.00, 2200000.00, '2026-06-25 06:58:48', '2026-06-25 06:58:48'),
+(3, 2, 8, 3500000.00, 1800000.00, '2026-06-25 07:00:19', '2026-06-25 07:00:19'),
+(7, 6, 7, 8000000.00, 5000000.00, '2026-06-25 07:10:55', '2026-06-25 07:10:55'),
+(8, 7, 3, 2500000.00, 1200000.00, '2026-06-25 07:11:41', '2026-06-25 07:11:41'),
+(9, 8, 2, 3000000.00, 1500000.00, '2026-06-25 07:13:12', '2026-06-25 07:13:12'),
+(10, 9, 7, 8000000.00, 5000000.00, '2026-06-25 07:14:35', '2026-06-25 07:14:35'),
+(11, 10, 7, 8000000.00, 5000000.00, '2026-06-25 07:15:36', '2026-06-25 07:15:36'),
+(12, 11, 8, 3500000.00, 1800000.00, '2026-06-25 07:17:11', '2026-06-25 07:17:11'),
+(13, 5, 1, 5000000.00, 2500000.00, '2026-06-25 07:17:25', '2026-06-25 07:17:25'),
+(19, 3, 1, 5000000.00, 2500000.00, '2026-06-25 09:32:20', '2026-06-25 09:32:20'),
+(21, 4, 4, 4000000.00, 2000000.00, '2026-06-25 10:20:22', '2026-06-25 10:20:22'),
+(23, 12, 2, 3000000.00, 1500000.00, '2026-06-25 10:36:25', '2026-06-25 10:36:25'),
+(24, 13, 8, 3500000.00, 1800000.00, '2026-06-25 10:46:30', '2026-06-25 10:46:30'),
+(25, 14, 6, 4500000.00, 2200000.00, '2026-06-25 10:48:05', '2026-06-25 10:48:05');
 
 -- --------------------------------------------------------
 
@@ -252,16 +278,24 @@ INSERT INTO `contract_services` (`id`, `contract_id`, `service_id`, `created_at`
 --
 
 CREATE TABLE `contract_transfer_history` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `from_am_id` bigint DEFAULT NULL,
   `to_am_id` bigint DEFAULT NULL,
   `transferred_by` bigint NOT NULL,
+  `transfer_type` enum('direct','approved_request') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'approved_request',
   `notes` text COLLATE utf8mb4_general_ci,
   `transfer_date` datetime NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `contract_transfer_history`
+--
+
+INSERT INTO `contract_transfer_history` (`id`, `contract_id`, `from_am_id`, `to_am_id`, `transferred_by`, `transfer_type`, `notes`, `transfer_date`, `created_at`, `updated_at`) VALUES
+(1, 5, 2, 3, 8, 'direct', 'Ulang', '2026-06-25 14:19:04', '2026-06-25 07:19:04', '2026-06-25 07:19:04');
 
 -- --------------------------------------------------------
 
@@ -270,7 +304,7 @@ CREATE TABLE `contract_transfer_history` (
 --
 
 CREATE TABLE `contract_transfer_requests` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `requested_by` bigint NOT NULL,
   `current_am_id` bigint NOT NULL,
@@ -282,6 +316,13 @@ CREATE TABLE `contract_transfer_requests` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `contract_transfer_requests`
+--
+
+INSERT INTO `contract_transfer_requests` (`id`, `contract_id`, `requested_by`, `current_am_id`, `target_am_id`, `reason`, `status`, `approved_by`, `approved_at`, `created_at`, `updated_at`) VALUES
+(1, 5, 2, 2, 3, 'Ga sempat', 'rejected', 8, '2026-06-25 14:18:29', '2026-06-25 07:17:54', '2026-06-25 07:18:29');
 
 -- --------------------------------------------------------
 
@@ -302,7 +343,7 @@ CREATE TABLE `migrations` (
 --
 
 CREATE TABLE `notes` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `contract_id` bigint NOT NULL,
   `user_id` bigint NOT NULL,
   `note` text COLLATE utf8mb4_general_ci NOT NULL,
@@ -333,20 +374,26 @@ CREATE TABLE `notifications` (
 --
 
 CREATE TABLE `notification_settings` (
-  `id` bigint NOT NULL,
-  `manager_email` varchar(255) DEFAULT NULL,
-  `daily_schedule` varchar(20) DEFAULT '08:00',
-  `weekly_schedule` varchar(50) DEFAULT 'monday_morning',
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED DEFAULT NULL,
+  `manager_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `daily_schedule` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '08:00',
+  `weekly_schedule` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'monday_morning',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `notification_settings`
 --
 
-INSERT INTO `notification_settings` (`id`, `manager_email`, `daily_schedule`, `weekly_schedule`, `created_at`, `updated_at`) VALUES
-(1, 'manager@perusahaan.com', '10:00', 'friday_morning', '2026-06-24 00:14:22', '2026-06-24 01:04:48');
+INSERT INTO `notification_settings` (`id`, `user_id`, `manager_email`, `daily_schedule`, `weekly_schedule`, `created_at`, `updated_at`) VALUES
+(1, NULL, '', '08:00', 'monday_morning', '2026-06-24 08:51:58', '2026-06-24 08:51:58'),
+(2, NULL, 'manager@example.com', '08:00', 'monday_morning', '2026-06-24 15:54:05', '2026-06-24 15:54:05'),
+(3, 9, 'AM1@telkom.com', '08:00', 'monday_morning', '2026-06-24 10:40:05', '2026-06-24 10:40:05'),
+(4, 12, 'inputter@telkom.com', '08:00', 'monday_morning', '2026-06-24 12:10:31', '2026-06-24 12:10:31'),
+(5, 1, 'AM1@telkom.com', '08:00', 'monday_morning', '2026-06-25 07:07:52', '2026-06-25 07:07:52'),
+(6, 2, 'silvianabila2301@gmail.com', '08:00', 'monday_morning', '2026-06-25 07:12:02', '2026-06-25 10:32:08');
 
 -- --------------------------------------------------------
 
@@ -355,7 +402,7 @@ INSERT INTO `notification_settings` (`id`, `manager_email`, `daily_schedule`, `w
 --
 
 CREATE TABLE `roles` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -378,28 +425,28 @@ INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
 --
 
 CREATE TABLE `services` (
-  `id` bigint NOT NULL,
-  `service_name` varchar(255) NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `installation_fee` decimal(18,2) NOT NULL DEFAULT '0.00',
   `monthly_fee` decimal(18,2) NOT NULL DEFAULT '0.00',
-  `status` enum('active','inactive') DEFAULT 'active',
+  `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `services`
 --
 
 INSERT INTO `services` (`id`, `service_name`, `installation_fee`, `monthly_fee`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Metro Ethernet', 5000000.00, 2500000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(2, 'IP Transit', 3000000.00, 1500000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(3, 'Astinet', 2500000.00, 1200000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(4, 'Managed Service', 4000000.00, 2000000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(5, 'SD-WAN', 6000000.00, 3500000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(6, 'Cloud Connect', 4500000.00, 2200000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(7, 'Data Center Service', 8000000.00, 5000000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26'),
-(8, 'Internet Dedicated', 3500000.00, 1800000.00, 'active', '2026-06-20 07:44:26', '2026-06-20 07:44:26');
+(1, 'Metro Ethernet', 5000000.00, 2500000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(2, 'IP Transit', 3000000.00, 1500000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(3, 'Astinet', 2500000.00, 1200000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(4, 'Managed Service', 4000000.00, 2000000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(5, 'SD-WAN', 6000000.00, 3500000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(6, 'Cloud Connect', 4500000.00, 2200000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(7, 'Data Center Service', 8000000.00, 5000000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26'),
+(8, 'Internet Dedicated', 3500000.00, 1800000.00, 'active', '2026-06-20 00:44:26', '2026-06-20 00:44:26');
 
 -- --------------------------------------------------------
 
@@ -408,23 +455,20 @@ INSERT INTO `services` (`id`, `service_name`, `installation_fee`, `monthly_fee`,
 --
 
 CREATE TABLE `sessions` (
-  `id` varchar(255) NOT NULL,
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `user_agent` text,
-  `payload` longtext NOT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_activity` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `sessions`
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('5rywhZRgIUBb4qxiOyQpqU8GpyLdmwH3Mmrb8K9g', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJqZDcxNFhCdjB3TTB3ZGY0TkM1SUpmVEI2MzlZZm9UekdnUlNHVGJxIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2Rhc2hib2FyZCIsInJvdXRlIjoiZGFzaGJvYXJkIn0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjo4fQ==', 1782274714),
-('Hvjg4P3Na1gJDUPFafUPI07gLAYNP0CfD2kDNrRX', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJqZHBFRmF2SFpXMVpFY09HMzh0SlNvR29UNENFRVBvZWpKS2VtS1MyIiwidXJsIjpbXSwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9lbWFpbC1ub3RpZmljYXRpb25zIiwicm91dGUiOiJlbWFpbC5ub3RpZmljYXRpb25zIn0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjh9', 1782288529),
-('kFunsmrJdxxKhbezEoa5p3Toj9SKotkCBkS5YGfi', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJFT1hGNUJXcXdGb0VPTWs2bTh2SjRNejVXU3lnSlYwUjI5b2NiRFhyIiwidXJsIjp7ImludGVuZGVkIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2VtYWlsLW5vdGlmaWNhdGlvbnMifSwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9sb2dpbiIsInJvdXRlIjoibG9naW4ifSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==', 1782283785),
-('z98HMCQ7S1ubLEtXUauFae1V4spqlj2f3acDnJtD', 9, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJ4bzdYWmdzc3pTUHZkUlNuaWM2eEJJS1BWWHkxQUI4SHNtQWo0ckxmIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9iYXNvXC8xXC9kb3dubG9hZCIsInJvdXRlIjoiYmFzby5kb3dubG9hZCJ9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX0sImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjo5fQ==', 1782275593);
+('Fb2BXpB5XnHwZC7PDEJ6LVT46bfU69FLwaW4gE7X', 8, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJhZXM2cW9ydHgzb1RuN044U29GN0JSTEhwZjQwcG1tNXJlemdTbVFRIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cLzEyNy4wLjAuMTo4MDAwXC9wcm9maWxlIiwicm91dGUiOiJwcm9maWxlIn0sIl9mbGFzaCI6eyJvbGQiOltdLCJuZXciOltdfSwibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiOjh9', 1782436740);
 
 -- --------------------------------------------------------
 
@@ -433,11 +477,10 @@ INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, 
 --
 
 CREATE TABLE `users` (
-  `id` bigint NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
   `role_id` bigint NOT NULL,
   `name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `profile_photo` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -448,13 +491,13 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `role_id`, `name`, `email`, `profile_photo`, `password`, `status`, `created_at`, `updated_at`) VALUES
-(8, 1, 'Manager', 'manager@telkom.com', 'profile-photos/mnJytVRAeCb5YaXJ9JYQzo2FpCLxcb7f82D7YT4S.png', '$2y$12$x/jKf20Lo8Lck9FpPjqnJO9KV5TGrui//UDH/.vV.tf.o2PjibgiK', 'active', '2026-06-17 02:06:36', '2026-06-23 00:28:09'),
-(9, 2, 'Account Manager 1', 'AM1@telkom.com', NULL, '$2y$12$SdYtglKdH0H5ADuf16lEyeAsLgY2Sl8hOnR45qEcwWuSYJnc.fuH2', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
-(10, 2, 'Account Manager 2', 'AM2@telkom.com', NULL, '$2y$12$fwFUKh.sSsn6NmyyDsB/VujtpY7OtiH5koMosRT.qVfEePZM91ZrS', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
-(11, 2, 'Account Manager 3', 'AM3@telkom.com', NULL, '$2y$12$Mc2XZmFr0wOm4em/ZpaRdu7x9MJuMeGFC7Wn0pCZrg00JNWy2VlIC', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
-(12, 3, 'Support Inputter', 'inputter@telkom.com', NULL, '$2y$12$TZF/JYTfXlKEvJgbEbBIseOykjzXGu218.YTj5Q49nhhOctlvZcSy', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
-(13, 4, 'Support Paycall', 'paycall@telkom.com', NULL, '$2y$12$QbRQEiTmdgaDOQUK7pB/kOq4c2bvA20TCe/KqEEjQq1INMuGq8LPW', 'active', '2026-06-17 02:06:38', '2026-06-17 02:06:38');
+INSERT INTO `users` (`id`, `role_id`, `name`, `email`, `password`, `status`, `created_at`, `updated_at`) VALUES
+(1, 2, 'Account Manager 1', 'AM1@telkom.com', '$2y$12$SdYtglKdH0H5ADuf16lEyeAsLgY2Sl8hOnR45qEcwWuSYJnc.fuH2', 'active', '2026-06-17 02:06:37', '2026-06-25 02:10:20'),
+(2, 2, 'Account Manager 2', 'AM2@telkom.com', '$2y$12$fwFUKh.sSsn6NmyyDsB/VujtpY7OtiH5koMosRT.qVfEePZM91ZrS', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
+(3, 2, 'Account Manager 3', 'AM3@telkom.com', '$2y$12$Mc2XZmFr0wOm4em/ZpaRdu7x9MJuMeGFC7Wn0pCZrg00JNWy2VlIC', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
+(8, 1, 'Manager', 'manager@telkom.com', '$2y$12$x/jKf20Lo8Lck9FpPjqnJO9KV5TGrui//UDH/.vV.tf.o2PjibgiK', 'active', '2026-06-17 02:06:36', '2026-06-17 02:06:36'),
+(12, 3, 'Support Inputter', 'inputter@telkom.com', '$2y$12$TZF/JYTfXlKEvJgbEbBIseOykjzXGu218.YTj5Q49nhhOctlvZcSy', 'active', '2026-06-17 02:06:37', '2026-06-17 02:06:37'),
+(13, 4, 'Support Paycall', 'paycall@telkom.com', '$2y$12$QbRQEiTmdgaDOQUK7pB/kOq4c2bvA20TCe/KqEEjQq1INMuGq8LPW', 'active', '2026-06-17 02:06:38', '2026-06-17 02:06:38');
 
 --
 -- Indexes for dumped tables
@@ -471,9 +514,7 @@ ALTER TABLE `activity_logs`
 -- Indexes for table `baso_files`
 --
 ALTER TABLE `baso_files`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `baso_files_contract_id_fk` (`contract_id`),
-  ADD KEY `baso_files_uploaded_by_fk` (`uploaded_by`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `billings`
@@ -482,18 +523,6 @@ ALTER TABLE `billings`
   ADD PRIMARY KEY (`id`),
   ADD KEY `contract_id` (`contract_id`),
   ADD KEY `updated_by` (`updated_by`);
-
---
--- Indexes for table `cache`
---
-ALTER TABLE `cache`
-  ADD PRIMARY KEY (`key`);
-
---
--- Indexes for table `cache_locks`
---
-ALTER TABLE `cache_locks`
-  ADD PRIMARY KEY (`key`);
 
 --
 -- Indexes for table `contracts`
@@ -591,7 +620,9 @@ ALTER TABLE `services`
 -- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sessions_user_id_index` (`user_id`),
+  ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
 -- Indexes for table `users`
@@ -609,180 +640,95 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `baso_files`
 --
 ALTER TABLE `baso_files`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `billings`
 --
 ALTER TABLE `billings`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `contract_extensions`
 --
 ALTER TABLE `contract_extensions`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contract_files`
 --
 ALTER TABLE `contract_files`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contract_services`
 --
 ALTER TABLE `contract_services`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `contract_transfer_history`
 --
 ALTER TABLE `contract_transfer_history`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `contract_transfer_requests`
 --
 ALTER TABLE `contract_transfer_requests`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `migrations`
---
-ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `notifications`
---
-ALTER TABLE `notifications`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notification_settings`
 --
 ALTER TABLE `notification_settings`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `activity_logs`
+-- Constraints for table `sessions`
 --
-ALTER TABLE `activity_logs`
-  ADD CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `baso_files`
---
-ALTER TABLE `baso_files`
-  ADD CONSTRAINT `baso_files_contract_id_fk` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `baso_files_uploaded_by_fk` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `billings`
---
-ALTER TABLE `billings`
-  ADD CONSTRAINT `billings_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
-  ADD CONSTRAINT `billings_ibfk_2` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `contracts`
---
-ALTER TABLE `contracts`
-  ADD CONSTRAINT `contracts_ibfk_1` FOREIGN KEY (`owner_am_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `contracts_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `contract_extensions`
---
-ALTER TABLE `contract_extensions`
-  ADD CONSTRAINT `contract_extensions_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
-  ADD CONSTRAINT `contract_extensions_ibfk_2` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `contract_files`
---
-ALTER TABLE `contract_files`
-  ADD CONSTRAINT `contract_files_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
-  ADD CONSTRAINT `contract_files_ibfk_2` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `contract_transfer_history`
---
-ALTER TABLE `contract_transfer_history`
-  ADD CONSTRAINT `contract_transfer_history_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
-  ADD CONSTRAINT `contract_transfer_history_ibfk_2` FOREIGN KEY (`from_am_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `contract_transfer_history_ibfk_3` FOREIGN KEY (`to_am_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `contract_transfer_history_ibfk_4` FOREIGN KEY (`transferred_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `contract_transfer_requests`
---
-ALTER TABLE `contract_transfer_requests`
-  ADD CONSTRAINT `contract_transfer_requests_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
-  ADD CONSTRAINT `contract_transfer_requests_ibfk_2` FOREIGN KEY (`requested_by`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `contract_transfer_requests_ibfk_3` FOREIGN KEY (`current_am_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `contract_transfer_requests_ibfk_4` FOREIGN KEY (`target_am_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `contract_transfer_requests_ibfk_5` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `notes`
---
-ALTER TABLE `notes`
-  ADD CONSTRAINT `notes_ibfk_1` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`),
-  ADD CONSTRAINT `notes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `notifications`
---
-ALTER TABLE `notifications`
-  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
+ALTER TABLE `sessions`
+  ADD CONSTRAINT `sessions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
