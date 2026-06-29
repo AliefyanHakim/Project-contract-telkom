@@ -17,21 +17,18 @@
            class="vt-menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
             <span class="vt-menu-icon">D</span>
             <span>Dashboard</span>
-            <b>›</b>
-        </a>
+                </a>
 
         <a href="{{ url('/contract-list') }}"
            class="vt-menu-item {{ request()->is('contract-list') || request()->is('closed-contract') || request()->is('contracts*') ? 'active' : '' }}">
             <span class="vt-menu-icon">▤</span>
             <span>Contract List</span>
-            <b>›</b>
-        </a>
+                    </a>
 
         <a href="{{ url('/billing') }}"
            class="vt-menu-item {{ request()->is('billing*') ? 'active' : '' }}">
             <span class="vt-menu-icon">▥</span>
             <span>Billing & Invoices</span>
-            <b>›</b>
         </a>
 
         @if(auth()->user()->isManager())
@@ -39,8 +36,7 @@
                class="vt-menu-item {{ request()->is('detailam') || request()->is('account-manager*') ? 'active' : '' }}">
                 <span class="vt-menu-icon">AM</span>
                 <span>Account Manager</span>
-                <b>›</b>
-            </a>
+                            </a>
         @endif
 
         @if(auth()->user()->isAccountManager() || auth()->user()->isSupportInputter())
@@ -48,8 +44,7 @@
                class="vt-menu-item {{ request()->is('contract-alerts') ? 'active' : '' }}">
                 <span class="vt-menu-icon">!</span>
                 <span>Contract Alerts</span>
-                <b>›</b>
-            </a>
+                            </a>
         @endif
 
         @if(auth()->user()->isManager() || auth()->user()->isAccountManager() || auth()->user()->isSupportInputter())
@@ -57,8 +52,7 @@
                class="vt-menu-item {{ request()->is('transfer-request') || request()->is('acceptreject-transfer') || request()->is('accepted-transfer') || request()->is('rejected-transfer') || request()->is('direct-transfer') || request()->is('transfer-contract') ? 'active' : '' }}">
                 <span class="vt-menu-icon">⇄</span>
                 <span>Transfer Request</span>
-                <b>›</b>
-            </a>
+                            </a>
         @endif
 
         <p class="vt-menu-title">Settings</p>
@@ -68,8 +62,7 @@
                class="vt-menu-item {{ request()->is('email-notifications') ? 'active' : '' }}">
                 <span class="vt-menu-icon">✉</span>
                 <span>Email Notifications</span>
-                <b>›</b>
-            </a>
+                            </a>
         @endif
 
         @if(auth()->user()->isManager())
@@ -77,16 +70,14 @@
                class="vt-menu-item {{ request()->is('activity-logs') ? 'active' : '' }}">
                 <span class="vt-menu-icon">LOG</span>
                 <span>Activity Logs</span>
-                <b>›</b>
-            </a>
+                           </a>
         @endif
 
         <a href="{{ url('/profile') }}"
            class="vt-menu-item {{ request()->is('profile') || request()->is('settings/profile') ? 'active' : '' }}">
             <span class="vt-menu-icon">⚙</span>
             <span>Profile</span>
-            <b>›</b>
-        </a>
+                    </a>
     </nav>
 
     @php
