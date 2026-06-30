@@ -247,7 +247,7 @@ class DashboardController extends Controller
     {
         if ($user->isAccountManager()) {
             $query->where('owner_am_id', $user->id);
-        }
+       
 
         /*
         |--------------------------------------------------------------------------
